@@ -27,7 +27,6 @@ public class Market {
         while (true) {
             switch (selectPage()) {
                 case WISHLIST_PAGE:
-
                     if (user.isEmptyList()) {
                         System.out.println("\n❌ 현재 관심 목록에 담긴 제품이 없습니다. ❌");
                     } else {
@@ -38,7 +37,7 @@ public class Market {
 
                         if (isSelected(selectedProduct)) {
                             showDetailInformation(selectedProduct);
-                            ask(selectedProduct);
+                            askWishlistTask(selectedProduct);
                         }
                     }
                     System.out.println("\n페이지 선택으로 돌아갑니다.");
@@ -51,7 +50,7 @@ public class Market {
 
                     if (isSelected(selectedProduct)) {
                         showDetailInformation(selectedProduct);
-                        askTask(selectedProduct);
+                        askProductTask(selectedProduct);
                     }
                     System.out.println("\n페이지 선택으로 돌아갑니다.");
                     break;
@@ -133,7 +132,7 @@ public class Market {
         System.out.println("==================================");
     }
 
-    private void askTask(Product selectedProduct) {
+    private void askProductTask(Product selectedProduct) {
         System.out.println("\n원하시는 작업을 선택해주세요. 다른 키 입력 시 페이지 선택으로 돌아갑니다.");
         System.out.println("1. 거래 요청하기\n2. 관심 목록에 추가하기");
         System.out.print(">>> ");
@@ -148,7 +147,7 @@ public class Market {
         }
     }
 
-    private void ask(Product selectedProduct) {
+    private void askWishlistTask(Product selectedProduct) {
         System.out.println("\n원하시는 작업을 선택해주세요. 다른 키 입력 시 페이지 선택으로 돌아갑니다.");
         System.out.println("1. 거래 요청 보내기\n2. 관심 목록에서 삭제하기");
         System.out.print(">>> ");
