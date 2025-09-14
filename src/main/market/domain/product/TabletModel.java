@@ -1,3 +1,5 @@
+package main.market.domain.product;
+
 public enum TabletModel {
     WIFI("와이파이"),
     CELLULAR("셀룰러");
