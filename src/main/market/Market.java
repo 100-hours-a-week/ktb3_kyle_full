@@ -5,6 +5,7 @@ import main.market.domain.product.Laptop;
 import main.market.domain.product.Product;
 import main.market.domain.product.Tablet;
 import main.market.domain.user.User;
+import main.market.util.Timer;
 
 import java.util.List;
 import java.util.Scanner;
@@ -16,14 +17,18 @@ public class Market {
     private final static String EXIT = "exit";
     private boolean exit = false;
     private final Database database;
+    private final Timer timer;
     private final User user;
 
-    public Market(Database database, User user) {
+    public Market(Database database, User user, Timer timer) {
         this.database = database;
         this.user = user;
+        this.timer = timer;
     }
 
     public void run() {
+        timer.start();
+
         while (true) {
             switch (selectPage()) {
                 case WISHLIST_PAGE:
@@ -61,9 +66,13 @@ public class Market {
 
             if (exit) break;
         }
+
+        timer.interrupt();
+        System.out.println("중고마켓을 " + timer.getCount() + "(초) 이용하셨습니다. 감사합니다. 🙇‍♂️");
     }
 
     private String selectPage() {
+        System.out.println("\n⏰ 중고마켓 이용 시간: " + timer.getCount() + "(초)");
         System.out.println("🙇‍♂️ 어서오세요 중고마켓입니다. 이동하시려는 페이지를 선택해주세요.(다른 번호 입력 시 프로그램을 종료합니다.)");
         System.out.println("1. 관심 목록 페이지\n2. 상품 조회 페이지");
         System.out.print(">>> ");
@@ -139,8 +148,7 @@ public class Market {
 
         String input = scanner.nextLine();
         if (input.equals("1")) {
-            System.out.println("\n거래 요청을 성공적으로 전송했습니다.");
-            System.out.println("\n이용해주셔서 감사합니다.");
+            sendTradingRequest();
         } else if (input.equals("2")) {
             System.out.println("\n🎊 관심 목록에 [ " + selectedProduct.getName() + " ] 제품이 추가 되었습니다. 🎊");
             user.addWishlist(selectedProduct);
@@ -154,11 +162,35 @@ public class Market {
         String input = scanner.nextLine();
 
         if (input.equals("1")) {
-            System.out.println("\n거래 요청을 성공적으로 전송했습니다.");
-            System.out.println("\n이용해주셔서 감사합니다.");
+            sendTradingRequest();
         } else if (input.equals("2")) {
             System.out.println("\n🗑 관심 목록에서 [ " + selectedProduct.getName() + " ] 제품이 제거 되었습니다. 🗑");
             user.removeWishlist(selectedProduct);
         }
+    }
+
+    private void sendTradingRequest() {
+        // TODO: 스레드 적용
+        Thread thread = new Thread(() -> {
+            try {
+                System.out.print("거래 요청을 전송 중입니다. ");
+                for (int i = 0; i < 3; i++) {
+                    System.out.print("✔ ");
+                    Thread.sleep(300);
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException("🚨 거래 요청 실패");
+            }
+        });
+
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException("🚨 거래 요청 실패");
+        }
+
+        System.out.println("\n✅ 거래 요청을 성공적으로 전송했습니다.");
+        System.out.println("\n🙇‍♂️ 이용해주셔서 감사합니다. 🙇‍♂️");
     }
 }

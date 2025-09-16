@@ -3,6 +3,7 @@ package main;
 import main.database.Database;
 import main.market.Market;
 import main.market.domain.user.User;
+import main.market.util.Timer;
 
 public class Application {
     public static void main(String[] args) {
@@ -10,8 +11,8 @@ public class Application {
         database.initialize();
 
         User user = new User();
-
-        Market market = new Market(database, user);
+        Timer timer = new Timer();
+        Market market = new Market(database, user, timer);
         market.run();
     }
 }
