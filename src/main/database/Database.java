@@ -8,12 +8,26 @@ import main.market.domain.product.TabletModel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Database {
     private final HashMap<String, List<Product>> products = new HashMap<>();
 
     public List<Product> findByArea(String area) {
         return products.get(area);
+    }
+
+    public List<Product> findMostViewedProducts() {
+        int maxViewCount = products.values().stream()
+            .flatMap(List::stream)
+            .mapToInt(Product::getViewCount)
+            .max()
+            .orElse(1);
+
+        return products.values().stream()
+            .flatMap(List::stream)
+            .filter(product -> product.getViewCount() == maxViewCount)
+            .toList();
     }
 
     public void initialize() {

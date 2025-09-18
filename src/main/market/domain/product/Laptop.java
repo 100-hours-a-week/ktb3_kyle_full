@@ -10,6 +10,7 @@ public class Laptop extends ElectronicDevice {
         this.keyboardLight = keyboardLight;
     }
 
+    @Override
     public String getDetailInformation() {
         return "상품명: " + getName() +
             "\n가격: " + getPrice() +

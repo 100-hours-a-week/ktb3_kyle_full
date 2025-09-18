@@ -3,6 +3,7 @@ package main;
 import main.database.Database;
 import main.market.Market;
 import main.market.domain.user.User;
+import main.market.util.PopularProductScheduler;
 import main.market.util.Timer;
 
 public class Application {
@@ -10,9 +11,13 @@ public class Application {
         Database database = new Database();
         database.initialize();
 
+        PopularProductScheduler scheduler = new PopularProductScheduler(database);
+        scheduler.start();
+
         User user = new User();
         Timer timer = new Timer();
         Market market = new Market(database, user, timer);
         market.run();
+        scheduler.shutdown();
     }
 }

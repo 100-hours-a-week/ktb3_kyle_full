@@ -36,6 +36,13 @@ public class Product {
             "\n조회수: " + viewCount;
     }
 
+    public String getDetailInformation() {
+        return "상품명: " + name +
+            "\n가격: " + price +
+            "\n거래 희망 지역: " + area +
+            "\n조회수: " + viewCount;
+    }
+
     public void increaseViewCount() {
         viewCount++;
     }

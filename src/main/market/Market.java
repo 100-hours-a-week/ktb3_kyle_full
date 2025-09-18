@@ -1,10 +1,10 @@
 package main.market;
 
 import main.database.Database;
-import main.market.domain.product.Laptop;
 import main.market.domain.product.Product;
-import main.market.domain.product.Tablet;
 import main.market.domain.user.User;
+import main.market.util.PopularProductScheduler;
+import main.market.util.ThreadUtils;
 import main.market.util.Timer;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class Market {
     public void run() {
         timer.start();
 
-        while (true) {
+        do {
             switch (selectPage()) {
                 case WISHLIST_PAGE:
                     if (user.isEmptyList()) {
@@ -63,12 +63,10 @@ public class Market {
                     exit = true;
                     break;
             }
-
-            if (exit) break;
-        }
+        } while (!exit);
 
         timer.interrupt();
-        System.out.println("중고마켓을 " + timer.getCount() + "(초) 이용하셨습니다. 감사합니다. 🙇‍♂️");
+        System.out.println("🙇‍ 중고마켓을 " + timer.getCount() + "(초) 이용하셨습니다. 감사합니다. 🙇‍♂️");
     }
 
     private String selectPage() {
@@ -130,14 +128,8 @@ public class Market {
     }
 
     private void showDetailInformation(Product product) {
-        String productInformation = "";
-        if (product instanceof Laptop laptop) {
-            productInformation = laptop.getDetailInformation();
-        } else if (product instanceof Tablet tablet) {
-            productInformation = tablet.getDetailInformation();
-        }
         System.out.println("===========제품 상세 정보===========");
-        System.out.println(productInformation);
+        System.out.println(product.getDetailInformation());
         System.out.println("==================================");
     }
 
@@ -172,14 +164,10 @@ public class Market {
     private void sendTradingRequest() {
         // TODO: 스레드 적용
         Thread thread = new Thread(() -> {
-            try {
-                System.out.print("거래 요청을 전송 중입니다. ");
-                for (int i = 0; i < 3; i++) {
-                    System.out.print("✔ ");
-                    Thread.sleep(300);
-                }
-            } catch (InterruptedException e) {
-                throw new RuntimeException("🚨 거래 요청 실패");
+            System.out.print("거래 요청을 전송 중입니다. ");
+            for (int i = 0; i < 3; i++) {
+                System.out.print("✔ ");
+                ThreadUtils.sleep(300);
             }
         });
 
