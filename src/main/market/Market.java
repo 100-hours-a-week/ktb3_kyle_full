@@ -121,14 +121,8 @@ public class Market {
     }
 
     private void showDetailInformation(Product product) {
-        String productInformation = "";
-        if (product instanceof Laptop laptop) {
-            productInformation = laptop.getDetailInformation();
-        } else if (product instanceof Tablet tablet) {
-            productInformation = tablet.getDetailInformation();
-        }
         System.out.println("===========제품 상세 정보===========");
-        System.out.println(productInformation);
+        System.out.println(product.getDetailInformation());
         System.out.println("==================================");
     }
 

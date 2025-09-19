@@ -1,6 +1,6 @@
 package main.market.domain.product;
 
-public class ElectronicDevice extends Product {
+public abstract class ElectronicDevice extends Product {
     private String storage;
     private String color;
     private String quality;
@@ -23,4 +23,6 @@ public class ElectronicDevice extends Product {
     public String getQuality() {
         return quality;
     }
+
+    public abstract String getDetailInformation();
 }

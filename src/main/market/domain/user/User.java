@@ -3,13 +3,14 @@ package main.market.domain.user;
 import main.market.domain.product.Product;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class User {
     private final List<Product> wishlist = new ArrayList<>();
 
     public List<Product> getWishlist() {
-        return new ArrayList<>(wishlist);
+        return Collections.unmodifiableList(wishlist);
     }
 
     public boolean isEmptyList() {

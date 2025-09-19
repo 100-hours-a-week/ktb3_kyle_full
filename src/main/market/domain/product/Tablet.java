@@ -10,6 +10,7 @@ public class Tablet extends ElectronicDevice {
         this.touchPen = touchPen;
     }
 
+    @Override
     public String getDetailInformation() {
         return "상품명: " + getName() +
             "\n가격: " + getPrice() +

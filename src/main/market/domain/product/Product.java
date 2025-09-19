@@ -1,6 +1,6 @@
 package main.market.domain.product;
 
-public class Product {
+public abstract class Product {
     private int price;
     private int viewCount;
     private String name;
@@ -35,6 +35,8 @@ public class Product {
             "\n거래 희망 지역: " + area +
             "\n조회수: " + viewCount;
     }
+
+    public abstract String getDetailInformation();
 
     public void increaseViewCount() {
         viewCount++;
