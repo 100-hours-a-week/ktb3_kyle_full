@@ -3,6 +3,7 @@ package main;
 import main.database.Database;
 import main.market.Market;
 import main.market.domain.user.User;
+import main.market.io.IOHandler;
 
 public class Application {
     public static void main(String[] args) {
@@ -10,8 +11,8 @@ public class Application {
         database.initialize();
 
         User user = new User();
-
-        Market market = new Market(database, user);
+        IOHandler ioHandler = new IOHandler();
+        Market market = new Market(database, user, ioHandler);
         market.run();
     }
 }
