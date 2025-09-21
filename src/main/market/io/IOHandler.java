@@ -2,7 +2,7 @@ package main.market.io;
 
 import main.market.domain.product.Product;
 import main.market.exception.MarketException;
-import main.market.io.action.MarketStatus;
+import main.market.io.action.PageStatus;
 import main.market.io.action.UserAction;
 
 import java.util.List;
@@ -49,7 +49,7 @@ public class IOHandler {
         return products.get(productNumber - 1);
     }
 
-    public MarketStatus selectPage() {
+    public PageStatus selectPage() {
         outputHandler.askPageSelecting();
         return inputHandler.getPageSelecting();
     }

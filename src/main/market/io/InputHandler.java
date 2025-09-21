@@ -1,26 +1,26 @@
 package main.market.io;
 
-import main.market.Market;
 import main.market.exception.MarketException;
-import main.market.io.action.MarketStatus;
+import main.market.io.action.PageStatus;
 import main.market.io.action.UserAction;
 
 import java.util.Scanner;
 
+import static main.market.io.action.PageStatus.*;
 import static main.market.io.action.UserAction.*;
 
 public class InputHandler {
     private final static Scanner SCANNER = new Scanner(System.in);
 
-    public MarketStatus getPageSelecting() {
+    public PageStatus getPageSelecting() {
         String input = SCANNER.nextLine();
         if (input.equals("1")) {
-            return MarketStatus.WISHLIST_PAGE;
+            return WISHLIST_PAGE;
         }
         if (input.equals("2")) {
-            return MarketStatus.PRODUCT_PAGE;
+            return PRODUCT_PAGE;
         }
-        return MarketStatus.EXIT;
+        return EXIT;
     }
 
     public String getTradingArea() {
