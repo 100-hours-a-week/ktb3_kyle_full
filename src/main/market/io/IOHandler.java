@@ -35,6 +35,14 @@ public class IOHandler {
         outputHandler.showWishlistAddComment(productName);
     }
 
+    public void showMostViewedProducts(List<Product> mostViewedProducts) {
+        outputHandler.showMostViewedProducts(mostViewedProducts);
+    }
+
+    public void showEndingComment(int count) {
+        outputHandler.showEndingComment(count);
+    }
+
     public String getTradingArea() {
         outputHandler.askTradingArea();
         return inputHandler.getTradingArea();
@@ -49,8 +57,8 @@ public class IOHandler {
         return products.get(productNumber - 1);
     }
 
-    public PageStatus selectPage() {
-        outputHandler.askPageSelecting();
+    public PageStatus selectPage(int count) {
+        outputHandler.askPageSelecting(count);
         return inputHandler.getPageSelecting();
     }
 
@@ -59,7 +67,7 @@ public class IOHandler {
         return inputHandler.selectWishlistPageAction();
     }
 
-    public UserAction selectProductPageAction () {
+    public UserAction selectProductPageAction() {
         outputHandler.showProductPageTask();
         return inputHandler.selectProductPageAction();
     }

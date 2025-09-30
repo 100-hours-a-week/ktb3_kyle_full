@@ -16,6 +16,19 @@ public class Database {
         return products.get(area);
     }
 
+    public List<Product> findMostViewedProducts() {
+        int maxViewCount = products.values().stream()
+            .flatMap(List::stream)
+            .mapToInt(Product::getViewCount)
+            .max()
+            .orElse(1);
+
+        return products.values().stream()
+            .flatMap(List::stream)
+            .filter(product -> product.getViewCount() == maxViewCount)
+            .toList();
+    }
+
     public void initialize() {
         Laptop laptop1 = new Laptop(
             900000,

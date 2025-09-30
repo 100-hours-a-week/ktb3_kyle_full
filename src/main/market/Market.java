@@ -7,8 +7,10 @@ import main.market.exception.MarketException;
 import main.market.io.IOHandler;
 import main.market.io.action.PageStatus;
 import main.market.io.action.UserAction;
+import main.market.util.Timer;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 import static main.market.io.action.PageStatus.*;
 
@@ -17,18 +19,21 @@ public class Market {
     private final IOHandler ioHandler;
     private final Database database;
     private final User user;
+    private final Timer timer;
     private PageStatus pageStatus = WISHLIST_PAGE;
 
-    public Market(Database database, User user, IOHandler ioHandler) {
+    public Market(Database database, User user, IOHandler ioHandler, Timer timer) {
         this.database = database;
         this.user = user;
         this.ioHandler = ioHandler;
+        this.timer = timer;
     }
 
     public void run() {
+        timer.start();
         do {
             try {
-                pageStatus = ioHandler.selectPage();
+                pageStatus = ioHandler.selectPage(timer.getCount());
                 List<Product> products = findProductsByMarketStatus();
                 Product selectedProduct = selectProduct(products);
                 ioHandler.showDetailInformation(selectedProduct);
@@ -39,6 +44,8 @@ public class Market {
                 ioHandler.showSimpleMessage("알 수 없는 오류가 발생했습니다.");
             }
         } while (pageStatus.isNotExit());
+        timer.interrupt();
+        ioHandler.showEndingComment(timer.getCount());
     }
 
     private List<Product> findProductsByMarketStatus() {
@@ -52,7 +59,7 @@ public class Market {
             }
             return database.findByArea(tradingArea);
         }
-        throw new MarketException("\n🙇‍♂️ 다른 번호를 입력하여 프로그램을 종료합니다. 이용해주셔서 감사합니다. 🙇‍♂️");
+        throw new MarketException("\n⛔ 다른 번호를 입력하여 프로그램을 종료합니다. ⛔");
     }
 
     private boolean isInvalidTradingArea(String input) {
