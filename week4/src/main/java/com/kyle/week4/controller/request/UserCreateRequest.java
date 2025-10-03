@@ -13,7 +13,6 @@ public class UserCreateRequest {
     public User toEntity() {
         return User.builder()
             .email(email)
-            .password(password)
             .nickname(nickname)
             .profileImage(profileImage)
             .build();

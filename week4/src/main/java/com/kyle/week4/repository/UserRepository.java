@@ -2,7 +2,6 @@ package com.kyle.week4.repository;
 
 import com.kyle.week4.domain.User;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.Assert;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -14,7 +13,7 @@ public class UserRepository {
 
     public Long save(User user) {
         Long userId = primaryKey.getAndIncrement();
-        user.setUserId(userId);
+        user.assignUserId(userId);
         database.putIfAbsent(userId, user);
         return userId;
     }
