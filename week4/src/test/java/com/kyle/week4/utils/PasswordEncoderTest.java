@@ -1,9 +1,7 @@
 package com.kyle.week4.utils;
 
-import com.kyle.week4.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
