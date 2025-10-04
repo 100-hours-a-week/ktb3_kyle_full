@@ -17,4 +17,19 @@ public class UserRepository {
         database.putIfAbsent(userId, user);
         return userId;
     }
+
+    public boolean existsByNickname(String nickname) {
+        return database.values().stream()
+          .anyMatch(user -> user.isDuplicateNickname(nickname));
+    }
+
+    public boolean existsByEmail(String email) {
+        return database.values().stream()
+          .anyMatch(user -> user.isDuplicateEmail(email));
+    }
+
+    public void clear() {
+        primaryKey.set(1);
+        database.clear();
+    }
 }
