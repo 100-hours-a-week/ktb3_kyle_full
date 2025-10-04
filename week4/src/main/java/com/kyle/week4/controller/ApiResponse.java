@@ -4,6 +4,7 @@ import com.kyle.week4.exception.CustomException;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 public record ApiResponse<T>(
     HttpStatus httpStatus,
@@ -21,5 +22,9 @@ public record ApiResponse<T>(
 
     public static <T> ApiResponse<T> fail(final CustomException e) {
         return new ApiResponse<>(e.getHttpStatus(), false, null, e.getMessage());
+    }
+
+    public static <T> ApiResponse<T> validationFail(final MethodArgumentNotValidException e) {
+        return new ApiResponse<>(HttpStatus.BAD_REQUEST, false, null, e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
     }
 }

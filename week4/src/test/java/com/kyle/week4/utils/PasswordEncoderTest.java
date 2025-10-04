@@ -17,7 +17,7 @@ class PasswordEncoderTest {
     }
 
     @Test
-    @DisplayName("원본과 다른 비밀번호는 검증 시 일치하면 안된다.")
+    @DisplayName("원본과 다른 비밀번호는 검증 시 일치하지 않는다.")
     void matchesFailure() {
         String password = "plain-password";
         String otherPassword = "other-password";
