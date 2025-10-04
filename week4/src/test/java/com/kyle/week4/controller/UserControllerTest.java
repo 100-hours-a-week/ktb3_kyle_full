@@ -55,7 +55,7 @@ class UserControllerTest extends ControllerTestSupport {
           .andDo(print())
           .andExpect(status().isBadRequest())
           .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").isBoolean())
+          .andExpect(jsonPath("$.success").value(false))
           .andExpect(jsonPath("$.data").isEmpty())
           .andExpect(jsonPath("$.errorMessage").value("올바른 이메일 주소 형식을 입력해주세요."));
     }
@@ -81,7 +81,7 @@ class UserControllerTest extends ControllerTestSupport {
           .andDo(print())
           .andExpect(status().isBadRequest())
           .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").isBoolean())
+          .andExpect(jsonPath("$.success").value(false))
           .andExpect(jsonPath("$.data").isEmpty())
           .andExpect(jsonPath("$.errorMessage").value("비밀번호는 8자 이상 20자 이하 까지 가능합니다."));
     }
@@ -106,7 +106,7 @@ class UserControllerTest extends ControllerTestSupport {
           .andDo(print())
           .andExpect(status().isBadRequest())
           .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").isBoolean())
+          .andExpect(jsonPath("$.success").value(false))
           .andExpect(jsonPath("$.data").isEmpty())
           .andExpect(jsonPath("$.errorMessage").value("비밀번호는 대문자, 소문자, 숫자, 특수문자를 각각 1자 이상 포함해야 합니다."));
     }
@@ -131,7 +131,7 @@ class UserControllerTest extends ControllerTestSupport {
           .andDo(print())
           .andExpect(status().isBadRequest())
           .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").isBoolean())
+          .andExpect(jsonPath("$.success").value(false))
           .andExpect(jsonPath("$.data").isEmpty())
           .andExpect(jsonPath("$.errorMessage").value("닉네임은 최대 10자 까지 작성 가능합니다."));
     }
@@ -157,7 +157,7 @@ class UserControllerTest extends ControllerTestSupport {
           .andDo(print())
           .andExpect(status().isBadRequest())
           .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").isBoolean())
+          .andExpect(jsonPath("$.success").value(false))
           .andExpect(jsonPath("$.data").isEmpty())
           .andExpect(jsonPath("$.errorMessage").value("닉네임을 작성하지 않거나, 공백을 포함할 수 없습니다."));
     }
