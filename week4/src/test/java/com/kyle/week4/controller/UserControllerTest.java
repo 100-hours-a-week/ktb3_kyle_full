@@ -3,6 +3,8 @@ package com.kyle.week4.controller;
 import com.kyle.week4.controller.request.UserCreateRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.MediaType;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -58,20 +60,14 @@ class UserControllerTest extends ControllerTestSupport {
           .andExpect(jsonPath("$.errorMessage").value("올바른 이메일 주소 형식을 입력해주세요."));
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"Kyle12!", "Kyle12!Kyle12!Kyle12!"})
     @DisplayName("회원가입 시 비밀번호는 8자 이상, 20자 이하여야 한다.")
-    void validationPassword() throws Exception {
+    void validationPassword(String password) throws Exception {
         // given
-        UserCreateRequest request1 = UserCreateRequest.builder()
+        UserCreateRequest request = UserCreateRequest.builder()
           .email("kyle@example.com")
-          .password("Kyle12!")
-          .nickname("kyle")
-          .profileImage("https://image.kr/img.jpg")
-          .build();
-
-        UserCreateRequest request2 = UserCreateRequest.builder()
-          .email("kyle@example.com")
-          .password("Kyle12!Kyle12!Kyle12!")
+          .password(password)
           .nickname("kyle")
           .profileImage("https://image.kr/img.jpg")
           .build();
@@ -79,19 +75,7 @@ class UserControllerTest extends ControllerTestSupport {
         // when // then
         mockMvc.perform(
             post("/users")
-              .content(objectMapper.writeValueAsString(request1))
-              .contentType(MediaType.APPLICATION_JSON)
-          )
-          .andDo(print())
-          .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").isBoolean())
-          .andExpect(jsonPath("$.data").isEmpty())
-          .andExpect(jsonPath("$.errorMessage").value("비밀번호는 8자 이상 20자 이하 까지 가능합니다."));
-
-        mockMvc.perform(
-            post("/users")
-              .content(objectMapper.writeValueAsString(request2))
+              .content(objectMapper.writeValueAsString(request))
               .contentType(MediaType.APPLICATION_JSON)
           )
           .andDo(print())
@@ -152,40 +136,22 @@ class UserControllerTest extends ControllerTestSupport {
           .andExpect(jsonPath("$.errorMessage").value("닉네임은 최대 10자 까지 작성 가능합니다."));
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"", " "})
     @DisplayName("회원가입 시 닉네임을 작성하지 않거나 공백을 포함할 수 없다.")
-    void validationNicknameNotBlank() throws Exception {
+    void validationNicknameNotBlank(String nickname) throws Exception {
         // given
-        UserCreateRequest request1 = UserCreateRequest.builder()
+        UserCreateRequest request = UserCreateRequest.builder()
           .email("kyle@example.com")
           .password("Kyle123!")
-          .nickname("")
-          .profileImage("https://image.kr/img.jpg")
-          .build();
-
-        UserCreateRequest request2 = UserCreateRequest.builder()
-          .email("kyle@example.com")
-          .password("Kyle123!")
-          .nickname(" ")
+          .nickname(nickname)
           .profileImage("https://image.kr/img.jpg")
           .build();
 
         // when // then
         mockMvc.perform(
             post("/users")
-              .content(objectMapper.writeValueAsString(request1))
-              .contentType(MediaType.APPLICATION_JSON)
-          )
-          .andDo(print())
-          .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").isBoolean())
-          .andExpect(jsonPath("$.data").isEmpty())
-          .andExpect(jsonPath("$.errorMessage").value("닉네임을 작성하지 않거나, 공백을 포함할 수 없습니다."));
-
-        mockMvc.perform(
-            post("/users")
-              .content(objectMapper.writeValueAsString(request2))
+              .content(objectMapper.writeValueAsString(request))
               .contentType(MediaType.APPLICATION_JSON)
           )
           .andDo(print())
