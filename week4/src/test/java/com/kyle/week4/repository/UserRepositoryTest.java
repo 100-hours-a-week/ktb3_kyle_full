@@ -1,11 +1,9 @@
 package com.kyle.week4.repository;
 
-import com.kyle.week4.domain.User;
+import com.kyle.week4.entity.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -41,7 +39,7 @@ class UserRepositoryTest {
 
     @Test
     @DisplayName("닉네임이 이미 존재하는 경우 중복으로 판단한다.")
-    void duplicateNickname() {
+    void existsByNickname() {
         // given
         String nickname = "test";
         User user = createUser("user@example.com", nickname, "image");
@@ -56,7 +54,7 @@ class UserRepositoryTest {
 
     @Test
     @DisplayName("이메일이 이미 존재하는 경우 중복으로 판단한다.")
-    void duplicateEmail() {
+    void existsByEmail() {
         // given
         String email = "user@example.com";
         User user = createUser(email, "test", "image");

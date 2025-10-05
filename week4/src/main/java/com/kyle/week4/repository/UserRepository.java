@@ -1,8 +1,9 @@
 package com.kyle.week4.repository;
 
-import com.kyle.week4.domain.User;
+import com.kyle.week4.entity.User;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -26,6 +27,10 @@ public class UserRepository {
     public boolean existsByEmail(String email) {
         return database.values().stream()
           .anyMatch(user -> user.isDuplicateEmail(email));
+    }
+
+    public Optional<User> findById(Long id) {
+        return Optional.ofNullable(database.get(id));
     }
 
     public void clear() {

@@ -1,4 +1,4 @@
-package com.kyle.week4.domain;
+package com.kyle.week4.entity;
 
 import lombok.Builder;
 import lombok.NoArgsConstructor;

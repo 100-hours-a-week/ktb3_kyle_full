@@ -1,6 +1,6 @@
 package com.kyle.week4.controller.request;
 
-import com.kyle.week4.domain.User;
+import com.kyle.week4.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
