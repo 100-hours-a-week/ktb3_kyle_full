@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -65,6 +67,39 @@ class UserRepositoryTest {
 
         // then
         assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("식별자로 사용자를 조회한다.")
+    void findById() {
+        // given
+        User user = createUser("user1@example.com", "user1", "image1");
+        Long userId = userRepository.save(user);
+
+        // when
+        Optional<User> findUser = userRepository.findById(userId);
+
+        // then
+        assertThat(findUser).isPresent().get()
+          .extracting("email", "nickname", "profileImage")
+          .contains("user1@example.com", "user1", "image1");
+    }
+
+    @Test
+    @DisplayName("이메일로 사용자를 조회한다.")
+    void findByEmail() {
+        // given
+        String email = "user1@example.com";
+        User user = createUser(email, "user1", "image1");
+        userRepository.save(user);
+
+        // when
+        Optional<User> findUser = userRepository.findByEmail(email);
+
+        // then
+        assertThat(findUser).isPresent().get()
+          .extracting("email", "nickname", "profileImage")
+          .contains(email, "user1", "image1");
     }
 
     private User createUser(String email, String nickname, String profileImage) {

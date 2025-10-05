@@ -21,16 +21,22 @@ public class UserRepository {
 
     public boolean existsByNickname(String nickname) {
         return database.values().stream()
-          .anyMatch(user -> user.isDuplicateNickname(nickname));
+          .anyMatch(user -> user.isSameNickname(nickname));
     }
 
     public boolean existsByEmail(String email) {
         return database.values().stream()
-          .anyMatch(user -> user.isDuplicateEmail(email));
+          .anyMatch(user -> user.isSameEmail(email));
     }
 
     public Optional<User> findById(Long id) {
         return Optional.ofNullable(database.get(id));
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return database.values().stream()
+          .filter(user -> user.isSameEmail(email))
+          .findFirst();
     }
 
     public void clear() {
