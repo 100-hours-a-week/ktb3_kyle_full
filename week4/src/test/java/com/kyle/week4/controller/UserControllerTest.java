@@ -32,7 +32,36 @@ class UserControllerTest extends ControllerTestSupport {
               .contentType(MediaType.APPLICATION_JSON)
           )
           .andDo(print())
-          .andExpect(status().isCreated());
+          .andExpect(status().isCreated())
+          .andExpect(jsonPath("$.httpStatus").value("CREATED"))
+          .andExpect(jsonPath("$.success").value(true))
+          .andExpect(jsonPath("$.data").isNumber())
+          .andExpect(jsonPath("$.errorMessage").isEmpty());
+    }
+
+    @Test
+    @DisplayName("회원가입 시 이메일은 비어있을 수 없다.")
+    void validationEmailIsEmpty() throws Exception {
+        // given
+        UserCreateRequest request = UserCreateRequest.builder()
+          .email("")
+          .password("Kyle1234!")
+          .nickname("kyle")
+          .profileImage("https://image.kr/img.jpg")
+          .build();
+
+        // when // then
+        mockMvc.perform(
+            post("/users")
+              .content(objectMapper.writeValueAsString(request))
+              .contentType(MediaType.APPLICATION_JSON)
+          )
+          .andDo(print())
+          .andExpect(status().isBadRequest())
+          .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
+          .andExpect(jsonPath("$.success").value(false))
+          .andExpect(jsonPath("$.data").isEmpty())
+          .andExpect(jsonPath("$.errorMessage").value("이메일은 비어있을 수 없습니다."));
     }
 
     @Test
