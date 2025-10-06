@@ -24,7 +24,7 @@ public class AuthService {
         if (isNotSamePassword(request.getPassword(), user.getPassword())) {
             throw new CustomException(INVALID_PASSWORD);
         }
-        return user.getUserId();
+        return user.getId();
     }
 
     private boolean isNotSamePassword(String rawPassword, String encodedPassword) {

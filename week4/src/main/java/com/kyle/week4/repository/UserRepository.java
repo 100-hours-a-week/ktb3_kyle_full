@@ -14,7 +14,7 @@ public class UserRepository {
 
     public Long save(User user) {
         Long userId = primaryKey.getAndIncrement();
-        user.assignUserId(userId);
+        user.assignId(userId);
         database.putIfAbsent(userId, user);
         return userId;
     }

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class User {
     @Getter
-    private Long userId;
+    private Long id;
     private String email;
     @Getter
     private String password;
@@ -29,8 +29,8 @@ public class User {
         return this.email.equals(email);
     }
 
-    public void assignUserId(Long userId) {
-        this.userId = userId;
+    public void assignId(Long id) {
+        this.id = id;
     }
 
     public void encodePassword(String encodedPassword) {
