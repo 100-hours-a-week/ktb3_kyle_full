@@ -57,7 +57,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("이메일이 일치하지 않으면 예외가 발생한다.")
+    @DisplayName("로그인 시 이메일이 일치하지 않으면 예외가 발생한다.")
     void invalidEmail() {
         // given
         String email = "test@test.com";
@@ -79,7 +79,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("비밀번호가 일치하지 않으면 예외가 발생한다.")
+    @DisplayName("로그인 시 비밀번호가 일치하지 않으면 예외가 발생한다.")
     void invalidPassword() {
         // given
         String email = "test@test.com";
