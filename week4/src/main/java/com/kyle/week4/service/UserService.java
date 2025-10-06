@@ -1,5 +1,6 @@
 package com.kyle.week4.service;
 
+import com.kyle.week4.controller.request.LoginRequest;
 import com.kyle.week4.controller.request.UserCreateRequest;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
@@ -8,8 +9,7 @@ import com.kyle.week4.utils.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import static com.kyle.week4.exception.ErrorCode.DUPLICATE_EMAIL_ERROR;
-import static com.kyle.week4.exception.ErrorCode.DUPLICATE_NICKNAME_ERROR;
+import static com.kyle.week4.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor

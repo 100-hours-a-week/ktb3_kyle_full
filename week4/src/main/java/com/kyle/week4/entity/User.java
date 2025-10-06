@@ -1,12 +1,15 @@
 package com.kyle.week4.entity;
 
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class User {
+    @Getter
     private Long userId;
     private String email;
+    @Getter
     private String password;
     private String nickname;
     private String profileImage;
@@ -18,11 +21,11 @@ public class User {
         this.profileImage = profileImage;
     }
 
-    public boolean isDuplicateNickname(String nickname) {
+    public boolean isSameNickname(String nickname) {
         return this.nickname.equals(nickname);
     }
 
-    public boolean isDuplicateEmail(String email) {
+    public boolean isSameEmail(String email) {
         return this.email.equals(email);
     }
 
