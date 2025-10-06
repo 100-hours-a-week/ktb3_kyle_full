@@ -5,8 +5,6 @@ import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.repository.UserRepository;
 import com.kyle.week4.utils.PasswordEncoder;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,18 +17,14 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public Long login(LoginRequest request, HttpServletRequest httpRequest) {
+    public Long login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
           .orElseThrow(() -> new CustomException(INVALID_EMAIL));
 
         if (isNotSamePassword(request.getPassword(), user.getPassword())) {
             throw new CustomException(INVALID_PASSWORD);
         }
-
-        Long userId = user.getUserId();
-        HttpSession session = httpRequest.getSession(true);
-        session.setAttribute("userId", userId);
-        return userId;
+        return user.getUserId();
     }
 
     private boolean isNotSamePassword(String rawPassword, String encodedPassword) {

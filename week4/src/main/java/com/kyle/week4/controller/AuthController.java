@@ -3,6 +3,7 @@ package com.kyle.week4.controller;
 import com.kyle.week4.controller.request.LoginRequest;
 import com.kyle.week4.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +19,9 @@ public class AuthController {
       @RequestBody LoginRequest loginRequest,
       HttpServletRequest httpRequest
     ) {
-        return ApiResponse.ok(authService.login(loginRequest, httpRequest));
+        Long userId = authService.login(loginRequest);
+        HttpSession session = httpRequest.getSession(true);
+        session.setAttribute("userId", userId);
+        return ApiResponse.ok(userId);
     }
 }
