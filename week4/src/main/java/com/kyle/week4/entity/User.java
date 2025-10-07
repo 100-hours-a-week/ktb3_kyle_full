@@ -4,12 +4,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor
 public class User {
-    @Getter
     private Long id;
     private String email;
-    @Getter
     private String password;
     private String nickname;
     private String profileImage;

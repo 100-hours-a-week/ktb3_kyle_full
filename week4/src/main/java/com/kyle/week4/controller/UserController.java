@@ -4,10 +4,7 @@ import com.kyle.week4.controller.request.UserCreateRequest;
 import com.kyle.week4.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,7 +17,7 @@ public class UserController {
     }
 
     @GetMapping("/test")
-    public ApiResponse<String> test() {
-        return ApiResponse.ok("test");
+    public ApiResponse<Long> test(@SessionAttribute("userId") Long userId) {
+        return ApiResponse.ok(userId);
     }
 }
