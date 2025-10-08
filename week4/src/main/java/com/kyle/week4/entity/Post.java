@@ -35,4 +35,8 @@ public class Post extends BaseEntity {
     public void assignId(Long id) {
         this.id = id;
     }
+
+    public boolean isNew() {
+        return id == null;
+    }
 }
