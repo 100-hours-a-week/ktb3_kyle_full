@@ -30,9 +30,9 @@ class UserRepositoryTest {
         User user3 = createUser("user3@example.com", "user3", "image3");
 
         // when
-        Long user1Id = userRepository.save(user1);
-        Long user2Id = userRepository.save(user2);
-        Long user3Id = userRepository.save(user3);
+        Long user1Id = userRepository.save(user1).getId();
+        Long user2Id = userRepository.save(user2).getId();
+        Long user3Id = userRepository.save(user3).getId();
 
         // then
         assertThat(user2Id).isEqualTo(user1Id + 1);
@@ -74,7 +74,7 @@ class UserRepositoryTest {
     void findById() {
         // given
         User user = createUser("user1@example.com", "user1", "image1");
-        Long userId = userRepository.save(user);
+        Long userId = userRepository.save(user).getId();
 
         // when
         Optional<User> findUser = userRepository.findById(userId);

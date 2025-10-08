@@ -12,11 +12,13 @@ public class UserRepository {
     private final AtomicLong primaryKey = new AtomicLong(1);
     private final ConcurrentHashMap<Long, User> database = new ConcurrentHashMap<>();
 
-    public Long save(User user) {
-        Long userId = primaryKey.getAndIncrement();
-        user.assignId(userId);
-        database.putIfAbsent(userId, user);
-        return userId;
+    public User save(User user) {
+        if (user.isNew()) {
+            Long userId = primaryKey.getAndIncrement();
+            user.assignId(userId);
+        }
+        database.put(user.getId(), user);
+        return user;
     }
 
     public boolean existsByNickname(String nickname) {

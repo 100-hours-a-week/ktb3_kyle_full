@@ -28,6 +28,10 @@ public class User {
         return this.email.equals(email);
     }
 
+    public boolean isNew() {
+        return id == null;
+    }
+
     public void assignId(Long id) {
         this.id = id;
     }

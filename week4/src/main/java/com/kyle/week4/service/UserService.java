@@ -26,6 +26,7 @@ public class UserService {
         }
         User user = request.toEntity();
         user.encodePassword(passwordEncoder.encode(request.getPassword()));
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        return savedUser.getId();
     }
 }
