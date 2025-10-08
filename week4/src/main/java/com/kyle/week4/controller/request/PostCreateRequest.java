@@ -3,6 +3,7 @@ package com.kyle.week4.controller.request;
 import com.kyle.week4.entity.Post;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,6 +21,13 @@ public class PostCreateRequest {
     private String content;
 
     private List<String> images;
+
+    @Builder
+    public PostCreateRequest(String title, String content, List<String> images) {
+        this.title = title;
+        this.content = content;
+        this.images = images;
+    }
 
     public Post toEntity(Long userId) {
         return Post.builder()
