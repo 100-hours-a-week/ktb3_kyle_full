@@ -4,6 +4,7 @@ import com.kyle.week4.controller.request.PostCreateRequest;
 import com.kyle.week4.controller.response.PostDetailResponse;
 import com.kyle.week4.controller.response.PostResponse;
 import com.kyle.week4.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ public class PostController {
     @PostMapping("/posts")
     public ApiResponse<PostDetailResponse> createPost(
       @SessionAttribute("userId") Long userId,
-      @RequestBody PostCreateRequest request
+      @Valid @RequestBody PostCreateRequest request
     ) {
         return ApiResponse.ok(postService.createPost(userId, request));
     }
