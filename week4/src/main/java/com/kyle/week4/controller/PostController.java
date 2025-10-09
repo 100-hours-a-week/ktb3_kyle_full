@@ -1,9 +1,7 @@
 package com.kyle.week4.controller;
 
 import com.kyle.week4.controller.request.PostCreateRequest;
-import com.kyle.week4.controller.response.PostResponse;
-import com.kyle.week4.entity.Post;
-import com.kyle.week4.repository.PostRepository;
+import com.kyle.week4.controller.response.PostDetailResponse;
 import com.kyle.week4.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +15,7 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping("/posts")
-    public ApiResponse<PostResponse> createPost(
+    public ApiResponse<PostDetailResponse> createPost(
       @SessionAttribute("userId") Long userId,
       @RequestBody PostCreateRequest request
     ) {

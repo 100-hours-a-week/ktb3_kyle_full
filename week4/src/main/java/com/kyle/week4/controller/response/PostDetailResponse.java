@@ -1,16 +1,19 @@
 package com.kyle.week4.controller.response;
 
 import com.kyle.week4.entity.Post;
+import com.kyle.week4.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
-public class PostResponse {
+public class PostDetailResponse {
     private Long id;
     private String title;
     private String content;
+    private String authorNickname;
+    private String authorProfileImage;
     private int likeCount;
     private int viewCount;
     private int commentCount;
@@ -18,10 +21,12 @@ public class PostResponse {
     private List<String> images;
 
     @Builder
-    public PostResponse(Long id, String title, String content, int likeCount, int viewCount, int commentCount, boolean isAuthor, List<String> images) {
+    public PostDetailResponse(Long id, String title, String content, String authorNickname, String authorProfileImage, int likeCount, int viewCount, int commentCount, boolean isAuthor, List<String> images) {
         this.id = id;
         this.title = title;
         this.content = content;
+        this.authorNickname = authorNickname;
+        this.authorProfileImage = authorProfileImage;
         this.likeCount = likeCount;
         this.viewCount = viewCount;
         this.commentCount = commentCount;
@@ -29,15 +34,17 @@ public class PostResponse {
         this.images = images;
     }
 
-    public static PostResponse of(Post post, Long userId) {
-        return PostResponse.builder()
+    public static PostDetailResponse of(Post post, User user) {
+        return PostDetailResponse.builder()
           .id(post.getId())
           .title(post.getTitle())
           .content(post.getContent())
           .likeCount(post.getLikeCount())
           .viewCount(post.getViewCount())
           .commentCount(post.getCommentCount())
-          .isAuthor(post.getUserId().equals(userId))
+          .isAuthor(post.getUserId().equals(user.getId()))
+          .authorNickname(user.getNickname())
+          .authorProfileImage(user.getProfileImage())
           .images(post.getImages())
           .build();
     }

@@ -1,7 +1,7 @@
 package com.kyle.week4.service;
 
 import com.kyle.week4.controller.request.PostCreateRequest;
-import com.kyle.week4.controller.response.PostResponse;
+import com.kyle.week4.controller.response.PostDetailResponse;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.repository.PostRepository;
@@ -50,14 +50,14 @@ class PostServiceTest {
           .build();
 
         // when
-        PostResponse postResponse = postService.createPost(1L, request);
+        PostDetailResponse postDetailResponse = postService.createPost(1L, request);
 
         // then
-        assertThat(postResponse.getId()).isNotNull();
-        assertThat(postResponse)
+        assertThat(postDetailResponse.getId()).isNotNull();
+        assertThat(postDetailResponse)
           .extracting("title", "content", "likeCount", "viewCount", "commentCount", "isAuthor")
           .contains("제목1", "내용1", 0, 0, 0, true);
-        assertThat(postResponse.getImages()).hasSize(2)
+        assertThat(postDetailResponse.getImages()).hasSize(2)
           .containsExactlyInAnyOrder(
             "image1", "image2"
           );
