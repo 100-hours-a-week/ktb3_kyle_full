@@ -5,6 +5,7 @@ import com.kyle.week4.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -19,9 +20,10 @@ public class PostDetailResponse {
     private int commentCount;
     private boolean isAuthor;
     private List<String> images;
+    private LocalDateTime createdAt;
 
     @Builder
-    public PostDetailResponse(Long id, String title, String content, String authorNickname, String authorProfileImage, int likeCount, int viewCount, int commentCount, boolean isAuthor, List<String> images) {
+    public PostDetailResponse(Long id, String title, String content, String authorNickname, String authorProfileImage, int likeCount, int viewCount, int commentCount, boolean isAuthor, List<String> images, LocalDateTime createdAt) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -32,6 +34,7 @@ public class PostDetailResponse {
         this.commentCount = commentCount;
         this.isAuthor = isAuthor;
         this.images = images;
+        this.createdAt = createdAt;
     }
 
     public static PostDetailResponse of(Post post, User user) {
@@ -46,6 +49,7 @@ public class PostDetailResponse {
           .authorNickname(user.getNickname())
           .authorProfileImage(user.getProfileImage())
           .images(post.getImages())
+          .createdAt(post.getCreatedAt())
           .build();
     }
 }

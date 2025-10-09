@@ -2,12 +2,12 @@ package com.kyle.week4.controller;
 
 import com.kyle.week4.controller.request.PostCreateRequest;
 import com.kyle.week4.controller.response.PostDetailResponse;
+import com.kyle.week4.controller.response.PostResponse;
 import com.kyle.week4.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,5 +20,13 @@ public class PostController {
       @RequestBody PostCreateRequest request
     ) {
         return ApiResponse.ok(postService.createPost(userId, request));
+    }
+
+    @GetMapping("/posts")
+    public ApiResponse<List<PostResponse>> infiniteScroll(
+      @RequestParam("limit") int limit,
+      @RequestParam(value = "lastPostId", required = false) Long lastPostId
+    ) {
+        return ApiResponse.ok(postService.infiniteScroll(lastPostId, limit));
     }
 }
