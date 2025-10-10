@@ -35,7 +35,7 @@ class PostRepositoryTest {
     }
 
     @Test
-    @DisplayName("게시물을 저장한다.")
+    @DisplayName("게시글을 저장한다.")
     void save() {
         // given
         Post post = createPost("제목1");
@@ -50,7 +50,7 @@ class PostRepositoryTest {
     }
 
     @Test
-    @DisplayName("게시물을 내림차순으로 limit 개수만큼 조회한다.")
+    @DisplayName("게시글을 최신순으로 limit 개수만큼 조회한다.")
     void findAllInfiniteScrollFirst() {
         // given
         for (int i = 1; i <= 10; i++) {
@@ -70,7 +70,7 @@ class PostRepositoryTest {
     }
 
     @Test
-    @DisplayName("게시물이 limit 보다 적을 경우, 남아있는 모든 게시물을 반환한다")
+    @DisplayName("게시글이 limit 보다 적을 경우, 남아있는 모든 게시글을 반환한다")
     void findAllInfiniteScrollFirst_whenLessThanLimit() {
         // given
         for (int i = 1; i <= 2; i++) {
@@ -103,7 +103,7 @@ class PostRepositoryTest {
     }
 
     @Test
-    @DisplayName("마지막 게시물 ID 이전의 게시글을 내림차순으로 limit 개수만큼 조회한다.")
+    @DisplayName("마지막 게시글 ID 이전의 게시글을 최신순으로 limit 개수만큼 조회한다.")
     void findAllInfiniteScrollLastId() {
         // given
         for (int i = 1; i <= 10; i++) {
@@ -126,7 +126,7 @@ class PostRepositoryTest {
     }
 
     @Test
-    @DisplayName("마지막 게시물 ID 이전의 게시글이 존재하지 않으면 빈 리스트를 반환한다.")
+    @DisplayName("마지막 게시글 ID 이전의 게시글이 존재하지 않으면 빈 리스트를 반환한다.")
     void findAllInfiniteScrollLastId_whenLessThanLimit() {
         // given
         Long lastPostId = 1L;
@@ -140,7 +140,7 @@ class PostRepositoryTest {
     }
 
     @Test
-    @DisplayName("마지막 게시물 ID 이전의 게시글이 limit 보다 적을 경우, 남아있는 모든 게시글을 반환한다.")
+    @DisplayName("마지막 게시글 ID 이전의 게시글이 limit 보다 적을 경우, 남아있는 모든 게시글을 반환한다.")
     void findAllInfiniteScrollLastId_whenEmpty() {
         // given
         for (int i = 1; i <= 5; i++) {
