@@ -1,23 +1,16 @@
 package com.kyle.week4.controller;
 
 import com.kyle.week4.controller.request.PostCreateRequest;
-import com.kyle.week4.filter.AuthenticationFilter;
-import jakarta.servlet.DispatcherType;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
-import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import java.io.IOException;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -29,7 +22,7 @@ class PostControllerTest extends ControllerTestSupport {
 
     @BeforeEach
     void setUp() throws Exception {
-        BDDMockito.given(authenticationProvider.isAuthenticated(any(), any()))
+        given(authenticationProvider.isAuthenticated(any(), any()))
           .willReturn(true);
 
         session.setAttribute("userId", 1L);
@@ -53,7 +46,7 @@ class PostControllerTest extends ControllerTestSupport {
               .contentType(MediaType.APPLICATION_JSON)
           )
           .andDo(print())
-          .andExpect(status().isOk());
+          .andExpect(status().isCreated());
     }
 
     @Test

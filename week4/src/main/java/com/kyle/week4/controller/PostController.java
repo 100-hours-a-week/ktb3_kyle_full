@@ -20,7 +20,7 @@ public class PostController {
       @SessionAttribute("userId") Long userId,
       @Valid @RequestBody PostCreateRequest request
     ) {
-        return ApiResponse.ok(postService.createPost(userId, request));
+        return ApiResponse.created(postService.createPost(userId, request));
     }
 
     @GetMapping("/posts")
