@@ -37,7 +37,7 @@ public class PostDetailResponse {
         this.createdAt = createdAt;
     }
 
-    public static PostDetailResponse of(Post post, User user) {
+    public static PostDetailResponse of(Post post, Long userId) {
         return PostDetailResponse.builder()
           .id(post.getId())
           .title(post.getTitle())
@@ -45,9 +45,9 @@ public class PostDetailResponse {
           .likeCount(post.getLikeCount())
           .viewCount(post.getViewCount())
           .commentCount(post.getCommentCount())
-          .isAuthor(post.getUserId().equals(user.getId()))
-          .authorNickname(user.getNickname())
-          .authorProfileImage(user.getProfileImage())
+          .isAuthor(post.getUser().getId().equals(userId))
+          .authorNickname(post.getUser().getNickname())
+          .authorProfileImage(post.getUser().getProfileImage())
           .images(post.getImages())
           .createdAt(post.getCreatedAt())
           .build();

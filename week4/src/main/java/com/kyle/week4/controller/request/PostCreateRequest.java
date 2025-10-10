@@ -1,6 +1,7 @@
 package com.kyle.week4.controller.request;
 
 import com.kyle.week4.entity.Post;
+import com.kyle.week4.entity.User;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -29,12 +30,12 @@ public class PostCreateRequest {
         this.images = images;
     }
 
-    public Post toEntity(Long userId) {
+    public Post toEntity(User user) {
         return Post.builder()
           .title(title)
           .content(content)
           .images(images)
-          .userId(userId)
+          .user(user)
           .build();
     }
 }

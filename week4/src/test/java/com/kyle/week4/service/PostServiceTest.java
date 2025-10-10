@@ -27,14 +27,16 @@ class PostServiceTest {
     @Autowired
     private UserRepository userRepository;
 
+    private final User user = createUser();
+
     @BeforeEach
     void setUp() {
-        User user = createUser();
         userRepository.save(user);
     }
 
     @AfterEach
     void tearDown() {
+        userRepository.clear();
         postRepository.clear();
     }
 
@@ -126,7 +128,7 @@ class PostServiceTest {
         return Post.builder()
           .title(title)
           .content("내용입니다.")
-          .userId(1L)
+          .user(user)
           .images(List.of("image1.jpg", "image2.jpg"))
           .build();
     }

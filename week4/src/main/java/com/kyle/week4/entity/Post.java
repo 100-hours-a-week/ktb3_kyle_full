@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Post extends BaseEntity {
     private Long id;
-    private Long userId;
+    private User user;
     private String title;
     private String content;
     private int likeCount;
@@ -20,10 +20,10 @@ public class Post extends BaseEntity {
     private List<String> images;
 
     @Builder
-    public Post(Long userId, String title, String content, List<String> images) {
+    public Post(User user, String title, String content, List<String> images) {
         super();
         this.images = images;
-        this.userId = userId;
+        this.user = user;
         this.title = title;
         this.content = content;
         this.isDeleted = false;

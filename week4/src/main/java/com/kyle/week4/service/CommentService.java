@@ -5,14 +5,14 @@ import com.kyle.week4.entity.Comment;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
-import com.kyle.week4.exception.ErrorCode;
 import com.kyle.week4.repository.CommentRepository;
 import com.kyle.week4.repository.PostRepository;
 import com.kyle.week4.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import static com.kyle.week4.exception.ErrorCode.*;
+import static com.kyle.week4.exception.ErrorCode.POST_NOT_FOUND;
+import static com.kyle.week4.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

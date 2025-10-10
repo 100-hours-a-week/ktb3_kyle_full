@@ -25,10 +25,10 @@ public class PostService {
         User user = userRepository.findById(userId)
           .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        Post post = request.toEntity(userId);
+        Post post = request.toEntity(user);
         Post savedPost = postRepository.save(post);
 
-        return PostDetailResponse.of(savedPost, user);
+        return PostDetailResponse.of(savedPost, userId);
     }
 
     public List<PostResponse> infiniteScroll(Long lastPostId, int limit) {
@@ -37,11 +37,7 @@ public class PostService {
           postRepository.findAllInfiniteScroll(lastPostId, limit);
 
         return posts.stream()
-          .map(post -> {
-              User user = userRepository.findById(post.getUserId())
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-              return PostResponse.of(post, user);
-          })
+          .map(PostResponse::of)
           .toList();
     }
 }
