@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,6 +24,10 @@ public class PostRepository {
         }
         database.put(post.getId(), post);
         return post;
+    }
+
+    public Optional<Post> findById(Long id) {
+        return Optional.ofNullable(database.get(id));
     }
 
     public List<Post> findAllInfiniteScroll(int limit) {
