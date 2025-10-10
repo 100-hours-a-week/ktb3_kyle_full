@@ -40,4 +40,10 @@ public class PostService {
           .map(PostResponse::of)
           .toList();
     }
+
+    public PostDetailResponse getPost(Long userId, Long postId) {
+        Post post = postRepository.findById(postId)
+          .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
+        return PostDetailResponse.of(post, userId);
+    }
 }

@@ -25,7 +25,11 @@ public class Comment extends BaseEntity {
         return id == null;
     }
 
-    public void assignId(Long id) {
+    public boolean isSamePost(Long postId) {
+        return this.post.getId().equals(postId);
+    }
+
+        public void assignId(Long id) {
         this.id = id;
     }
 }

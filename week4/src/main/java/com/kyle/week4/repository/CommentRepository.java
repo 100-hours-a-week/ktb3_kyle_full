@@ -1,9 +1,9 @@
 package com.kyle.week4.repository;
 
 import com.kyle.week4.entity.Comment;
-import com.kyle.week4.entity.Post;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -19,5 +19,24 @@ public class CommentRepository {
         }
         database.put(comment.getId(), comment);
         return comment;
+    }
+
+    public List<Comment> findAllInfiniteScroll(Long postId, int limit) {
+        return database.values().stream()
+          .filter(comment -> comment.isSamePost(postId))
+          .limit(limit)
+          .toList();
+    }
+
+    public List<Comment> findAllInfiniteScroll(Long postId, Long lastCommentId, int limit) {
+        return database.tailMap(lastCommentId, false).values().stream()
+          .filter(comment -> comment.isSamePost(postId))
+          .limit(limit)
+          .toList();
+    }
+
+    public void clear() {
+        primaryKey.set(1);
+        database.clear();
     }
 }
