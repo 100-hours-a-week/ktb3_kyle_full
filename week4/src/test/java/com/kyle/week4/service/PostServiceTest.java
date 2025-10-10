@@ -5,6 +5,8 @@ import com.kyle.week4.controller.response.PostDetailResponse;
 import com.kyle.week4.controller.response.PostResponse;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
+import com.kyle.week4.exception.CustomException;
+import com.kyle.week4.exception.ErrorCode;
 import com.kyle.week4.repository.PostRepository;
 import com.kyle.week4.repository.UserRepository;
 import org.junit.jupiter.api.*;
@@ -14,7 +16,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.Collection;
 import java.util.List;
 
+import static com.kyle.week4.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 class PostServiceTest {
@@ -41,7 +45,7 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("게시물을 저장한다.")
+    @DisplayName("게시글을 저장한다.")
     void createPostTest() {
         // given
         PostCreateRequest request = PostCreateRequest.builder()
@@ -114,6 +118,34 @@ class PostServiceTest {
               assertThat(responses).isEmpty();
           })
         );
+    }
+
+    @Test
+    @DisplayName("게시글의 상세 정보를 조회한다.")
+    void getPostDetail() {
+        // given
+        Post post = createPost("제목1");
+        Long postId = postRepository.save(post).getId();
+
+        // when
+        PostDetailResponse response = postService.getPostDetail(1L, postId);
+
+        // then
+        assertThat(response)
+          .extracting("id", "title")
+          .containsExactlyInAnyOrder(postId, "제목1");
+    }
+
+    @Test
+    @DisplayName("게시글이 존재하지 않으면 예외가 발생한다.")
+    void getPostDetail_whenPostNotFound() {
+        // given
+        Long postId = 1L;
+
+        // when // then
+        assertThatThrownBy(() -> postService.getPostDetail(1L, postId))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorCode", POST_NOT_FOUND);
     }
 
     private User createUser() {

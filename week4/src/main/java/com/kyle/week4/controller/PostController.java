@@ -30,4 +30,12 @@ public class PostController {
     ) {
         return ApiResponse.ok(postService.infiniteScroll(lastPostId, limit));
     }
+
+    @GetMapping("/posts/{postId}")
+    public ApiResponse<PostDetailResponse> getPostDetail(
+      @PathVariable("postId") Long postId,
+      @SessionAttribute("userId") Long userId
+    ) {
+        return ApiResponse.ok(postService.getPostDetail(userId, postId));
+    }
 }

@@ -1,11 +1,14 @@
 package com.kyle.week4.service;
 
 import com.kyle.week4.controller.request.PostCreateRequest;
+import com.kyle.week4.controller.response.CommentResponse;
 import com.kyle.week4.controller.response.PostDetailResponse;
 import com.kyle.week4.controller.response.PostResponse;
+import com.kyle.week4.entity.Comment;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
+import com.kyle.week4.repository.CommentRepository;
 import com.kyle.week4.repository.PostRepository;
 import com.kyle.week4.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +21,11 @@ import static com.kyle.week4.exception.ErrorCode.*;
 @Service
 @RequiredArgsConstructor
 public class PostService {
+    private static final int COMMENT_PAGE_SIZE = 10;
+
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     public PostDetailResponse createPost(Long userId, PostCreateRequest request) {
         User user = userRepository.findById(userId)
@@ -28,7 +34,7 @@ public class PostService {
         Post post = request.toEntity(user);
         Post savedPost = postRepository.save(post);
 
-        return PostDetailResponse.of(savedPost, userId);
+        return PostDetailResponse.of(savedPost, userId, List.of());
     }
 
     public List<PostResponse> infiniteScroll(Long lastPostId, int limit) {
@@ -41,9 +47,19 @@ public class PostService {
           .toList();
     }
 
-    public PostDetailResponse getPost(Long userId, Long postId) {
+    public PostDetailResponse getPostDetail(Long userId, Long postId) {
         Post post = postRepository.findById(postId)
           .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
-        return PostDetailResponse.of(post, userId);
+
+        List<CommentResponse> comments = getCommentResponses(userId, postId);
+
+        return PostDetailResponse.of(post, userId, comments);
+    }
+
+    private List<CommentResponse> getCommentResponses(Long userId, Long postId) {
+        List<Comment> comments = commentRepository.findAllInfiniteScroll(postId, COMMENT_PAGE_SIZE);
+        return comments.stream()
+          .map(comment -> CommentResponse.of(comment, userId))
+          .toList();
     }
 }
