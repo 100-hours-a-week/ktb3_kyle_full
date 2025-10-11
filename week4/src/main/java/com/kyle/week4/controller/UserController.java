@@ -1,6 +1,7 @@
 package com.kyle.week4.controller;
 
 import com.kyle.week4.controller.request.UserCreateRequest;
+import com.kyle.week4.controller.request.UserProfileUpdateRequest;
 import com.kyle.week4.controller.response.UserProfileResponse;
 import com.kyle.week4.service.UserService;
 import jakarta.validation.Valid;
@@ -22,5 +23,13 @@ public class UserController {
       @SessionAttribute("userId") Long userId
     ) {
         return ApiResponse.ok(userService.getUserProfile(userId));
+    }
+
+    @PatchMapping("/users/profile")
+    public ApiResponse<UserProfileResponse> updateUserProfile(
+      @SessionAttribute("userId") Long userId,
+      @Valid @RequestBody UserProfileUpdateRequest request
+    ) {
+        return ApiResponse.ok(userService.updateUserProfile(userId, request));
     }
 }

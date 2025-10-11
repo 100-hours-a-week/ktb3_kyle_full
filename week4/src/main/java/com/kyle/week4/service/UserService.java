@@ -2,6 +2,7 @@ package com.kyle.week4.service;
 
 import com.kyle.week4.controller.request.LoginRequest;
 import com.kyle.week4.controller.request.UserCreateRequest;
+import com.kyle.week4.controller.request.UserProfileUpdateRequest;
 import com.kyle.week4.controller.response.UserProfileResponse;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
@@ -33,6 +34,17 @@ public class UserService {
 
     public UserProfileResponse getUserProfile(Long userId) {
         User user = findUserBy(userId);
+        return UserProfileResponse.of(user);
+    }
+
+    public UserProfileResponse updateUserProfile(Long userId, UserProfileUpdateRequest request) {
+        User user = findUserBy(userId);
+
+        if (userRepository.existsByNickname(request.getNickname())) {
+            throw new CustomException(DUPLICATE_NICKNAME_ERROR);
+        }
+
+        user.updateUserProfile(request);
         return UserProfileResponse.of(user);
     }
 

@@ -1,6 +1,7 @@
 package com.kyle.week4.service;
 
 import com.kyle.week4.controller.request.UserCreateRequest;
+import com.kyle.week4.controller.request.UserProfileUpdateRequest;
 import com.kyle.week4.controller.response.UserProfileResponse;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
@@ -113,7 +114,7 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("사용자 정보 시 사용자가 존재하지 않으면 예외가 발생한다.")
+    @DisplayName("사용자 정보 조회 시 사용자가 존재하지 않으면 예외가 발생한다.")
     void getUserProfile_whenUserNotFound() {
         // given
         Long userId = 1L;
@@ -122,6 +123,52 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.getUserProfile(userId))
           .isInstanceOf(CustomException.class)
           .hasFieldOrPropertyWithValue("errorCode", USER_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("사용자의 정보를 수정한다.")
+    void updateUserProfile() {
+        // given
+        User user = createUser("test1@test.com", "test1", "image.jpg");
+        userRepository.save(user);
+
+        UserProfileUpdateRequest request = new UserProfileUpdateRequest("update", "update.jpg");
+
+        // when
+        UserProfileResponse response = userService.updateUserProfile(user.getId(), request);
+
+        // then
+        assertThat(response)
+          .extracting("email", "nickname", "profileImage")
+          .containsExactlyInAnyOrder("test1@test.com", "update", "update.jpg");
+    }
+
+    @Test
+    @DisplayName("사용자 정보 수정 시 사용자가 존재하지 않으면 예외가 발생한다.")
+    void updateUserProfile_whenUserNotFound() {
+        // given
+        Long userId = 1L;
+        UserProfileUpdateRequest request = new UserProfileUpdateRequest("update", "update.jpg");
+
+        // when // then
+        assertThatThrownBy(() -> userService.updateUserProfile(userId, request))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorCode", USER_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("사용자 정보 수정 시 이전 닉네임과 같거나 이미 존재하는 닉네임일 경우 예외가 발생한다.")
+    void updateUserProfile_whenDuplicateNickname() {
+        // given
+        User user = createUser("test1@test.com", "test1", "image.jpg");
+        userRepository.save(user);
+
+        UserProfileUpdateRequest request = new UserProfileUpdateRequest("test1", "update.jpg");
+
+        // when // then
+        assertThatThrownBy(() -> userService.updateUserProfile(user.getId(), request))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorCode", DUPLICATE_NICKNAME_ERROR);
     }
 
     private User createUser(String email, String nickname, String profileImage) {

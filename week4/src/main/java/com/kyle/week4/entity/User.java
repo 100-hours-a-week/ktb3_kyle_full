@@ -1,5 +1,6 @@
 package com.kyle.week4.entity;
 
+import com.kyle.week4.controller.request.UserProfileUpdateRequest;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,5 +39,10 @@ public class User {
 
     public void encodePassword(String encodedPassword) {
         this.password = encodedPassword;
+    }
+
+    public void updateUserProfile(UserProfileUpdateRequest request) {
+        this.nickname = request.getNickname();
+        this.profileImage = request.getProfileImage();
     }
 }
