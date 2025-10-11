@@ -4,6 +4,7 @@ import com.kyle.week4.entity.Comment;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -19,6 +20,10 @@ public class CommentRepository {
         }
         database.put(comment.getId(), comment);
         return comment;
+    }
+
+    public Optional<Comment> findById(Long id) {
+        return Optional.ofNullable(database.get(id));
     }
 
     public List<Comment> findAllInfiniteScroll(Long postId, int limit) {

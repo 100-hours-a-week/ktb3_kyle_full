@@ -1,5 +1,6 @@
 package com.kyle.week4.entity;
 
+import com.kyle.week4.controller.request.CommentUpdateRequest;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,7 +34,15 @@ public class Comment extends BaseEntity {
         return this.user.getId().equals(userId);
     }
 
+    public boolean isNotAuthor(Long userId) {
+        return !isSameUser(userId);
+    }
+
     public void assignId(Long id) {
         this.id = id;
+    }
+
+    public void updateComment(CommentUpdateRequest request) {
+        this.content = request.getContent();
     }
 }
