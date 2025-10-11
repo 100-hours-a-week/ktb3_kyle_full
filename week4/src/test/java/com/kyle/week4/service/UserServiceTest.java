@@ -1,6 +1,7 @@
 package com.kyle.week4.service;
 
 import com.kyle.week4.controller.request.UserCreateRequest;
+import com.kyle.week4.controller.response.UserProfileResponse;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.exception.ErrorCode;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static com.kyle.week4.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -69,7 +71,7 @@ class UserServiceTest {
         // when // then
         assertThatThrownBy(() -> userService.createUser(request))
           .isInstanceOf(CustomException.class)
-          .hasFieldOrPropertyWithValue("errorCode", ErrorCode.DUPLICATE_NICKNAME_ERROR)
+          .hasFieldOrPropertyWithValue("errorCode", DUPLICATE_NICKNAME_ERROR)
           .hasMessage("이미 가입된 닉네임입니다.");
     }
 
@@ -92,6 +94,34 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.createUser(request))
           .isInstanceOf(CustomException.class)
           .hasMessage("이미 가입된 이메일입니다.");
+    }
+
+    @Test
+    @DisplayName("사용자의 정보를 조회한다.")
+    void getUserProfile() {
+        // given
+        User user = createUser("test1@test.com", "test1", "image.jpg");
+        userRepository.save(user);
+
+        // when
+        UserProfileResponse response = userService.getUserProfile(user.getId());
+
+        // then
+        assertThat(response)
+          .extracting("email", "nickname", "profileImage")
+          .containsExactlyInAnyOrder("test1@test.com", "test1", "image.jpg");
+    }
+
+    @Test
+    @DisplayName("사용자 정보 시 사용자가 존재하지 않으면 예외가 발생한다.")
+    void getUserProfile_whenUserNotFound() {
+        // given
+        Long userId = 1L;
+
+        // when // then
+        assertThatThrownBy(() -> userService.getUserProfile(userId))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorCode", USER_NOT_FOUND);
     }
 
     private User createUser(String email, String nickname, String profileImage) {

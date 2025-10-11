@@ -2,6 +2,7 @@ package com.kyle.week4.service;
 
 import com.kyle.week4.controller.request.LoginRequest;
 import com.kyle.week4.controller.request.UserCreateRequest;
+import com.kyle.week4.controller.response.UserProfileResponse;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.repository.UserRepository;
@@ -28,5 +29,15 @@ public class UserService {
         user.encodePassword(passwordEncoder.encode(request.getPassword()));
         User savedUser = userRepository.save(user);
         return savedUser.getId();
+    }
+
+    public UserProfileResponse getUserProfile(Long userId) {
+        User user = findUserBy(userId);
+        return UserProfileResponse.of(user);
+    }
+
+    private User findUserBy(Long userId) {
+        return userRepository.findById(userId)
+          .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     }
 }

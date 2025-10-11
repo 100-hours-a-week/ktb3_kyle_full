@@ -1,6 +1,7 @@
 package com.kyle.week4.controller;
 
 import com.kyle.week4.controller.request.UserCreateRequest;
+import com.kyle.week4.controller.response.UserProfileResponse;
 import com.kyle.week4.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +17,10 @@ public class UserController {
         return ApiResponse.created(userService.createUser(request));
     }
 
-    @GetMapping("/test")
-    public ApiResponse<Long> test(@SessionAttribute("userId") Long userId) {
-        return ApiResponse.ok(userId);
+    @GetMapping("/users/profile")
+    public ApiResponse<UserProfileResponse> getUserProfile(
+      @SessionAttribute("userId") Long userId
+    ) {
+        return ApiResponse.ok(userService.getUserProfile(userId));
     }
 }
