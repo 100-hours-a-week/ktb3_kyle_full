@@ -3,6 +3,7 @@ package com.kyle.week4.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kyle.week4.filter.AuthenticationFilter;
 import com.kyle.week4.filter.AuthenticationProvider;
+import com.kyle.week4.service.CommentService;
 import com.kyle.week4.service.PostService;
 import com.kyle.week4.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = {
   UserController.class,
-  PostController.class
+  PostController.class,
+  CommentController.class,
 })
 public class ControllerTestSupport {
     @Autowired
@@ -26,6 +28,9 @@ public class ControllerTestSupport {
 
     @MockitoBean
     protected PostService postService;
+
+    @MockitoBean
+    protected CommentService commentService;
 
     @MockitoBean
     protected AuthenticationProvider authenticationProvider;
