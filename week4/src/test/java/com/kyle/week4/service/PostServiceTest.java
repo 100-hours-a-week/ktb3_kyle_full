@@ -15,6 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.kyle.week4.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -146,6 +149,31 @@ class PostServiceTest {
         assertThatThrownBy(() -> postService.getPostDetail(1L, postId))
           .isInstanceOf(CustomException.class)
           .hasFieldOrPropertyWithValue("errorCode", POST_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("게시글의 상세 정보를 조회하면 조회수가 증가한다.")
+    void increaseViewCount_whenGetPostDetail() throws Exception {
+        // given
+        Post post = createPost("제목1");
+        Long postId = postRepository.save(post).getId();
+
+        final int totalViewCount = 1000;
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        CountDownLatch latch = new CountDownLatch(totalViewCount);
+
+        // when
+        for (int i = 0; i < totalViewCount; i++) {
+            executor.submit(() -> {
+                postService.getPostDetail(1L, postId);
+                latch.countDown();
+            });
+        }
+        latch.await();
+        int viewCount = postRepository.getViewCount(postId);
+
+        // then
+        assertThat(viewCount).isEqualTo(totalViewCount);
     }
 
     private User createUser() {

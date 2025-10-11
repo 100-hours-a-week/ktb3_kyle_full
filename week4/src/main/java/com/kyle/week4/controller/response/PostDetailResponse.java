@@ -38,13 +38,13 @@ public class PostDetailResponse {
         this.comments = comments;
     }
 
-    public static PostDetailResponse of(Post post, Long userId, List<CommentResponse> comments) {
+    public static PostDetailResponse of(Post post, Long userId, int viewCount, List<CommentResponse> comments) {
         return PostDetailResponse.builder()
           .id(post.getId())
           .title(post.getTitle())
           .content(post.getContent())
           .likeCount(post.getLikeCount())
-          .viewCount(post.getViewCount())
+          .viewCount(viewCount)
           .commentCount(post.getCommentCount())
           .isAuthor(post.getUser().getId().equals(userId))
           .authorNickname(post.getUser().getNickname())

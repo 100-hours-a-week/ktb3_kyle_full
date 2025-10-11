@@ -24,6 +24,7 @@ public class PostRepository {
             Long postId = primaryKey.getAndIncrement();
             post.assignId(postId);
             commentCountLock.put(postId, new ReentrantLock());
+            viewCount.put(postId, new AtomicInteger(0));
         }
         database.put(post.getId(), post);
         return post;
@@ -52,6 +53,14 @@ public class PostRepository {
         } finally {
             commentCountLock.get(postId).unlock();
         }
+    }
+
+    public int getViewCount(Long postId) {
+        return viewCount.get(postId).get();
+    }
+
+    public int increaseViewCount(Long postId) {
+        return viewCount.get(postId).incrementAndGet();
     }
 
     public void clear() {
