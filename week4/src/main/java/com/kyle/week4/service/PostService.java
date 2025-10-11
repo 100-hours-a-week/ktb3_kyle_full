@@ -34,7 +34,7 @@ public class PostService {
         Post post = request.toEntity(user);
         Post savedPost = postRepository.save(post);
 
-        return PostDetailResponse.of(savedPost, userId, 0, List.of());
+        return PostDetailResponse.of(savedPost, userId, 0);
     }
 
     public List<PostResponse> infiniteScroll(Long lastPostId, int limit) {
@@ -56,15 +56,7 @@ public class PostService {
           .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
 
         int viewCount = postRepository.increaseViewCount(postId);
-        List<CommentResponse> comments = getCommentResponses(userId, postId);
 
-        return PostDetailResponse.of(post, userId, viewCount, comments);
-    }
-
-    private List<CommentResponse> getCommentResponses(Long userId, Long postId) {
-        List<Comment> comments = commentRepository.findAllInfiniteScroll(postId, COMMENT_PAGE_SIZE);
-        return comments.stream()
-          .map(comment -> CommentResponse.of(comment, userId))
-          .toList();
+        return PostDetailResponse.of(post, userId, viewCount);
     }
 }

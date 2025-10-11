@@ -19,11 +19,10 @@ public class PostDetailResponse {
     private int commentCount;
     private boolean isAuthor;
     private List<String> images;
-    private List<CommentResponse> comments;
     private LocalDateTime createdAt;
 
     @Builder
-    public PostDetailResponse(Long id, String title, String content, String authorNickname, String authorProfileImage, int likeCount, int viewCount, int commentCount, boolean isAuthor, List<String> images, List<CommentResponse> comments, LocalDateTime createdAt) {
+    public PostDetailResponse(Long id, String title, String content, String authorNickname, String authorProfileImage, int likeCount, int viewCount, int commentCount, boolean isAuthor, List<String> images, LocalDateTime createdAt) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -35,10 +34,9 @@ public class PostDetailResponse {
         this.isAuthor = isAuthor;
         this.images = images;
         this.createdAt = createdAt;
-        this.comments = comments;
     }
 
-    public static PostDetailResponse of(Post post, Long userId, int viewCount, List<CommentResponse> comments) {
+    public static PostDetailResponse of(Post post, Long userId, int viewCount) {
         return PostDetailResponse.builder()
           .id(post.getId())
           .title(post.getTitle())
@@ -51,7 +49,6 @@ public class PostDetailResponse {
           .authorProfileImage(post.getUser().getProfileImage())
           .images(post.getImages())
           .createdAt(post.getCreatedAt())
-          .comments(comments)
           .build();
     }
 }
