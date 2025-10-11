@@ -30,6 +30,7 @@ public class CommentService {
 
         Comment comment = request.toEntity(user, post);
         Comment savedComment = commentRepository.save(comment);
+        postRepository.increaseCommentCount(postId);
         return savedComment.getId();
     }
 }

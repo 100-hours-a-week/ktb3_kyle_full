@@ -36,6 +36,10 @@ public class Post extends BaseEntity {
         this.id = id;
     }
 
+    public void increaseCommentCount() {
+        commentCount++;
+    }
+
     public boolean isNew() {
         return id == null;
     }
