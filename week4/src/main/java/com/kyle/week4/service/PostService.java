@@ -1,6 +1,7 @@
 package com.kyle.week4.service;
 
 import com.kyle.week4.controller.request.PostCreateRequest;
+import com.kyle.week4.controller.request.PostUpdateRequest;
 import com.kyle.week4.controller.response.CommentResponse;
 import com.kyle.week4.controller.response.PostDetailResponse;
 import com.kyle.week4.controller.response.PostResponse;
@@ -56,6 +57,20 @@ public class PostService {
           .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
 
         int viewCount = postRepository.increaseViewCount(postId);
+
+        return PostDetailResponse.of(post, userId, viewCount);
+    }
+
+    public PostDetailResponse updatePost(Long userId, Long postId, PostUpdateRequest request) {
+        Post post = postRepository.findById(postId)
+          .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
+
+        if (post.isNotAuthor(userId)) {
+            throw new CustomException(PERMISSION_DENIED);
+        }
+        post.updatePost(request);
+
+        int viewCount = postRepository.getViewCount(postId);
 
         return PostDetailResponse.of(post, userId, viewCount);
     }

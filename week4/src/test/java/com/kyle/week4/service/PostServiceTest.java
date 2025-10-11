@@ -1,12 +1,12 @@
 package com.kyle.week4.service;
 
 import com.kyle.week4.controller.request.PostCreateRequest;
+import com.kyle.week4.controller.request.PostUpdateRequest;
 import com.kyle.week4.controller.response.PostDetailResponse;
 import com.kyle.week4.controller.response.PostResponse;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
-import com.kyle.week4.exception.ErrorCode;
 import com.kyle.week4.repository.PostRepository;
 import com.kyle.week4.repository.UserRepository;
 import org.junit.jupiter.api.*;
@@ -19,7 +19,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.kyle.week4.exception.ErrorCode.*;
+import static com.kyle.week4.exception.ErrorCode.POST_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -174,6 +174,28 @@ class PostServiceTest {
 
         // then
         assertThat(viewCount).isEqualTo(totalViewCount);
+    }
+
+    @Test
+    @DisplayName("게시글을 수정한다.")
+    void updatePostTest() {
+        // given
+        Post post = createPost("제목");
+        postRepository.save(post);
+
+        PostUpdateRequest request = PostUpdateRequest.builder()
+          .title("수정된 제목")
+          .content("수정된 내용")
+          .images(List.of("image100.jpg"))
+          .build();
+
+        // when
+        PostDetailResponse response = postService.updatePost(user.getId(), post.getId(), request);
+
+        // then
+        assertThat(response)
+          .extracting("id", "title", "content", "images")
+          .containsExactlyInAnyOrder(post.getId(), "수정된 제목", "수정된 내용", List.of("image100.jpg"));
     }
 
     private User createUser() {

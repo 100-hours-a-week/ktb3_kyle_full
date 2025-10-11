@@ -10,6 +10,7 @@ public enum ErrorCode {
     INVALID_EMAIL(401, HttpStatus.UNAUTHORIZED, "이메일이 일치하지 않습니다."),
     INVALID_PASSWORD(401, HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
     FAILED_AUTHENTICATE(401, HttpStatus.UNAUTHORIZED, "인증이 만료되었거나, 인증에 실패했습니다."),
+    PERMISSION_DENIED(403, HttpStatus.FORBIDDEN, "권한이 존재하지 않습니다."),
     NOT_FOUND_END_POINT(404, HttpStatus.NOT_FOUND, "존재하지 않는 API입니다."),
     USER_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
     POST_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),

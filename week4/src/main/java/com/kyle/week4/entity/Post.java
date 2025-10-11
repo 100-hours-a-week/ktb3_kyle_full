@@ -1,5 +1,6 @@
 package com.kyle.week4.entity;
 
+import com.kyle.week4.controller.request.PostUpdateRequest;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,7 +41,17 @@ public class Post extends BaseEntity {
         commentCount++;
     }
 
+    public void updatePost(PostUpdateRequest request) {
+        this.title = request.getTitle();
+        this.content = request.getContent();
+        this.images = request.getImages();
+    }
+
     public boolean isNew() {
         return id == null;
+    }
+
+    public boolean isNotAuthor(Long userId) {
+        return !this.user.getId().equals(userId);
     }
 }

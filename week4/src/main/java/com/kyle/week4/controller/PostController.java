@@ -1,6 +1,7 @@
 package com.kyle.week4.controller;
 
 import com.kyle.week4.controller.request.PostCreateRequest;
+import com.kyle.week4.controller.request.PostUpdateRequest;
 import com.kyle.week4.controller.response.PostDetailResponse;
 import com.kyle.week4.controller.response.PostResponse;
 import com.kyle.week4.service.PostService;
@@ -37,5 +38,14 @@ public class PostController {
       @SessionAttribute("userId") Long userId
     ) {
         return ApiResponse.ok(postService.getPostDetail(userId, postId));
+    }
+
+    @PatchMapping("/posts/{postId}")
+    public ApiResponse<PostDetailResponse> updatePost(
+      @SessionAttribute("userId") Long userId,
+      @PathVariable("postId") Long postId,
+      @Valid @RequestBody PostUpdateRequest request
+    ) {
+        return ApiResponse.ok(postService.updatePost(userId, postId, request));
     }
 }
