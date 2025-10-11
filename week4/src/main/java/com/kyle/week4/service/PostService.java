@@ -43,7 +43,11 @@ public class PostService {
           postRepository.findAllInfiniteScroll(lastPostId, limit);
 
         return posts.stream()
-          .map(PostResponse::of)
+          .map(post ->
+            PostResponse.of(
+              post,
+              postRepository.getViewCount(post.getId()))
+          )
           .toList();
     }
 

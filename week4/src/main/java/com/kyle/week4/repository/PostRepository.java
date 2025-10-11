@@ -3,7 +3,6 @@ package com.kyle.week4.repository;
 import com.kyle.week4.entity.Post;
 import org.springframework.stereotype.Repository;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -67,5 +66,6 @@ public class PostRepository {
         primaryKey.set(1);
         database.clear();
         viewCount.clear();
+        commentCountLock.clear();
     }
 }
