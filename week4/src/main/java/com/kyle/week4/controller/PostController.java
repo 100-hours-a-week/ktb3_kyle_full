@@ -54,7 +54,7 @@ public class PostController {
       @SessionAttribute("userId") Long userId,
       @PathVariable("postId") Long postId
     ) {
-
+        postService.deletePost(userId, postId);
         return ApiResponse.noContent();
     }
 }

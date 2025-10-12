@@ -26,8 +26,8 @@ public class Comment extends BaseEntity {
         return id == null;
     }
 
-    public boolean isSamePost(Long postId) {
-        return this.post.getId().equals(postId);
+    public boolean canDisplay(Long postId) {
+        return this.post.getId().equals(postId) && !isDeleted;
     }
 
     public boolean isSameUser(Long userId) {
@@ -44,5 +44,9 @@ public class Comment extends BaseEntity {
 
     public void updateComment(CommentUpdateRequest request) {
         this.content = request.getContent();
+    }
+
+    public void delete() {
+        isDeleted = true;
     }
 }

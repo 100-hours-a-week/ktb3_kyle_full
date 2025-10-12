@@ -28,14 +28,14 @@ public class CommentRepository {
 
     public List<Comment> findAllInfiniteScroll(Long postId, int limit) {
         return database.values().stream()
-          .filter(comment -> comment.isSamePost(postId))
+          .filter(comment -> comment.canDisplay(postId))
           .limit(limit)
           .toList();
     }
 
     public List<Comment> findAllInfiniteScroll(Long postId, Long lastCommentId, int limit) {
         return database.tailMap(lastCommentId, false).values().stream()
-          .filter(comment -> comment.isSamePost(postId))
+          .filter(comment -> comment.canDisplay(postId))
           .limit(limit)
           .toList();
     }

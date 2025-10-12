@@ -57,6 +57,17 @@ public class CommentService {
         return CommentResponse.of(comment, userId);
     }
 
+    public void deleteComment(Long userId, Long postId, Long commentId) {
+        Post post = findPostBy(postId);
+        Comment comment = findCommentBy(commentId);
+
+        if (comment.isNotAuthor(userId)) {
+            throw new CustomException(PERMISSION_DENIED);
+        }
+
+        comment.delete();
+    }
+
     private Comment findCommentBy(Long commentId) {
         return commentRepository.findById(commentId)
           .orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));

@@ -43,4 +43,15 @@ public class CommentController {
     ) {
         return ApiResponse.ok(commentService.updateComment(userId, postId, commentId, request));
     }
+
+    @DeleteMapping("/posts/{postId}/comments/{commentId}")
+    public ApiResponse<?> deleteComment(
+      @SessionAttribute("userId") Long userId,
+      @PathVariable("postId") Long postId,
+      @PathVariable("commentId") Long commentId,
+      @Valid @RequestBody CommentUpdateRequest request
+    ) {
+        commentService.deleteComment(userId, postId, commentId);
+        return ApiResponse.noContent();
+    }
 }
