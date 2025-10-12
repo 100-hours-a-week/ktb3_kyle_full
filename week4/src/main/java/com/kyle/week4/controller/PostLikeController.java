@@ -13,7 +13,7 @@ public class PostLikeController {
     @GetMapping("/posts/{postId}/like")
     public ApiResponse<PostLikeResponse> count(
       @SessionAttribute("userId") Long userId,
-      @PathVariable Long postId
+      @PathVariable("postId") Long postId
     ) {
         return ApiResponse.ok(postLikeService.count(userId, postId));
     }

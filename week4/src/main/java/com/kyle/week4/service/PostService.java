@@ -1,5 +1,6 @@
 package com.kyle.week4.service;
 
+import com.kyle.week4.cache.PostLikeCountCache;
 import com.kyle.week4.cache.PostViewCountCache;
 import com.kyle.week4.controller.request.PostCreateRequest;
 import com.kyle.week4.controller.request.PostUpdateRequest;
@@ -9,6 +10,7 @@ import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.repository.CommentRepository;
+import com.kyle.week4.repository.PostLikeRepository;
 import com.kyle.week4.repository.PostRepository;
 import com.kyle.week4.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final PostViewCountCache postViewCountCache;
+    private final PostLikeCountCache postLikeCountCache;
 
     public PostDetailResponse createPost(Long userId, PostCreateRequest request) {
         User user = userRepository.findById(userId)
@@ -34,9 +37,11 @@ public class PostService {
 
         Post post = request.toEntity(user);
         Post savedPost = postRepository.save(post);
-        int viewCount = postViewCountCache.increase(post.getId());
 
-        return PostDetailResponse.of(savedPost, userId, viewCount);
+        postViewCountCache.initCache(post.getId());
+        postLikeCountCache.initCache(post.getId());
+
+        return PostDetailResponse.of(savedPost, userId, 0);
     }
 
     public List<PostResponse> infiniteScroll(Long lastPostId, int limit) {

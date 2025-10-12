@@ -10,6 +10,11 @@ public class PostLikeCountMemoryCache implements PostLikeCountCache {
     private final ConcurrentHashMap<Long, AtomicInteger> likeCount = new ConcurrentHashMap<>();
 
     @Override
+    public void initCache(Long postId) {
+        likeCount.put(postId, new AtomicInteger(0));
+    }
+
+    @Override
     public int count(Long postId) {
         return likeCount.get(postId).get();
     }

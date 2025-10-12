@@ -10,10 +10,13 @@ public class PostViewCountMemoryCache implements PostViewCountCache {
     private final ConcurrentHashMap<Long, AtomicInteger> viewCount = new ConcurrentHashMap<>();
 
     @Override
+    public void initCache(Long postId) {
+        viewCount.put(postId, new AtomicInteger(0));
+    }
+
+    @Override
     public int count(Long postId) {
-        return viewCount.computeIfAbsent(postId,
-          k -> new AtomicInteger(0)
-        ).get();
+        return viewCount.get(postId).get();
     }
 
     @Override
