@@ -50,8 +50,8 @@ class UserServiceTest {
         // then
         User savedUser = userRepository.findById(userId).orElseThrow();
         assertThat(savedUser)
-          .extracting("userId", "email", "nickname", "profileImage")
-          .contains(2L, "test2@test.com", "test2", "test2");
+          .extracting("id", "email", "nickname", "profileImage")
+          .containsExactlyInAnyOrder(2L, "test2@test.com", "test2", "test2");
     }
 
     @Test

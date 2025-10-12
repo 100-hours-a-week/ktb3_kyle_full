@@ -62,6 +62,10 @@ public class PostRepository {
         return viewCount.get(postId).incrementAndGet();
     }
 
+    public boolean existsById(Long postId) {
+        return database.containsKey(postId) && database.get(postId).isNotDeleted();
+    }
+
     public void clear() {
         primaryKey.set(1);
         database.clear();

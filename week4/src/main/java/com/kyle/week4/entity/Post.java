@@ -54,4 +54,8 @@ public class Post extends BaseEntity {
     public boolean isNotAuthor(Long userId) {
         return !this.user.getId().equals(userId);
     }
+
+    public boolean isNotDeleted() {
+        return !isDeleted;
+    }
 }

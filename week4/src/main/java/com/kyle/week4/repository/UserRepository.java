@@ -3,6 +3,8 @@ package com.kyle.week4.repository;
 import com.kyle.week4.entity.User;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -19,6 +21,16 @@ public class UserRepository {
         }
         database.put(user.getId(), user);
         return user;
+    }
+
+    public List<User> saveAll(Iterable<User> users) {
+        List<User> result = new ArrayList<>();
+
+        for (User user : users) {
+            result.add(save(user));
+        }
+
+        return result;
     }
 
     public boolean existsByNickname(String nickname) {
