@@ -10,7 +10,6 @@ import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.repository.CommentRepository;
-import com.kyle.week4.repository.PostLikeRepository;
 import com.kyle.week4.repository.PostRepository;
 import com.kyle.week4.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +52,8 @@ public class PostService {
           .map(post ->
             PostResponse.of(
               post,
-              postViewCountCache.count(post.getId()))
+              postViewCountCache.count(post.getId()),
+              postLikeCountCache.count(post.getId()))
           )
           .toList();
     }
