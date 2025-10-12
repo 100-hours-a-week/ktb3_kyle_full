@@ -29,7 +29,7 @@ public class PostLikeService {
             throw new CustomException(ALREADY_LIKED_ERROR);
         }
 
-        if (!postRepository.existsById(postId)) {
+        if (postRepository.notExistsById(postId)) {
             throw new CustomException(POST_NOT_FOUND);
         }
 
@@ -42,7 +42,7 @@ public class PostLikeService {
     }
 
     public PostLikeResponse removeLike(Long userId, Long postId) {
-        if (!postRepository.existsById(postId)) {
+        if (postRepository.notExistsById(postId)) {
             throw new CustomException(POST_NOT_FOUND);
         }
 

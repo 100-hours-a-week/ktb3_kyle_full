@@ -48,4 +48,13 @@ public class PostController {
     ) {
         return ApiResponse.ok(postService.updatePost(userId, postId, request));
     }
+
+    @DeleteMapping("/posts/{postId}")
+    public ApiResponse<?> deletePost(
+      @SessionAttribute("userId") Long userId,
+      @PathVariable("postId") Long postId
+    ) {
+
+        return ApiResponse.noContent();
+    }
 }

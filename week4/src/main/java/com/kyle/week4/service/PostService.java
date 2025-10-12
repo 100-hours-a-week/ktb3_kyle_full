@@ -54,8 +54,7 @@ public class PostService {
     }
 
     public PostDetailResponse getPostDetail(Long userId, Long postId) {
-        Post post = postRepository.findById(postId)
-          .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
+        Post post = findPostBy(postId);
 
         int viewCount = postViewCountCache.increase(postId);
 
@@ -63,8 +62,7 @@ public class PostService {
     }
 
     public PostDetailResponse updatePost(Long userId, Long postId, PostUpdateRequest request) {
-        Post post = postRepository.findById(postId)
-          .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
+        Post post = findPostBy(postId);
 
         if (post.isNotAuthor(userId)) {
             throw new CustomException(PERMISSION_DENIED);
@@ -74,5 +72,20 @@ public class PostService {
         int viewCount = postViewCountCache.count(post.getId());
 
         return PostDetailResponse.of(post, userId, viewCount);
+    }
+
+    public void deletePost(Long userId, Long postId) {
+        Post post = findPostBy(postId);
+
+        if (post.isNotAuthor(userId)) {
+            throw new CustomException(PERMISSION_DENIED);
+        }
+
+        post.delete();
+    }
+
+    private Post findPostBy(Long postId) {
+        return postRepository.findById(postId)
+          .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
     }
 }

@@ -27,4 +27,8 @@ public record ApiResponse<T>(
     public static <T> ApiResponse<T> validationFail(final MethodArgumentNotValidException e) {
         return new ApiResponse<>(HttpStatus.BAD_REQUEST, false, null, e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
     }
+
+    public static <T> ApiResponse<T> noContent() {
+        return new ApiResponse<>(HttpStatus.NO_CONTENT, true, null, null);
+    }
 }

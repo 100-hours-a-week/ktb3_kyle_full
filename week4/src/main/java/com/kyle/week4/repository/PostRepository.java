@@ -32,12 +32,14 @@ public class PostRepository {
 
     public List<Post> findAllInfiniteScroll(int limit) {
         return database.descendingMap().values().stream()
+          .filter(Post::isNotDeleted)
           .limit(limit)
           .toList();
     }
 
     public List<Post> findAllInfiniteScroll(Long lastPostId, int limit) {
         return database.headMap(lastPostId, false).descendingMap().values().stream()
+          .filter(Post::isNotDeleted)
           .limit(limit)
           .toList();
     }
@@ -51,8 +53,8 @@ public class PostRepository {
         }
     }
 
-    public boolean existsById(Long postId) {
-        return database.containsKey(postId) && database.get(postId).isNotDeleted();
+    public boolean notExistsById(Long postId) {
+        return !database.containsKey(postId) || database.get(postId).isDeleted();
     }
 
     public void clear() {

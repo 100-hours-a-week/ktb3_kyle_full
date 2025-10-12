@@ -47,6 +47,10 @@ public class Post extends BaseEntity {
         this.images = request.getImages();
     }
 
+    public void delete() {
+        isDeleted = true;
+    }
+
     public boolean isNew() {
         return id == null;
     }
