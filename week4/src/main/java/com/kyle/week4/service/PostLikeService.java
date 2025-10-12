@@ -9,8 +9,6 @@ import com.kyle.week4.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 import static com.kyle.week4.exception.ErrorCode.*;
 
 @Service
@@ -19,6 +17,12 @@ public class PostLikeService {
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
     private final PostLikeCountCache postLikeCountCache;
+
+    public PostLikeResponse count(Long userId, Long postId) {
+        boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
+        int likeCount = postLikeCountCache.count(postId);
+        return new PostLikeResponse(likeCount, isLiked);
+    }
 
     public PostLikeResponse like(Long userId, Long postId) {
         if (postLikeRepository.existsByUserIdAndPostId(userId, postId)) {

@@ -10,6 +10,14 @@ import org.springframework.web.bind.annotation.*;
 public class PostLikeController {
     private final PostLikeService postLikeService;
 
+    @GetMapping("/posts/{postId}/like")
+    public ApiResponse<PostLikeResponse> count(
+      @SessionAttribute("userId") Long userId,
+      @PathVariable Long postId
+    ) {
+        return ApiResponse.ok(postLikeService.count(userId, postId));
+    }
+
     @PostMapping("/posts/{postId}/like")
     public ApiResponse<PostLikeResponse> like(
       @SessionAttribute("userId") Long userId,
