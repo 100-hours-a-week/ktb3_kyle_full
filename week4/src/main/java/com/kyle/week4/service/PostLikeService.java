@@ -9,8 +9,9 @@ import com.kyle.week4.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import static com.kyle.week4.exception.ErrorCode.ALREADY_LIKED_ERROR;
-import static com.kyle.week4.exception.ErrorCode.POST_NOT_FOUND;
+import java.util.Optional;
+
+import static com.kyle.week4.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -34,5 +35,19 @@ public class PostLikeService {
         int likeCount = postLikeCountCache.increase(postId);
 
         return new PostLikeResponse(likeCount, true);
+    }
+
+    public PostLikeResponse removeLike(Long userId, Long postId) {
+        if (!postRepository.existsById(postId)) {
+            throw new CustomException(POST_NOT_FOUND);
+        }
+
+        PostLike postLike = postLikeRepository.findByUserIdAndPostId(userId, postId)
+          .orElseThrow(() -> new CustomException(POST_LIKE_NOT_FOUND));
+        postLikeRepository.delete(postLike);
+
+        int likeCount = postLikeCountCache.decrease(postId);
+
+        return new PostLikeResponse(likeCount, false);
     }
 }

@@ -3,10 +3,7 @@ package com.kyle.week4.controller;
 import com.kyle.week4.controller.response.PostLikeResponse;
 import com.kyle.week4.service.PostLikeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,5 +16,13 @@ public class PostLikeController {
       @PathVariable("postId") Long postId
     ) {
         return ApiResponse.ok(postLikeService.like(userId, postId));
+    }
+
+    @DeleteMapping("/posts/{postId}/like")
+    public ApiResponse<PostLikeResponse> removeLike(
+      @SessionAttribute("userId") Long userId,
+      @PathVariable("postId") Long postId
+    ) {
+        return ApiResponse.ok(postLikeService.removeLike(userId, postId));
     }
 }
