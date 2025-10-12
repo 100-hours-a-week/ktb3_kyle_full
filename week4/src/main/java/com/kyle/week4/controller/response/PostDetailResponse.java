@@ -14,7 +14,6 @@ public class PostDetailResponse {
     private String content;
     private String authorNickname;
     private String authorProfileImage;
-    private int likeCount;
     private int viewCount;
     private int commentCount;
     private boolean isAuthor;
@@ -22,13 +21,12 @@ public class PostDetailResponse {
     private LocalDateTime createdAt;
 
     @Builder
-    public PostDetailResponse(Long id, String title, String content, String authorNickname, String authorProfileImage, int likeCount, int viewCount, int commentCount, boolean isAuthor, List<String> images, LocalDateTime createdAt) {
+    public PostDetailResponse(Long id, String title, String content, String authorNickname, String authorProfileImage, int viewCount, int commentCount, boolean isAuthor, List<String> images, LocalDateTime createdAt) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.authorNickname = authorNickname;
         this.authorProfileImage = authorProfileImage;
-        this.likeCount = likeCount;
         this.viewCount = viewCount;
         this.commentCount = commentCount;
         this.isAuthor = isAuthor;
@@ -41,7 +39,6 @@ public class PostDetailResponse {
           .id(post.getId())
           .title(post.getTitle())
           .content(post.getContent())
-          .likeCount(post.getLikeCount())
           .viewCount(viewCount)
           .commentCount(post.getCommentCount())
           .isAuthor(post.getUser().getId().equals(userId))

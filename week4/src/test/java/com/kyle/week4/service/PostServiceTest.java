@@ -1,5 +1,6 @@
 package com.kyle.week4.service;
 
+import com.kyle.week4.cache.PostViewCountCache;
 import com.kyle.week4.controller.request.PostCreateRequest;
 import com.kyle.week4.controller.request.PostUpdateRequest;
 import com.kyle.week4.controller.response.PostDetailResponse;
@@ -34,6 +35,9 @@ class PostServiceTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PostViewCountCache postViewCountCache;
+
     private final User user = createUser();
 
     @BeforeEach
@@ -45,6 +49,7 @@ class PostServiceTest {
     void tearDown() {
         userRepository.clear();
         postRepository.clear();
+        postViewCountCache.clear();
     }
 
     @Test
@@ -63,8 +68,8 @@ class PostServiceTest {
         // then
         assertThat(postDetailResponse.getId()).isNotNull();
         assertThat(postDetailResponse)
-          .extracting("title", "content", "likeCount", "viewCount", "commentCount", "isAuthor")
-          .contains("제목1", "내용1", 0, 0, 0, true);
+          .extracting("title", "content", "viewCount", "commentCount", "isAuthor")
+          .contains("제목1", "내용1", 0, 0, true);
         assertThat(postDetailResponse.getImages()).hasSize(2)
           .containsExactlyInAnyOrder(
             "image1", "image2"
@@ -170,7 +175,7 @@ class PostServiceTest {
             });
         }
         latch.await();
-        int viewCount = postRepository.getViewCount(postId);
+        int viewCount = postViewCountCache.count(postId);
 
         // then
         assertThat(viewCount).isEqualTo(totalViewCount);

@@ -6,24 +6,21 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
-public class PostLikeCountMemoryCache implements PostLikeCountCache {
-    private final ConcurrentHashMap<Long, AtomicInteger> likeCount = new ConcurrentHashMap<>();
+public class PostViewCountMemoryCache implements PostViewCountCache {
+    private final ConcurrentHashMap<Long, AtomicInteger> viewCount = new ConcurrentHashMap<>();
 
     @Override
     public int count(Long postId) {
-        return likeCount.get(postId).get();
+        return viewCount.computeIfAbsent(postId,
+          k -> new AtomicInteger(0)
+        ).get();
     }
 
     @Override
     public int increase(Long postId) {
-        return likeCount.computeIfAbsent(postId,
+        return viewCount.computeIfAbsent(postId,
           k -> new AtomicInteger(0)
         ).incrementAndGet();
-    }
-
-    @Override
-    public int decrease(Long postId) {
-        return likeCount.get(postId).decrementAndGet();
     }
 
     @Override
@@ -33,6 +30,6 @@ public class PostLikeCountMemoryCache implements PostLikeCountCache {
 
     @Override
     public void clear() {
-        likeCount.clear();
+        viewCount.clear();
     }
 }

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -15,7 +14,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class PostRepository {
     private final AtomicLong primaryKey = new AtomicLong(1);
     private final ConcurrentSkipListMap<Long, Post> database = new ConcurrentSkipListMap<>();
-    private final ConcurrentHashMap<Long, AtomicInteger> viewCount = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Long, ReentrantLock> commentCountLock = new ConcurrentHashMap<>();
 
     public Post save(Post post) {
@@ -23,7 +21,6 @@ public class PostRepository {
             Long postId = primaryKey.getAndIncrement();
             post.assignId(postId);
             commentCountLock.put(postId, new ReentrantLock());
-            viewCount.put(postId, new AtomicInteger(0));
         }
         database.put(post.getId(), post);
         return post;
@@ -54,14 +51,6 @@ public class PostRepository {
         }
     }
 
-    public int getViewCount(Long postId) {
-        return viewCount.get(postId).get();
-    }
-
-    public int increaseViewCount(Long postId) {
-        return viewCount.get(postId).incrementAndGet();
-    }
-
     public boolean existsById(Long postId) {
         return database.containsKey(postId) && database.get(postId).isNotDeleted();
     }
@@ -69,7 +58,6 @@ public class PostRepository {
     public void clear() {
         primaryKey.set(1);
         database.clear();
-        viewCount.clear();
         commentCountLock.clear();
     }
 }

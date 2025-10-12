@@ -43,6 +43,7 @@ class PostLikeServiceTest {
         postRepository.clear();
         userRepository.clear();
         postLikeRepository.clear();
+        postLikeCountCache.clear();
     }
 
     @Test

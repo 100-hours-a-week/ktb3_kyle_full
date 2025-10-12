@@ -1,11 +1,10 @@
 package com.kyle.week4.service;
 
+import com.kyle.week4.cache.PostViewCountCache;
 import com.kyle.week4.controller.request.PostCreateRequest;
 import com.kyle.week4.controller.request.PostUpdateRequest;
-import com.kyle.week4.controller.response.CommentResponse;
 import com.kyle.week4.controller.response.PostDetailResponse;
 import com.kyle.week4.controller.response.PostResponse;
-import com.kyle.week4.entity.Comment;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
@@ -27,6 +26,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final PostViewCountCache postViewCountCache;
 
     public PostDetailResponse createPost(Long userId, PostCreateRequest request) {
         User user = userRepository.findById(userId)
@@ -34,8 +34,9 @@ public class PostService {
 
         Post post = request.toEntity(user);
         Post savedPost = postRepository.save(post);
+        int viewCount = postViewCountCache.increase(post.getId());
 
-        return PostDetailResponse.of(savedPost, userId, 0);
+        return PostDetailResponse.of(savedPost, userId, viewCount);
     }
 
     public List<PostResponse> infiniteScroll(Long lastPostId, int limit) {
@@ -47,7 +48,7 @@ public class PostService {
           .map(post ->
             PostResponse.of(
               post,
-              postRepository.getViewCount(post.getId()))
+              postViewCountCache.count(post.getId()))
           )
           .toList();
     }
@@ -56,7 +57,7 @@ public class PostService {
         Post post = postRepository.findById(postId)
           .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
 
-        int viewCount = postRepository.increaseViewCount(postId);
+        int viewCount = postViewCountCache.increase(postId);
 
         return PostDetailResponse.of(post, userId, viewCount);
     }
@@ -70,7 +71,7 @@ public class PostService {
         }
         post.updatePost(request);
 
-        int viewCount = postRepository.getViewCount(postId);
+        int viewCount = postViewCountCache.count(post.getId());
 
         return PostDetailResponse.of(post, userId, viewCount);
     }
