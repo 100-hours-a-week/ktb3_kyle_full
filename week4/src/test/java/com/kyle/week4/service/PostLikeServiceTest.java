@@ -121,6 +121,86 @@ class PostLikeServiceTest {
           .hasFieldOrPropertyWithValue("errorCode", ErrorCode.POST_NOT_FOUND);
     }
 
+    @Test
+    @DisplayName("좋아요를 취소한다.")
+    void deletePostLike() {
+        // given
+        User user = createUser();
+        userRepository.save(user);
+
+        Post post = createPost(user, "제목");
+        postRepository.save(post);
+
+        postLikeService.like(user.getId(), post.getId());
+
+        // when
+        PostLikeResponse response = postLikeService.removeLike(user.getId(), post.getId());
+
+        // then
+        assertThat(response)
+          .extracting("likeCount", "isLiked")
+          .containsExactly(0, false);
+    }
+
+    @Test
+    @DisplayName("좋아요가 취소되면 좋아요수가 감소해야 한다.")
+    void deletePostLike_count() {
+        // given
+        User user1 = createUser();
+        User user2 = createUser();
+        User user3 = createUser();
+        List<User> users = userRepository.saveAll(List.of(user1, user2, user3));
+
+        Post post = createPost(user1, "제목");
+        postRepository.save(post);
+
+        for (User user : users) {
+            postLikeService.like(user.getId(), post.getId());
+        }
+        postLikeService.removeLike(user1.getId(), post.getId());
+
+        // when
+        int likeCount = postLikeCountCache.count(post.getId());
+
+        // then
+        assertThat(likeCount).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("좋아요를 취소 할 게시글이 존재하지 않으면 예외가 발생한다.")
+    void deletePostLike_whenPostNotFound() {
+        // given
+        User user = createUser();
+        userRepository.save(user);
+
+        Post post = createPost(user, "제목");
+        postRepository.save(post);
+
+        PostLike postLike = new PostLike(user.getId(), post.getId());
+        postLikeRepository.save(postLike);
+
+        // when // then
+        assertThatThrownBy(() -> postLikeService.removeLike(user.getId(), 10L))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorCode", ErrorCode.POST_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("좋아요를 누르지 않았는데, 좋아요를 취소하려고 하는 경우 예외가 발생한다.")
+    void deletePostLike_whenDoNotLike() {
+        // given
+        User user = createUser();
+        userRepository.save(user);
+
+        Post post = createPost(user, "제목");
+        postRepository.save(post);
+
+        // when // then
+        assertThatThrownBy(() -> postLikeService.removeLike(user.getId(), post.getId()))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorCode", ErrorCode.POST_LIKE_NOT_FOUND);
+    }
+
     private User createUser() {
         return User.builder()
           .email("test@test.com")
