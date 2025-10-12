@@ -1,6 +1,7 @@
 package com.kyle.week4.service;
 
 import com.kyle.week4.controller.request.LoginRequest;
+import com.kyle.week4.controller.request.PasswordUpdateRequest;
 import com.kyle.week4.controller.request.UserCreateRequest;
 import com.kyle.week4.controller.request.UserProfileUpdateRequest;
 import com.kyle.week4.controller.response.UserProfileResponse;
@@ -46,6 +47,14 @@ public class UserService {
 
         user.updateUserProfile(request);
         return UserProfileResponse.of(user);
+    }
+
+    public void updatePassword(Long userId, PasswordUpdateRequest request) {
+        User user = findUserBy(userId);
+        if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new CustomException(PASSWORD_SAME_BEFORE_ERROR);
+        }
+        user.encodePassword(passwordEncoder.encode(request.getPassword()));
     }
 
     private User findUserBy(Long userId) {

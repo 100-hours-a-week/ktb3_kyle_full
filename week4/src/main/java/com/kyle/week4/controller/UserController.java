@@ -1,5 +1,6 @@
 package com.kyle.week4.controller;
 
+import com.kyle.week4.controller.request.PasswordUpdateRequest;
 import com.kyle.week4.controller.request.UserCreateRequest;
 import com.kyle.week4.controller.request.UserProfileUpdateRequest;
 import com.kyle.week4.controller.response.UserProfileResponse;
@@ -31,5 +32,14 @@ public class UserController {
       @Valid @RequestBody UserProfileUpdateRequest request
     ) {
         return ApiResponse.ok(userService.updateUserProfile(userId, request));
+    }
+
+    @PatchMapping("/users/password")
+    public ApiResponse<?> updatePassword(
+      @SessionAttribute("userId") Long userId,
+      @Valid @RequestBody PasswordUpdateRequest request
+    ) {
+        userService.updatePassword(userId, request);
+        return ApiResponse.noContent();
     }
 }
