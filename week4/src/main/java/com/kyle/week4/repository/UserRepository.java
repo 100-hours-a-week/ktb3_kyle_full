@@ -13,6 +13,8 @@ import java.util.concurrent.atomic.AtomicLong;
 public class UserRepository {
     private final AtomicLong primaryKey = new AtomicLong(1);
     private final ConcurrentHashMap<Long, User> database = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, User> emailIndex = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, User> nicknameIndex = new ConcurrentHashMap<>();
 
     public User save(User user) {
         if (user.isNew()) {
@@ -20,6 +22,8 @@ public class UserRepository {
             user.assignId(userId);
         }
         database.put(user.getId(), user);
+        emailIndex.put(user.getEmail(), user);
+        nicknameIndex.put(user.getNickname(), user);
         return user;
     }
 
@@ -34,13 +38,11 @@ public class UserRepository {
     }
 
     public boolean existsByNickname(String nickname) {
-        return database.values().stream()
-          .anyMatch(user -> user.isSameNickname(nickname));
+        return nicknameIndex.containsKey(nickname);
     }
 
     public boolean existsByEmail(String email) {
-        return database.values().stream()
-          .anyMatch(user -> user.isSameEmail(email));
+        return findByEmail(email).isPresent();
     }
 
     public Optional<User> findById(Long id) {
@@ -48,13 +50,13 @@ public class UserRepository {
     }
 
     public Optional<User> findByEmail(String email) {
-        return database.values().stream()
-          .filter(user -> user.isSameEmail(email))
-          .findFirst();
+        return Optional.ofNullable(emailIndex.get(email));
     }
 
     public void clear() {
         primaryKey.set(1);
         database.clear();
+        emailIndex.clear();
+        nicknameIndex.clear();
     }
 }

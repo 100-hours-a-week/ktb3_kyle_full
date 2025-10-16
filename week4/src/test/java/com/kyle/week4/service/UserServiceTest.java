@@ -5,7 +5,6 @@ import com.kyle.week4.controller.request.UserProfileUpdateRequest;
 import com.kyle.week4.controller.response.UserProfileResponse;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
-import com.kyle.week4.exception.ErrorCode;
 import com.kyle.week4.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static com.kyle.week4.exception.ErrorCode.*;
+import static com.kyle.week4.exception.ErrorCode.DUPLICATE_NICKNAME_ERROR;
+import static com.kyle.week4.exception.ErrorCode.USER_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
