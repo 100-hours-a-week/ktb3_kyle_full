@@ -19,13 +19,16 @@ public class PostLikeService {
     private final PostLikeCountCache postLikeCountCache;
 
     public PostLikeResponse count(Long userId, Long postId) {
-        boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
+        String key = generateKey(userId, postId);
+        boolean isLiked = postLikeRepository.existsByUserIdAndPostId(key);
         int likeCount = postLikeCountCache.count(postId);
         return new PostLikeResponse(likeCount, isLiked);
     }
 
     public PostLikeResponse like(Long userId, Long postId) {
-        if (postLikeRepository.existsByUserIdAndPostId(userId, postId)) {
+        String key = generateKey(userId, postId);
+
+        if (postLikeRepository.existsByUserIdAndPostId(key)) {
             throw new CustomException(ALREADY_LIKED_ERROR);
         }
 
@@ -33,7 +36,7 @@ public class PostLikeService {
             throw new CustomException(POST_NOT_FOUND);
         }
 
-        PostLike postLike = new PostLike(userId, postId);
+        PostLike postLike = new PostLike(key);
         postLikeRepository.save(postLike);
 
         int likeCount = postLikeCountCache.increase(postId);
@@ -46,12 +49,17 @@ public class PostLikeService {
             throw new CustomException(POST_NOT_FOUND);
         }
 
-        PostLike postLike = postLikeRepository.findByUserIdAndPostId(userId, postId)
+        String key = generateKey(userId, postId);
+        PostLike postLike = postLikeRepository.findByUserIdAndPostId(key)
           .orElseThrow(() -> new CustomException(POST_LIKE_NOT_FOUND));
         postLikeRepository.delete(postLike);
 
         int likeCount = postLikeCountCache.decrease(postId);
 
         return new PostLikeResponse(likeCount, false);
+    }
+
+    private String generateKey(Long userId, Long postId) {
+        return userId + ":" + postId;
     }
 }
