@@ -1,6 +1,6 @@
 package com.kyle.week4.service;
 
-import com.kyle.week4.cache.PostLikeCountCache;
+import com.kyle.week4.cache.CountCache;
 import com.kyle.week4.controller.response.PostLikeResponse;
 import com.kyle.week4.entity.PostLike;
 import com.kyle.week4.exception.CustomException;
@@ -16,7 +16,7 @@ import static com.kyle.week4.exception.ErrorCode.*;
 public class PostLikeService {
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
-    private final PostLikeCountCache postLikeCountCache;
+    private final CountCache postLikeCountCache;
 
     public PostLikeResponse count(Long userId, Long postId) {
         String key = generateKey(userId, postId);

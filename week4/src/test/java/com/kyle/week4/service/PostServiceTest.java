@@ -1,6 +1,6 @@
 package com.kyle.week4.service;
 
-import com.kyle.week4.cache.PostViewCountCache;
+import com.kyle.week4.cache.CountCache;
 import com.kyle.week4.controller.request.PostCreateRequest;
 import com.kyle.week4.controller.request.PostUpdateRequest;
 import com.kyle.week4.controller.response.PostDetailResponse;
@@ -36,7 +36,7 @@ class PostServiceTest {
     private UserRepository userRepository;
 
     @Autowired
-    private PostViewCountCache postViewCountCache;
+    private CountCache postViewCountCache;
 
     private final User user = createUser();
 

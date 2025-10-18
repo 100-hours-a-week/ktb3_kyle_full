@@ -3,7 +3,7 @@ package com.kyle.week4.cache;
 import java.util.List;
 import java.util.Map;
 
-public interface PostLikeCountCache {
+public interface CountCache {
     void initCache(Long postId);
 
     int count(Long postId);

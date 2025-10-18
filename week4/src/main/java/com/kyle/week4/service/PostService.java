@@ -1,7 +1,6 @@
 package com.kyle.week4.service;
 
-import com.kyle.week4.cache.PostLikeCountCache;
-import com.kyle.week4.cache.PostViewCountCache;
+import com.kyle.week4.cache.CountCache;
 import com.kyle.week4.controller.request.PostCreateRequest;
 import com.kyle.week4.controller.request.PostUpdateRequest;
 import com.kyle.week4.controller.response.PostDetailResponse;
@@ -28,8 +27,8 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
-    private final PostViewCountCache postViewCountCache;
-    private final PostLikeCountCache postLikeCountCache;
+    private final CountCache postViewCountCache;
+    private final CountCache postLikeCountCache;
 
     public PostDetailResponse createPost(Long userId, PostCreateRequest request) {
         User user = userRepository.findById(userId)

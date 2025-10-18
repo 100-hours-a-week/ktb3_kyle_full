@@ -1,25 +1,24 @@
 package com.kyle.week4.cache;
 
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-@Component
-public class PostViewCountMemoryCache implements PostViewCountCache {
-    private final ConcurrentHashMap<Long, AtomicInteger> viewCount = new ConcurrentHashMap<>();
+@RequiredArgsConstructor
+public class InMemoryCache<T extends Map<Long, AtomicInteger>> implements CountCache {
+    private final T countCache;
 
     @Override
     public void initCache(Long postId) {
-        viewCount.put(postId, new AtomicInteger(0));
+        countCache.put(postId, new AtomicInteger(0));
     }
 
     @Override
     public int count(Long postId) {
-        return viewCount.get(postId).get();
+        return countCache.get(postId).get();
     }
 
     @Override
@@ -27,20 +26,25 @@ public class PostViewCountMemoryCache implements PostViewCountCache {
         return postIds.stream().collect(
           Collectors.toMap(
             postId -> postId,
-            postId -> viewCount.get(postId).get()
+            postId -> countCache.get(postId).get()
           )
         );
     }
 
     @Override
     public int increase(Long postId) {
-        return viewCount.computeIfAbsent(postId,
+        return countCache.computeIfAbsent(postId,
           k -> new AtomicInteger(0)
         ).incrementAndGet();
     }
 
     @Override
+    public int decrease(Long postId) {
+        return countCache.get(postId).decrementAndGet();
+    }
+
+    @Override
     public void clear() {
-        viewCount.clear();
+        countCache.clear();
     }
 }

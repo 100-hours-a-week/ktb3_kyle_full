@@ -1,6 +1,6 @@
 package com.kyle.week4.service;
 
-import com.kyle.week4.cache.PostLikeCountCache;
+import com.kyle.week4.cache.CountCache;
 import com.kyle.week4.controller.response.PostLikeResponse;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.PostLike;
@@ -36,7 +36,7 @@ class PostLikeServiceTest {
     private PostLikeRepository postLikeRepository;
 
     @Autowired
-    private PostLikeCountCache postLikeCountCache;
+    private CountCache postLikeCountCache;
 
     @AfterEach
     void tearDown() {
