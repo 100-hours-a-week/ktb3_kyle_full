@@ -11,26 +11,26 @@ public class PostLikeController {
     private final PostLikeService postLikeService;
 
     @GetMapping("/posts/{postId}/like")
-    public ApiResponse<PostLikeResponse> count(
+    public BaseResponse<PostLikeResponse> count(
       @SessionAttribute("userId") Long userId,
       @PathVariable("postId") Long postId
     ) {
-        return ApiResponse.ok(postLikeService.count(userId, postId));
+        return BaseResponse.ok(postLikeService.count(userId, postId));
     }
 
     @PostMapping("/posts/{postId}/like")
-    public ApiResponse<PostLikeResponse> like(
+    public BaseResponse<PostLikeResponse> like(
       @SessionAttribute("userId") Long userId,
       @PathVariable("postId") Long postId
     ) {
-        return ApiResponse.ok(postLikeService.like(userId, postId));
+        return BaseResponse.ok(postLikeService.like(userId, postId));
     }
 
     @DeleteMapping("/posts/{postId}/like")
-    public ApiResponse<PostLikeResponse> removeLike(
+    public BaseResponse<PostLikeResponse> removeLike(
       @SessionAttribute("userId") Long userId,
       @PathVariable("postId") Long postId
     ) {
-        return ApiResponse.ok(postLikeService.removeLike(userId, postId));
+        return BaseResponse.ok(postLikeService.removeLike(userId, postId));
     }
 }

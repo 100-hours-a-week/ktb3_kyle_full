@@ -1,7 +1,7 @@
 package com.kyle.week4.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kyle.week4.controller.ApiResponse;
+import com.kyle.week4.controller.BaseResponse;
 import com.kyle.week4.exception.CustomException;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,7 +28,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             response.setStatus(e.getHttpStatus().value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setCharacterEncoding("UTF-8");
-            objectMapper.writeValue(response.getWriter(), ApiResponse.fail(e));
+            objectMapper.writeValue(response.getWriter(), BaseResponse.fail(e));
         }
     }
 }

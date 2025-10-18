@@ -1,5 +1,6 @@
 package com.kyle.week4.controller;
 
+import com.kyle.week4.controller.docs.UserControllerDocs;
 import com.kyle.week4.controller.request.PasswordUpdateRequest;
 import com.kyle.week4.controller.request.UserCreateRequest;
 import com.kyle.week4.controller.request.UserProfileUpdateRequest;
@@ -11,35 +12,35 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserControllerDocs {
     private final UserService userService;
 
     @PostMapping("/users")
-    public ApiResponse<Long> createUser(@Valid @RequestBody UserCreateRequest request) {
-        return ApiResponse.created(userService.createUser(request));
+    public BaseResponse<Long> createUser(@Valid @RequestBody UserCreateRequest request) {
+        return BaseResponse.created(userService.createUser(request));
     }
 
     @GetMapping("/users/profile")
-    public ApiResponse<UserProfileResponse> getUserProfile(
+    public BaseResponse<UserProfileResponse> getUserProfile(
       @SessionAttribute("userId") Long userId
     ) {
-        return ApiResponse.ok(userService.getUserProfile(userId));
+        return BaseResponse.ok(userService.getUserProfile(userId));
     }
 
     @PatchMapping("/users/profile")
-    public ApiResponse<UserProfileResponse> updateUserProfile(
+    public BaseResponse<UserProfileResponse> updateUserProfile(
       @SessionAttribute("userId") Long userId,
       @Valid @RequestBody UserProfileUpdateRequest request
     ) {
-        return ApiResponse.ok(userService.updateUserProfile(userId, request));
+        return BaseResponse.ok(userService.updateUserProfile(userId, request));
     }
 
     @PatchMapping("/users/password")
-    public ApiResponse<?> updatePassword(
+    public BaseResponse<?> updatePassword(
       @SessionAttribute("userId") Long userId,
       @Valid @RequestBody PasswordUpdateRequest request
     ) {
         userService.updatePassword(userId, request);
-        return ApiResponse.noContent();
+        return BaseResponse.noContent();
     }
 }

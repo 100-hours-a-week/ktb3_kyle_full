@@ -1,6 +1,6 @@
 package com.kyle.week4.exception;
 
-import com.kyle.week4.controller.ApiResponse;
+import com.kyle.week4.controller.BaseResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,8 +18,8 @@ public class ResponseInterceptor implements ResponseBodyAdvice {
 
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
-        if (returnType.getParameterType() == ApiResponse.class) {
-            HttpStatus status = ((ApiResponse<?>) body).httpStatus();
+        if (returnType.getParameterType() == BaseResponse.class) {
+            HttpStatus status = ((BaseResponse<?>) body).httpStatus();
             response.setStatusCode(status);
         }
 

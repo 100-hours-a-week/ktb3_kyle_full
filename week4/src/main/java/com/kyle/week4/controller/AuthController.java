@@ -15,13 +15,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/auth/sessions")
-    public ApiResponse<Long> login(
+    public BaseResponse<Long> login(
       @RequestBody LoginRequest loginRequest,
       HttpServletRequest httpRequest
     ) {
         Long userId = authService.login(loginRequest);
         HttpSession session = httpRequest.getSession(true);
         session.setAttribute("userId", userId);
-        return ApiResponse.ok(userId);
+        return BaseResponse.ok(userId);
     }
 }

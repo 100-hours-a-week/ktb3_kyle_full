@@ -24,7 +24,9 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     private static final String[] EXCLUDED_PATHS = {
       "/users",
       "/auth/sessions",
-      "/swagger-ui/**"
+      "/swagger-ui/**",
+      "/v3/api-docs/**",
+      "/api-test"
     };
 
     private final AuthenticationProvider provider;
@@ -34,7 +36,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         if (!provider.isAuthenticated(request, response)) {
-            System.out.println(path);
             throw new CustomException(FAILED_AUTHENTICATE);
         }
         filterChain.doFilter(request, response);

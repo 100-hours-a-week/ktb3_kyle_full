@@ -2,3 +2,8 @@ server:
   servlet:
     session:
       timeout: 1h
+
+springdoc:
+  swagger-ui:
+    path: /api-test
+
