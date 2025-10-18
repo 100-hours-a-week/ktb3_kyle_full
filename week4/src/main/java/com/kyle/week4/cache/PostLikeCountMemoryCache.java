@@ -2,8 +2,11 @@ package com.kyle.week4.cache;
 
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Component
 public class PostLikeCountMemoryCache implements PostLikeCountCache {
@@ -20,6 +23,16 @@ public class PostLikeCountMemoryCache implements PostLikeCountCache {
     }
 
     @Override
+    public Map<Long, Integer> getCounts(List<Long> postIds) {
+        return postIds.stream().collect(
+          Collectors.toMap(
+            postId -> postId,
+            postId -> likeCount.get(postId).get()
+          )
+        );
+    }
+
+    @Override
     public int increase(Long postId) {
         return likeCount.computeIfAbsent(postId,
           k -> new AtomicInteger(0)
@@ -29,11 +42,6 @@ public class PostLikeCountMemoryCache implements PostLikeCountCache {
     @Override
     public int decrease(Long postId) {
         return likeCount.get(postId).decrementAndGet();
-    }
-
-    @Override
-    public void backUp(Long postId) {
-
     }
 
     @Override

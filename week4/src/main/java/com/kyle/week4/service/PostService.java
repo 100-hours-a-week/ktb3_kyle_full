@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.kyle.week4.exception.ErrorCode.*;
 
@@ -48,12 +49,19 @@ public class PostService {
           postRepository.findAllInfiniteScroll(limit) :
           postRepository.findAllInfiniteScroll(lastPostId, limit);
 
+        List<Long> postIds = posts.stream()
+          .map(Post::getId)
+          .toList();
+
+        Map<Long, Integer> viewCountMap = postViewCountCache.getCounts(postIds);
+        Map<Long, Integer> likeCountMap = postLikeCountCache.getCounts(postIds);
+
         return posts.stream()
           .map(post ->
             PostResponse.of(
               post,
-              postViewCountCache.count(post.getId()),
-              postLikeCountCache.count(post.getId()))
+              viewCountMap.get(post.getId()),
+              likeCountMap.get(post.getId()))
           )
           .toList();
     }

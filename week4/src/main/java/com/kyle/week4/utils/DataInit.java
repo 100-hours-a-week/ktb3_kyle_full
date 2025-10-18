@@ -4,12 +4,10 @@ import com.kyle.week4.controller.request.CommentCreateRequest;
 import com.kyle.week4.controller.request.PostCreateRequest;
 import com.kyle.week4.controller.request.UserCreateRequest;
 import com.kyle.week4.controller.response.PostDetailResponse;
-import com.kyle.week4.entity.Post;
 import com.kyle.week4.repository.UserRepository;
 import com.kyle.week4.service.CommentService;
 import com.kyle.week4.service.PostService;
 import com.kyle.week4.service.UserService;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +23,7 @@ public class DataInit {
 
     private final UserRepository userRepository;
 
-    @PostConstruct
+    //@PostConstruct
     public void init() {
         UserCreateRequest userCreateRequest1 = UserCreateRequest.builder()
           .email("test1@test.com")

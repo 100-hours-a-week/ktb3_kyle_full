@@ -81,8 +81,12 @@ class PostServiceTest {
     Collection<DynamicTest> infiniteScroll() {
         // given
         for (int i = 1; i <= 8; i++) {
-            Post post = createPost("제목" + i);
-            postRepository.save(post);
+            PostCreateRequest request = PostCreateRequest.builder()
+              .title("제목 " + i)
+              .content("내용" + i)
+              .images(List.of("image1", "image2"))
+              .build();
+            postService.createPost(user.getId(), request);
         }
 
         int limit = 3;
@@ -185,8 +189,12 @@ class PostServiceTest {
     @DisplayName("게시글을 수정한다.")
     void updatePostTest() {
         // given
-        Post post = createPost("제목");
-        postRepository.save(post);
+        PostCreateRequest createRequest = PostCreateRequest.builder()
+          .title("제목")
+          .content("내용")
+          .images(List.of("image1", "image2"))
+          .build();
+        PostDetailResponse post = postService.createPost(user.getId(), createRequest);
 
         PostUpdateRequest request = PostUpdateRequest.builder()
           .title("수정된 제목")
