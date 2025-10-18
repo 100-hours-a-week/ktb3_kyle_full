@@ -7,9 +7,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Set;
 
 import static com.kyle.week4.exception.ErrorCode.FAILED_AUTHENTICATE;
@@ -18,9 +20,12 @@ import static com.kyle.week4.exception.ErrorCode.FAILED_AUTHENTICATE;
 @Component
 @RequiredArgsConstructor
 public class AuthenticationFilter extends OncePerRequestFilter {
-    private static final Set<String> EXCLUDED_PATHS = Set.of(
-      "/users", "/auth/sessions"
-    );
+
+    private static final String[] EXCLUDED_PATHS = {
+      "/users",
+      "/auth/sessions",
+      "/swagger-ui/**"
+    };
 
     private final AuthenticationProvider provider;
 
@@ -28,14 +33,19 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
 
-        if (EXCLUDED_PATHS.contains(path)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         if (!provider.isAuthenticated(request, response)) {
+            System.out.println(path);
             throw new CustomException(FAILED_AUTHENTICATE);
         }
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String requestURI = request.getRequestURI();
+        AntPathMatcher antPathMatcher = new AntPathMatcher();
+
+        return Arrays.stream(EXCLUDED_PATHS)
+          .anyMatch(path -> antPathMatcher.match(path, requestURI));
     }
 }
