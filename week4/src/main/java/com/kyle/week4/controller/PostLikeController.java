@@ -1,5 +1,6 @@
 package com.kyle.week4.controller;
 
+import com.kyle.week4.controller.docs.PostLikeControllerDocs;
 import com.kyle.week4.controller.response.PostLikeResponse;
 import com.kyle.week4.service.PostLikeService;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-public class PostLikeController {
+public class PostLikeController implements PostLikeControllerDocs {
     private final PostLikeService postLikeService;
 
     @GetMapping("/posts/{postId}/like")
