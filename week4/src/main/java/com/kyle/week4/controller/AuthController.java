@@ -1,5 +1,6 @@
 package com.kyle.week4.controller;
 
+import com.kyle.week4.controller.docs.AuthControllerDocs;
 import com.kyle.week4.controller.request.LoginRequest;
 import com.kyle.week4.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthController implements AuthControllerDocs {
     private final AuthService authService;
 
     @PostMapping("/auth/sessions")
