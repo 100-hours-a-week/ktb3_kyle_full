@@ -70,7 +70,7 @@ public interface PostControllerDocs {
     @ApiErrorResponses({POST_NOT_FOUND})
     BaseResponse<PostDetailResponse> getPostDetail(
       @Parameter(
-        name = "게시글 ID",
+        name = "postId",
         description = "조회할 게시글의 ID",
         in = ParameterIn.PATH,
         required = true
@@ -95,7 +95,7 @@ public interface PostControllerDocs {
       @Parameter(hidden = true)
       Long userId,
       @Parameter(
-        name = "게시글 ID",
+        name = "postId",
         description = "수정할 게시글의 ID",
         in = ParameterIn.PATH,
         required = true
@@ -114,7 +114,7 @@ public interface PostControllerDocs {
       @Parameter(hidden = true)
       Long userId,
       @Parameter(
-        name = "게시글 ID",
+        name = "postId",
         description = "삭제할 게시글의 ID",
         in = ParameterIn.PATH,
         required = true

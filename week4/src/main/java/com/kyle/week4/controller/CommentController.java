@@ -1,5 +1,6 @@
 package com.kyle.week4.controller;
 
+import com.kyle.week4.controller.docs.CommentControllerDocs;
 import com.kyle.week4.controller.request.CommentCreateRequest;
 import com.kyle.week4.controller.request.CommentUpdateRequest;
 import com.kyle.week4.controller.response.CommentResponse;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class CommentController {
+public class CommentController implements CommentControllerDocs {
     private final CommentService commentService;
 
     @PostMapping("/posts/{postId}/comments")
@@ -48,8 +49,7 @@ public class CommentController {
     public BaseResponse<?> deleteComment(
       @SessionAttribute("userId") Long userId,
       @PathVariable("postId") Long postId,
-      @PathVariable("commentId") Long commentId,
-      @Valid @RequestBody CommentUpdateRequest request
+      @PathVariable("commentId") Long commentId
     ) {
         commentService.deleteComment(userId, postId, commentId);
         return BaseResponse.noContent();
