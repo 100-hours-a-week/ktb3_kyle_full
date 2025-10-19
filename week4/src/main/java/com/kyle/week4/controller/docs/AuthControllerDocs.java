@@ -2,8 +2,11 @@ package com.kyle.week4.controller.docs;
 
 import com.kyle.week4.controller.BaseResponse;
 import com.kyle.week4.controller.request.LoginRequest;
+import com.kyle.week4.controller.response.CommentResponse;
 import com.kyle.week4.swagger.annotation.ApiErrorResponses;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,7 +23,10 @@ public interface AuthControllerDocs {
       description = "사용자의 **이메일과 비밀번호를 입력**받아 **로그인을 수행**합니다.",
       security = @SecurityRequirement(name = "")
     )
-    @ApiResponse(responseCode = "200", description = "로그인 성공")
+    @ApiResponse(
+      responseCode = "200", description = "로그인 성공",
+      content = @Content(schema = @Schema(implementation = Long.class))
+    )
     @ApiErrorResponses({INVALID_EMAIL, INVALID_PASSWORD})
     BaseResponse<Long> login(LoginRequest loginRequest, HttpServletRequest httpRequest);
 }

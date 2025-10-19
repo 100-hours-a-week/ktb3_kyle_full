@@ -8,14 +8,14 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public class ErrorDto {
-    private HttpStatus httpStatus;
+    private String httpStatus;
     private boolean success;
     private Object data;
     private String errorMessage;
 
     static ErrorDto from(ErrorCode errorCode) {
         return new ErrorDto(
-          errorCode.getHttpStatus(),
+          errorCode.getHttpStatus().getReasonPhrase(),
           false,
           null,
           errorCode.getMessage()

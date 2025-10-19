@@ -4,10 +4,15 @@ import com.kyle.week4.controller.BaseResponse;
 import com.kyle.week4.controller.request.CommentCreateRequest;
 import com.kyle.week4.controller.request.CommentUpdateRequest;
 import com.kyle.week4.controller.response.CommentResponse;
+import com.kyle.week4.controller.response.PostLikeResponse;
+import com.kyle.week4.controller.response.PostResponse;
 import com.kyle.week4.swagger.annotation.ApiErrorResponses;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -25,7 +30,10 @@ public interface CommentControllerDocs {
             - 댓글의 내용은 비어있으면 안됩니다.
           """
     )
-    @ApiResponse(responseCode = "201", description = "댓글 생성 성공")
+    @ApiResponse(
+      responseCode = "201", description = "댓글 생성 성공",
+      content = @Content(schema = @Schema(implementation = Long.class))
+    )
     @ApiErrorResponses({USER_NOT_FOUND})
     BaseResponse<Long> createComment(
       @Parameter(hidden = true)
@@ -49,7 +57,13 @@ public interface CommentControllerDocs {
           - lastCommentId가 null이 아닐 경우 lastCommentId 이후에 작성된 댓글 limit 개수만큼 반환
           """
     )
-    @ApiResponse(responseCode = "200", description = "댓글 목록 조회 성공")
+    @ApiResponse(
+      responseCode = "200", description = "댓글 목록 조회 성공",
+      content = @Content(
+        mediaType = "application/json",
+        array = @ArraySchema(schema = @Schema(implementation = CommentResponse.class))
+      )
+    )
     BaseResponse<List<CommentResponse>> infiniteScroll(
       @Parameter(hidden = true)
       Long userId,
@@ -83,7 +97,10 @@ public interface CommentControllerDocs {
           - 댓글의 내용은 비어있으면 안됩니다.
           """
     )
-    @ApiResponse(responseCode = "200", description = "수정 성공")
+    @ApiResponse(
+      responseCode = "200", description = "수정 성공",
+      content = @Content(schema = @Schema(implementation = CommentResponse.class))
+    )
     @ApiErrorResponses({POST_NOT_FOUND, COMMENT_NOT_FOUND, PERMISSION_DENIED})
     BaseResponse<CommentResponse> updateComment(
       @Parameter(hidden = true)

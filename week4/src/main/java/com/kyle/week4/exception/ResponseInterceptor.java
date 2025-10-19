@@ -19,7 +19,7 @@ public class ResponseInterceptor implements ResponseBodyAdvice {
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         if (returnType.getParameterType() == BaseResponse.class) {
-            HttpStatus status = ((BaseResponse<?>) body).httpStatus();
+            HttpStatus status = ((BaseResponse<?>) body).getHttpStatus();
             response.setStatusCode(status);
         }
 

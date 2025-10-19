@@ -9,6 +9,9 @@ import com.kyle.week4.swagger.annotation.ApiErrorResponses;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -28,7 +31,10 @@ public interface PostControllerDocs {
             - 제목은 최대 26자 까지 작성 가능합니다.
           """
     )
-    @ApiResponse(responseCode = "201", description = "게시글 생성 성공")
+    @ApiResponse(
+      responseCode = "201", description = "게시글 생성 성공",
+      content = @Content(schema = @Schema(implementation = PostDetailResponse.class))
+    )
     @ApiErrorResponses({USER_NOT_FOUND})
     BaseResponse<PostDetailResponse> createPost(
       @Parameter(hidden = true)
@@ -45,7 +51,12 @@ public interface PostControllerDocs {
           - lastPostId가 null이 아닐 경우 lastPostId 이후의 최신 게시글을 limit 개수만큼 반환
           """
     )
-    @ApiResponse(responseCode = "200", description = "게시글 목록 조회 성공")
+    @ApiResponse(responseCode = "200", description = "게시글 목록 조회 성공",
+      content = @Content(
+        mediaType = "application/json",
+        array = @ArraySchema(schema = @Schema(implementation = PostResponse.class))
+      )
+    )
     BaseResponse<List<PostResponse>> infiniteScroll(
       @Parameter(
         name = "limit",
@@ -66,7 +77,10 @@ public interface PostControllerDocs {
       summary = "게시글 상세 정보 조회",
       description = "### 게시글의 상세 정보를 조회합니다."
     )
-    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(
+      responseCode = "200", description = "조회 성공",
+      content = @Content(schema = @Schema(implementation = PostDetailResponse.class))
+    )
     @ApiErrorResponses({POST_NOT_FOUND})
     BaseResponse<PostDetailResponse> getPostDetail(
       @Parameter(
@@ -89,7 +103,10 @@ public interface PostControllerDocs {
           - 제목은 최대 26자 까지 작성 가능합니다.
           """
     )
-    @ApiResponse(responseCode = "200", description = "수정 성공")
+    @ApiResponse(
+      responseCode = "200", description = "수정 성공",
+      content = @Content(schema = @Schema(implementation = PostDetailResponse.class))
+    )
     @ApiErrorResponses({POST_NOT_FOUND, PERMISSION_DENIED})
     BaseResponse<PostDetailResponse> updatePost(
       @Parameter(hidden = true)

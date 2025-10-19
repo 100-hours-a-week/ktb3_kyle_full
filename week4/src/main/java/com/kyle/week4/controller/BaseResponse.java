@@ -1,16 +1,22 @@
 package com.kyle.week4.controller;
 
 import com.kyle.week4.exception.CustomException;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
-public record BaseResponse<T>(
-    HttpStatus httpStatus,
-    boolean success,
-    @Nullable T data,
-    String errorMessage
-) {
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class BaseResponse<T> {
+    HttpStatus httpStatus;
+    boolean success;
+    @Nullable T data;
+    String errorMessage;
+
     public static <T> BaseResponse<T> ok(@Nullable final T data) {
         return new BaseResponse<>(HttpStatus.OK, true, data, null);
     }

@@ -1,5 +1,6 @@
 package com.kyle.week4.swagger;
 
+import com.kyle.week4.controller.BaseResponse;
 import com.kyle.week4.exception.ErrorCode;
 import com.kyle.week4.swagger.annotation.ApiErrorResponse;
 import com.kyle.week4.swagger.annotation.ApiErrorResponses;
@@ -10,13 +11,16 @@ import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import lombok.SneakyThrows;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 import java.util.List;
@@ -63,8 +67,40 @@ public class SwaggerConfig {
                     generateErrorResponseExample(operation, apiErrorResponse.value());
                 }
             }
+
+            addResponseBodyWrapperSchemaExample(operation, BaseResponse.class, "data");
             return operation;
         });
+    }
+
+    private void addResponseBodyWrapperSchemaExample(Operation operation, Class<?> type, String wrapFieldName) {
+        final ApiResponses responses = operation.getResponses();
+
+        responses.forEach((statusCode, apiResponse) -> {
+            if (apiResponse != null) {
+                Content content = apiResponse.getContent();
+                if (content != null) {
+                    content.keySet()
+                      .forEach(mediaTypeKey -> {
+                          final MediaType mediaType = content.get(mediaTypeKey);
+                          mediaType.schema(wrapSchema(Integer.parseInt(statusCode), mediaType.getSchema(), type, wrapFieldName));
+                      });
+                }
+            }
+        });
+    }
+
+    @SneakyThrows
+    private <T> Schema<T> wrapSchema(int statusCode, Schema<?> originalSchema, Class<T> type, String wrapFieldName) {
+        final Schema<T> wrapperSchema = new Schema<>();
+        final HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
+
+        wrapperSchema.addProperty("httpStatus", new Schema<>().type("String").example(httpStatus.getReasonPhrase()));
+        wrapperSchema.addProperty("success", new Schema<>().type("boolean").example(true));
+        wrapperSchema.addProperty("data", originalSchema);
+        wrapperSchema.addProperty("errorMessage", new Schema<>().type("boolean").example(null));
+
+        return wrapperSchema;
     }
 
     private void generateErrorResponseExample(Operation operation, ErrorCode errorCode) {
@@ -75,6 +111,7 @@ public class SwaggerConfig {
           .name(errorCode.toString())
           .code(errorCode.getCode())
           .message(errorCode.getMessage())
+          .status(errorCode.getHttpStatus())
           .build();
 
         addExamplesToResponses(responses, exampleHolder);
@@ -90,6 +127,7 @@ public class SwaggerConfig {
               .name(errorCode.toString())
               .code(errorCode.getCode())
               .message(errorCode.getMessage())
+              .status(errorCode.getHttpStatus())
               .build()
           )
           .collect(Collectors.groupingBy(ExampleHolder::getCode));
@@ -112,6 +150,7 @@ public class SwaggerConfig {
         mediaType.addExamples(exampleHolder.getName(), exampleHolder.getHolder());
         content.addMediaType("application/json", mediaType);
         apiResponse.setContent(content);
+        apiResponse.setDescription(exampleHolder.getStatus().name());
         apiResponses.addApiResponse(String.valueOf(exampleHolder.getCode()), apiResponse);
     }
 
@@ -124,14 +163,18 @@ public class SwaggerConfig {
               ApiResponse apiResponse = new ApiResponse();
 
               v.forEach(
-                exampleHolder -> mediaType.addExamples(
-                  exampleHolder.getName(),
-                  exampleHolder.getHolder()
-                )
+                exampleHolder -> {
+                    mediaType.addExamples(
+                      exampleHolder.getName(),
+                      exampleHolder.getHolder()
+                    );
+                    apiResponse.setDescription(exampleHolder.getStatus().name());
+                }
               );
 
               content.addMediaType("application/json", mediaType);
               apiResponse.setContent(content);
+
               apiResponses.addApiResponse(String.valueOf(status), apiResponse);
           }
         );
