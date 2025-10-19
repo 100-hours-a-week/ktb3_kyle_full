@@ -1,5 +1,6 @@
 package com.kyle.week4.controller;
 
+import com.kyle.week4.controller.docs.PostControllerDocs;
 import com.kyle.week4.controller.request.PostCreateRequest;
 import com.kyle.week4.controller.request.PostUpdateRequest;
 import com.kyle.week4.controller.response.PostDetailResponse;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class PostController {
+public class PostController implements PostControllerDocs {
     private final PostService postService;
 
     @PostMapping("/posts")
