@@ -3,7 +3,7 @@ package com.kyle.week4.service;
 import com.kyle.week4.controller.request.LoginRequest;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
-import com.kyle.week4.exception.ErrorCode;
+import com.kyle.week4.repository.UserMemoryRepository;
 import com.kyle.week4.repository.UserRepository;
 import com.kyle.week4.utils.PasswordEncoder;
 import org.junit.jupiter.api.AfterEach;

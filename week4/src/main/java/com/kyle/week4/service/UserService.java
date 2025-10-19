@@ -1,6 +1,5 @@
 package com.kyle.week4.service;
 
-import com.kyle.week4.controller.request.LoginRequest;
 import com.kyle.week4.controller.request.PasswordUpdateRequest;
 import com.kyle.week4.controller.request.UserCreateRequest;
 import com.kyle.week4.controller.request.UserProfileUpdateRequest;

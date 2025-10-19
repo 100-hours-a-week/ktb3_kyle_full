@@ -4,7 +4,7 @@ import com.kyle.week4.controller.request.CommentCreateRequest;
 import com.kyle.week4.controller.request.PostCreateRequest;
 import com.kyle.week4.controller.request.UserCreateRequest;
 import com.kyle.week4.controller.response.PostDetailResponse;
-import com.kyle.week4.repository.UserRepository;
+import com.kyle.week4.repository.UserMemoryRepository;
 import com.kyle.week4.service.CommentService;
 import com.kyle.week4.service.PostService;
 import com.kyle.week4.service.UserService;
@@ -21,7 +21,7 @@ public class DataInit {
     private final PostService postService;
     private final CommentService commentService;
 
-    private final UserRepository userRepository;
+    private final UserMemoryRepository userRepository;
 
     //@PostConstruct
     public void init() {

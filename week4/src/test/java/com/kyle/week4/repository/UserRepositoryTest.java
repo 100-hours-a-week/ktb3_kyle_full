@@ -104,9 +104,9 @@ class UserRepositoryTest {
 
     private User createUser(String email, String nickname, String profileImage) {
         return User.builder()
-            .email(email)
-            .nickname(nickname)
-            .profileImage(profileImage)
-            .build();
+          .email(email)
+          .nickname(nickname)
+          .profileImage(profileImage)
+          .build();
     }
 }

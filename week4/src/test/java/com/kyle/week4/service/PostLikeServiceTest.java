@@ -97,8 +97,7 @@ class PostLikeServiceTest {
         Post post = createPost(user, "제목");
         postRepository.save(post);
 
-        String key = generateKey(user.getId(), post.getId());
-        PostLike postLike = new PostLike(key);
+        PostLike postLike = new PostLike(user.getId(), post.getId());
         postLikeRepository.save(postLike);
 
         // when // then
@@ -178,8 +177,7 @@ class PostLikeServiceTest {
         Post post = createPost(user, "제목");
         postRepository.save(post);
 
-        String key = generateKey(user.getId(), post.getId());
-        PostLike postLike = new PostLike(key);
+        PostLike postLike = new PostLike(user.getId(), post.getId());
         postLikeRepository.save(postLike);
 
         // when // then
@@ -222,8 +220,7 @@ class PostLikeServiceTest {
     }
 
     private PostLike createPostLike(User user, Post post) {
-        String key = generateKey(user.getId(), post.getId());
-        return new PostLike(key);
+        return new PostLike(user.getId(), post.getId());
     }
 
     private String generateKey(Long userId, Long postId) {
