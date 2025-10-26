@@ -52,7 +52,7 @@ public interface CommentControllerDocs {
       summary = "댓글 무한 스크롤 조회",
       description =
         """
-          ### 댓글 ID 기반으로 게시글 목록을 최신순으로 조회합니다.
+          ### 댓글 ID 기반으로 댓글 목록을 작성순으로 조회합니다.
           - lastCommentId null일 경우 댓글 작성순으로 limit 개수만큼 반환
           - lastCommentId가 null이 아닐 경우 lastCommentId 이후에 작성된 댓글 limit 개수만큼 반환
           """

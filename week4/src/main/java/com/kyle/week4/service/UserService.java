@@ -1,5 +1,7 @@
 package com.kyle.week4.service;
 
+import com.kyle.week4.aop.CustomCacheEvict;
+import com.kyle.week4.aop.CustomCacheable;
 import com.kyle.week4.controller.request.PasswordUpdateRequest;
 import com.kyle.week4.controller.request.UserCreateRequest;
 import com.kyle.week4.controller.request.UserProfileUpdateRequest;
@@ -32,11 +34,13 @@ public class UserService {
         return savedUser.getId();
     }
 
+    @CustomCacheable(cacheName = "UserProfile", key = "#userId")
     public UserProfileResponse getUserProfile(Long userId) {
         User user = findUserBy(userId);
         return UserProfileResponse.of(user);
     }
 
+    @CustomCacheEvict(cacheName = "UserProfile", key = "#userId")
     public UserProfileResponse updateUserProfile(Long userId, UserProfileUpdateRequest request) {
         User user = findUserBy(userId);
 
