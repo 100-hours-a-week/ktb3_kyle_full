@@ -1,6 +1,6 @@
 package com.kyle.week4.aop;
 
-import com.kyle.week4.cache.SimpleCacheStore;
+import com.kyle.week4.cache.CacheStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -12,14 +12,13 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 @Aspect
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class CustomCacheAspect {
-    private final SimpleCacheStore cacheStore;
+    private final CacheStore cacheStore;
 
     @Around("@annotation(CustomCacheable)")
     public Object applyCustomCache(ProceedingJoinPoint joinPoint) throws Throwable {

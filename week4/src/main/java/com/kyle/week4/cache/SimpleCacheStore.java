@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class SimpleCacheStore {
+public class SimpleCacheStore implements CacheStore {
     private final Map<String, Object> cache = new ConcurrentHashMap<>();
 
     public Object get(String key) {
