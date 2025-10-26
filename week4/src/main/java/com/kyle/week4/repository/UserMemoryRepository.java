@@ -1,6 +1,7 @@
 package com.kyle.week4.repository;
 
 import com.kyle.week4.entity.User;
+import com.kyle.week4.exception.CustomException;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -8,6 +9,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
+
+import static com.kyle.week4.exception.ErrorCode.DUPLICATE_EMAIL_ERROR;
+import static com.kyle.week4.exception.ErrorCode.DUPLICATE_NICKNAME_ERROR;
 
 @Repository
 public class UserMemoryRepository implements UserRepository {
@@ -19,12 +24,24 @@ public class UserMemoryRepository implements UserRepository {
     @Override
     public User save(User user) {
         if (user.isNew()) {
+            User existByEmail = emailIndex.putIfAbsent(user.getEmail(), user);
+            if (existByEmail != null) { throw new CustomException(DUPLICATE_EMAIL_ERROR); }
+
+            User existingByNickname = nicknameIndex.putIfAbsent(user.getNickname(), user);
+            if (existingByNickname != null) {
+                emailIndex.remove(user.getEmail());
+                throw new CustomException(DUPLICATE_NICKNAME_ERROR);
+            }
+
             Long userId = primaryKey.getAndIncrement();
             user.assignId(userId);
+            database.put(user.getId(), user);
         }
-        database.put(user.getId(), user);
-        emailIndex.put(user.getEmail(), user);
-        nicknameIndex.put(user.getNickname(), user);
+        else {
+            database.put(user.getId(), user);
+            emailIndex.put(user.getEmail(), user);
+            nicknameIndex.put(user.getNickname(), user);
+        }
         return user;
     }
 

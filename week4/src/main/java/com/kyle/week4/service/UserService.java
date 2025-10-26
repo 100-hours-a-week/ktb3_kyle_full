@@ -8,10 +8,15 @@ import com.kyle.week4.controller.request.UserProfileUpdateRequest;
 import com.kyle.week4.controller.response.UserProfileResponse;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
+import com.kyle.week4.repository.UserNamedLock;
 import com.kyle.week4.repository.UserRepository;
 import com.kyle.week4.utils.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.kyle.week4.exception.ErrorCode.*;
 
@@ -22,12 +27,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public Long createUser(UserCreateRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new CustomException(DUPLICATE_EMAIL_ERROR);
-        }
-        if (userRepository.existsByNickname(request.getNickname())) {
-            throw new CustomException(DUPLICATE_NICKNAME_ERROR);
-        }
         User user = request.toEntity();
         user.encodePassword(passwordEncoder.encode(request.getPassword()));
         User savedUser = userRepository.save(user);
