@@ -1,3 +1,20 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/kyle_week7?serverTimezone=UTC
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+
+  output:
+    ansi:
+      enabled: ALWAYS
 server:
   servlet:
     session:
@@ -6,4 +23,3 @@ server:
 springdoc:
   swagger-ui:
     path: /api-test
-
