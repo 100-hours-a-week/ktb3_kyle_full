@@ -1,17 +1,29 @@
 package com.kyle.week4.entity;
 
 import com.kyle.week4.controller.request.UserProfileUpdateRequest;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Entity
 @Getter
 @NoArgsConstructor
 public class User extends BaseTime {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(length = 100, unique = true)
     private String email;
+
+    @Column(length = 20)
     private String password;
+
+    @Column(length = 10, unique = true)
     private String nickname;
+
+    @Column(length = 200)
     private String profileImage;
 
     @Builder
