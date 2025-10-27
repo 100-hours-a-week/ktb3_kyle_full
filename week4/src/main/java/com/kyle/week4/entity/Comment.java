@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class Comment extends BaseEntity {
+public class Comment extends BaseTime {
     private Long id;
     private User user;
     private Post post;

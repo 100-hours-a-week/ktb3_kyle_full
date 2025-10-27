@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class Post extends BaseEntity {
+public class Post extends BaseTime {
     private Long id;
     private User user;
     private String title;

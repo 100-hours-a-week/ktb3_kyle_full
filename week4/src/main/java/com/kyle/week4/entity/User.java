@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class User {
+public class User extends BaseTime {
     private Long id;
     private String email;
     private String password;
