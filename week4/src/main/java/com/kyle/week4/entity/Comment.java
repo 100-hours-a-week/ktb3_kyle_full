@@ -1,17 +1,32 @@
 package com.kyle.week4.entity;
 
 import com.kyle.week4.controller.request.CommentUpdateRequest;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static jakarta.persistence.FetchType.LAZY;
+
+@Entity
 @Getter
 @NoArgsConstructor
 public class Comment extends BaseTime {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "post_id")
     private Post post;
+
+    @Column(columnDefinition = "LONGTEXT")
     private String content;
+
     private boolean isDeleted;
 
     @Builder
