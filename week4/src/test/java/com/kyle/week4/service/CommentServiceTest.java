@@ -4,10 +4,12 @@ import com.kyle.week4.controller.request.CommentCreateRequest;
 import com.kyle.week4.controller.request.CommentUpdateRequest;
 import com.kyle.week4.controller.response.CommentResponse;
 import com.kyle.week4.entity.Comment;
+import com.kyle.week4.entity.CommentCount;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.repository.MemoryClearRepository;
+import com.kyle.week4.repository.post.CommentCountRepository;
 import com.kyle.week4.repository.comment.CommentJpaRepository;
 import com.kyle.week4.repository.comment.CommentRepository;
 import com.kyle.week4.repository.post.PostJpaRepository;
@@ -17,6 +19,8 @@ import com.kyle.week4.repository.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -31,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 class CommentServiceTest {
+    private static final Logger log = LoggerFactory.getLogger(CommentServiceTest.class);
     @Autowired
     private CommentService commentService;
 
@@ -53,6 +58,9 @@ class CommentServiceTest {
     private CommentJpaRepository commentJpaRepository;
 
     @Autowired
+    private CommentCountRepository commentCountRepository;
+
+    @Autowired
     private List<MemoryClearRepository> memoryClearRepositoryList;
 
     @AfterEach
@@ -64,7 +72,7 @@ class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("댓글이 작성되면 게시글의 댓글수가 증가한다.")
+    @DisplayName("테이블 분리 전(Post 조회 시 PESSIMISTIC_WRITE) - 댓글이 작성되면 게시글의 댓글수가 증가한다.")
     void increaseCommentCount_whenCreateComment() throws Exception {
         // given
         User user = createUser();
@@ -92,6 +100,120 @@ class CommentServiceTest {
         // then
         Post result = postJpaRepository.findById(post.getId()).orElseThrow();
         assertThat(result.getCommentCount()).isEqualTo(totalCommentCount);
+    }
+
+    @Test
+    @DisplayName("테이블 분리 후(벌크성 update 쿼리) - 댓글이 작성되면 게시글의 댓글수가 증가한다.")
+    void increaseCommentCount_whenCreateCommentPessimistic1() throws Exception {
+        // given
+        User user = createUser();
+        userRepository.save(user);
+
+        Post post = createPost(user, "제목");
+        postRepository.save(post);
+
+        CommentCount commentCount = CommentCount.builder()
+                .postId(post.getId())
+                .commentCount(0)
+                .build();
+        commentCountRepository.save(commentCount);
+
+        CommentCreateRequest request = new CommentCreateRequest("댓글");
+
+        final int totalCommentCount = 10000;
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        CountDownLatch latch = new CountDownLatch(totalCommentCount);
+
+        // when
+        for (int i = 0; i < totalCommentCount; i++) {
+            executor.submit(() -> {
+                commentService.createCommentPessimistic1(user.getId(), post.getId(), request);
+                latch.countDown();
+            });
+        }
+        latch.await();
+        executor.shutdown();
+
+        // then
+        CommentCount findCommentCount = commentCountRepository.findById(post.getId()).orElseThrow();
+        assertThat(findCommentCount.getCommentCount()).isEqualTo(totalCommentCount);
+    }
+
+    @Test
+    @DisplayName("테이블 분리 후(CommentCount 조회 시 PESSIMISTIC_WRITE) - 댓글이 작성되면 게시글의 댓글수가 증가한다.")
+    void increaseCommentCount_whenCreateCommentPessimistic2() throws Exception {
+        // given
+        User user = createUser();
+        userRepository.save(user);
+
+        Post post = createPost(user, "제목");
+        postRepository.save(post);
+
+        CommentCount commentCount = CommentCount.builder()
+                .postId(post.getId())
+                .commentCount(0)
+                .build();
+        commentCountRepository.save(commentCount);
+
+        CommentCreateRequest request = new CommentCreateRequest("댓글");
+
+        final int totalCommentCount = 10000;
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        CountDownLatch latch = new CountDownLatch(totalCommentCount);
+
+        // when
+        for (int i = 0; i < totalCommentCount; i++) {
+            executor.submit(() -> {
+                commentService.createCommentPessimistic2(user.getId(), post.getId(), request);
+                latch.countDown();
+            });
+        }
+        latch.await();
+        executor.shutdown();
+
+        // then
+        CommentCount findCommentCount = commentCountRepository.findById(post.getId()).orElseThrow();
+        assertThat(findCommentCount.getCommentCount()).isEqualTo(totalCommentCount);
+    }
+
+    @Test
+    @DisplayName("테이블 분리 후(OPTIMISTIC) - 댓글이 작성되면 게시글의 댓글수가 증가한다.")
+    void increaseCommentCount_whenCreateCommentOptimistic() throws Exception {
+        // given
+        User user = createUser();
+        userRepository.save(user);
+
+        Post post = createPost(user, "제목");
+        postRepository.save(post);
+
+        CommentCount commentCount = CommentCount.builder()
+                .postId(post.getId())
+                .commentCount(0)
+                .build();
+        commentCountRepository.save(commentCount);
+
+        CommentCreateRequest request = new CommentCreateRequest("댓글");
+
+        final int totalCommentCount = 10000;
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        CountDownLatch latch = new CountDownLatch(totalCommentCount);
+
+        // when
+        for (int i = 0; i < totalCommentCount; i++) {
+            executor.submit(() -> {
+                try {
+                    commentService.createCommentOptimistic(user.getId(), post.getId(), request);
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await();
+        executor.shutdown();
+
+        // then
+        CommentCount findCommentCount = commentCountRepository.findById(post.getId()).orElseThrow();
+        assertThat(findCommentCount.getCommentCount()).isEqualTo(totalCommentCount);
     }
 
     @Test

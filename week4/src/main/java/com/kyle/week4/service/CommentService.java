@@ -4,9 +4,11 @@ import com.kyle.week4.controller.request.CommentCreateRequest;
 import com.kyle.week4.controller.request.CommentUpdateRequest;
 import com.kyle.week4.controller.response.CommentResponse;
 import com.kyle.week4.entity.Comment;
+import com.kyle.week4.entity.CommentCount;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
+import com.kyle.week4.repository.post.CommentCountRepository;
 import com.kyle.week4.repository.comment.CommentRepository;
 import com.kyle.week4.repository.post.PostRepository;
 import com.kyle.week4.repository.user.UserRepository;
@@ -25,6 +27,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final CommentCountRepository commentCountRepository;
 
     @Transactional
     public Long createComment(Long userId, Long postId, CommentCreateRequest request) {
@@ -35,6 +38,46 @@ public class CommentService {
         Comment comment = request.toEntity(user, post);
         Comment savedComment = commentRepository.save(comment);
         postRepository.increaseCommentCount(postId);
+
+        return savedComment.getId();
+    }
+
+    @Transactional
+    public Long createCommentPessimistic1(Long userId, Long postId, CommentCreateRequest request) {
+        User user = findUserBy(userId);
+        Post post = findPostBy(postId);
+
+        Comment comment = request.toEntity(user, post);
+        Comment savedComment = commentRepository.save(comment);
+        commentCountRepository.increase(postId);
+
+        return savedComment.getId();
+    }
+
+    @Transactional
+    public Long createCommentPessimistic2(Long userId, Long postId, CommentCreateRequest request) {
+        User user = findUserBy(userId);
+        Post post = findPostBy(postId);
+
+        Comment comment = request.toEntity(user, post);
+        Comment savedComment = commentRepository.save(comment);
+        CommentCount commentCount = commentCountRepository.findLockedByPostId(postId)
+                .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
+        commentCount.increase();
+
+        return savedComment.getId();
+    }
+
+    @Transactional
+    public Long createCommentOptimistic(Long userId, Long postId, CommentCreateRequest request) {
+        User user = findUserBy(userId);
+        Post post = findPostBy(postId);
+
+        Comment comment = request.toEntity(user, post);
+        Comment savedComment = commentRepository.save(comment);
+        CommentCount commentCount = commentCountRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
+        commentCount.increase();
 
         return savedComment.getId();
     }
