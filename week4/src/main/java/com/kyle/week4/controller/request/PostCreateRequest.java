@@ -38,7 +38,6 @@ public class PostCreateRequest {
         return Post.builder()
           .title(title)
           .content(content)
-          .images(images)
           .user(user)
           .build();
     }

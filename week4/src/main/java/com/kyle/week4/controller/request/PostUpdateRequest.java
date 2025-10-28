@@ -22,13 +22,9 @@ public class PostUpdateRequest {
     @Schema(description = "수정할 내용", example = "수정된 내용입니다.")
     private String content;
 
-    @Schema(description = "업로드 한 이미지 경로", example = "[\"image1.jpg\", \"image2.jpg\"]")
-    private List<String> images;
-
     @Builder
-    public PostUpdateRequest(String title, String content, List<String> images) {
+    public PostUpdateRequest(String title, String content) {
         this.title = title;
         this.content = content;
-        this.images = images;
     }
 }

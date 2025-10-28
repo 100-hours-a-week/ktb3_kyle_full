@@ -66,7 +66,6 @@ public class PostDetailResponse {
           .isAuthor(post.getUser().getId().equals(userId))
           .authorNickname(post.getUser().getNickname())
           .authorProfileImage(post.getUser().getProfileImage())
-          .images(post.getImages())
           .createdAt(post.getCreatedAt())
           .build();
     }

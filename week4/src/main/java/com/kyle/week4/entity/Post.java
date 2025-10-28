@@ -1,29 +1,43 @@
 package com.kyle.week4.entity;
 
 import com.kyle.week4.controller.request.PostUpdateRequest;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import static jakarta.persistence.FetchType.*;
+
+@Entity
 @Getter
 @NoArgsConstructor
 public class Post extends BaseTime {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
+
+    @Column(length = 26)
     private String title;
+
+    @Column(columnDefinition = "LONGTEXT")
     private String content;
+
     private int likeCount;
+
     private int viewCount;
+
     private int commentCount;
+
     private boolean isDeleted;
-    private List<String> images;
 
     @Builder
-    public Post(User user, String title, String content, List<String> images) {
-        super();
-        this.images = images;
+    public Post(User user, String title, String content) {
         this.user = user;
         this.title = title;
         this.content = content;
@@ -44,7 +58,6 @@ public class Post extends BaseTime {
     public void updatePost(PostUpdateRequest request) {
         this.title = request.getTitle();
         this.content = request.getContent();
-        this.images = request.getImages();
     }
 
     public void delete() {

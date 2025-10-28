@@ -222,7 +222,6 @@ class CommentRepositoryTest {
           .title(title)
           .content("내용입니다.")
           .user(user)
-          .images(List.of("image1.jpg", "image2.jpg"))
           .build();
     }
 
