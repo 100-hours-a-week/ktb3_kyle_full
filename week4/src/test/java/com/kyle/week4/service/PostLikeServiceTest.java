@@ -7,6 +7,7 @@ import com.kyle.week4.entity.PostLike;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.exception.ErrorCode;
+import com.kyle.week4.repository.MemoryClearRepository;
 import com.kyle.week4.repository.PostLikeRepository;
 import com.kyle.week4.repository.PostRepository;
 import com.kyle.week4.repository.UserRepository;
@@ -38,12 +39,15 @@ class PostLikeServiceTest {
     @Autowired
     private CountCache postLikeCountCache;
 
+    @Autowired
+    private List<MemoryClearRepository> memoryClearRepositoryList;
+
     @AfterEach
     void tearDown() {
         postRepository.clear();
-        userRepository.clear();
         postLikeRepository.clear();
         postLikeCountCache.clear();
+        memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 
     @Test

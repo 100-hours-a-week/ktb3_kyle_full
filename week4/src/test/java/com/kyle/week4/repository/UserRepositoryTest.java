@@ -23,9 +23,12 @@ class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private List<MemoryClearRepository> memoryClearRepositoryList;
+
     @AfterEach
     void tearDown() {
-        userRepository.clear();
+        memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 
     @Test

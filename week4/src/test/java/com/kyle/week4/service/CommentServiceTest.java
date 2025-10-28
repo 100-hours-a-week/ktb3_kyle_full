@@ -8,6 +8,7 @@ import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.repository.CommentRepository;
+import com.kyle.week4.repository.MemoryClearRepository;
 import com.kyle.week4.repository.PostRepository;
 import com.kyle.week4.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -39,11 +40,14 @@ class CommentServiceTest {
     @Autowired
     private CommentRepository commentRepository;
 
+    @Autowired
+    private List<MemoryClearRepository> memoryClearRepositoryList;
+
     @AfterEach
     void tearDown() {
         postRepository.clear();
-        userRepository.clear();
         commentRepository.clear();
+        memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 
     @Test

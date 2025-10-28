@@ -21,6 +21,9 @@ class PostRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private List<MemoryClearRepository> memoryClearRepositoryList;
+
     private final User user = createUser();
 
     @BeforeEach
@@ -30,8 +33,8 @@ class PostRepositoryTest {
 
     @AfterEach
     void tearDown() {
-        userRepository.clear();
         postRepository.clear();
+        memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 
     @Test

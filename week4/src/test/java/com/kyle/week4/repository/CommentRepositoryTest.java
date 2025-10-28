@@ -24,11 +24,14 @@ class CommentRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private List<MemoryClearRepository> memoryClearRepositoryList;
+
     @AfterEach
     void tearDown() {
-        userRepository.clear();
         postRepository.clear();
         commentRepository.clear();
+        memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 
     @Test

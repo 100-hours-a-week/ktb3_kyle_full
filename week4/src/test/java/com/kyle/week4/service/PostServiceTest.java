@@ -8,6 +8,7 @@ import com.kyle.week4.controller.response.PostResponse;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
+import com.kyle.week4.repository.MemoryClearRepository;
 import com.kyle.week4.repository.PostRepository;
 import com.kyle.week4.repository.UserRepository;
 import org.junit.jupiter.api.*;
@@ -40,6 +41,9 @@ class PostServiceTest {
 
     private final User user = createUser();
 
+    @Autowired
+    private List<MemoryClearRepository> memoryClearRepositoryList;
+
     @BeforeEach
     void setUp() {
         userRepository.save(user);
@@ -47,9 +51,9 @@ class PostServiceTest {
 
     @AfterEach
     void tearDown() {
-        userRepository.clear();
         postRepository.clear();
         postViewCountCache.clear();
+        memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 
     @Test
@@ -199,7 +203,6 @@ class PostServiceTest {
         PostUpdateRequest request = PostUpdateRequest.builder()
           .title("수정된 제목")
           .content("수정된 내용")
-          .images(List.of("image100.jpg"))
           .build();
 
         // when

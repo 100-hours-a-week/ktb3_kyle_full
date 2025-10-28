@@ -5,18 +5,24 @@ import com.kyle.week4.controller.request.UserProfileUpdateRequest;
 import com.kyle.week4.controller.response.UserProfileResponse;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
+import com.kyle.week4.repository.MemoryClearRepository;
+import com.kyle.week4.repository.UserJpaRepository;
 import com.kyle.week4.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static com.kyle.week4.exception.ErrorCode.DUPLICATE_NICKNAME_ERROR;
 import static com.kyle.week4.exception.ErrorCode.USER_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@Transactional
 @SpringBootTest
 class UserServiceTest {
     @Autowired
@@ -25,9 +31,16 @@ class UserServiceTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserJpaRepository userJpaRepository;
+
+    @Autowired
+    private List<MemoryClearRepository> memoryClearRepositoryList;
+
     @AfterEach
     void tearDown() {
-        userRepository.clear();
+        userJpaRepository.deleteAllInBatch();
+        memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 
     @Test
@@ -50,8 +63,8 @@ class UserServiceTest {
         // then
         User savedUser = userRepository.findById(userId).orElseThrow();
         assertThat(savedUser)
-          .extracting("id", "email", "nickname", "profileImage")
-          .containsExactlyInAnyOrder(2L, "test2@test.com", "test2", "test2");
+          .extracting("email", "nickname", "profileImage")
+          .containsExactlyInAnyOrder("test2@test.com", "test2", "test2");
     }
 
     @Test

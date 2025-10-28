@@ -133,7 +133,6 @@ class PostControllerTest extends ControllerTestSupport {
         PostUpdateRequest request = PostUpdateRequest.builder()
           .title("")
           .content("내용입니다.")
-          .images(List.of("image1.jpg", "image2.jpg"))
           .build();
 
         // when // then
@@ -158,7 +157,6 @@ class PostControllerTest extends ControllerTestSupport {
         PostUpdateRequest request = PostUpdateRequest.builder()
           .title("제목제목제목제목제목제목제목제목제목제목제목제목제목.")
           .content("내용입니다.")
-          .images(List.of("image1.jpg", "image2.jpg"))
           .build();
 
         // when // then
@@ -183,7 +181,6 @@ class PostControllerTest extends ControllerTestSupport {
         PostUpdateRequest request = PostUpdateRequest.builder()
           .title("제목입니다.")
           .content("")
-          .images(List.of("image1.jpg", "image2.jpg"))
           .build();
 
         // when // then
