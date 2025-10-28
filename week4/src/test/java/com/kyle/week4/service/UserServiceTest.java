@@ -6,8 +6,8 @@ import com.kyle.week4.controller.response.UserProfileResponse;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.repository.MemoryClearRepository;
-import com.kyle.week4.repository.UserJpaRepository;
-import com.kyle.week4.repository.UserRepository;
+import com.kyle.week4.repository.user.UserJpaRepository;
+import com.kyle.week4.repository.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,6 +31,7 @@ class UserServiceTest {
     @Autowired
     private UserRepository userRepository;
 
+    // TODO: 테스트에만 필요한 deleteAllInBatch를 인터페이스에 포함하여야 할까?
     @Autowired
     private UserJpaRepository userJpaRepository;
 

@@ -4,8 +4,8 @@ import com.kyle.week4.cache.CountCache;
 import com.kyle.week4.controller.response.PostLikeResponse;
 import com.kyle.week4.entity.PostLike;
 import com.kyle.week4.exception.CustomException;
-import com.kyle.week4.repository.PostLikeRepository;
-import com.kyle.week4.repository.PostRepository;
+import com.kyle.week4.repository.postlike.PostLikeRepository;
+import com.kyle.week4.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

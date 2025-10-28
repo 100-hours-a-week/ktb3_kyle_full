@@ -1,4 +1,4 @@
-package com.kyle.week4.repository;
+package com.kyle.week4.repository.postlike;
 
 import com.kyle.week4.entity.PostLike;
 import org.springframework.stereotype.Repository;

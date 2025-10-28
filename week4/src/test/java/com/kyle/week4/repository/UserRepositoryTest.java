@@ -2,6 +2,7 @@ package com.kyle.week4.repository;
 
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
+import com.kyle.week4.repository.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

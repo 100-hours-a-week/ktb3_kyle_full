@@ -1,4 +1,4 @@
-package com.kyle.week4.repository;
+package com.kyle.week4.repository.comment;
 
 import com.kyle.week4.entity.Comment;
 

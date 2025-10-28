@@ -1,7 +1,6 @@
-package com.kyle.week4.repository;
+package com.kyle.week4.repository.post;
 
 import com.kyle.week4.entity.Post;
-import com.kyle.week4.entity.User;
 
 import java.util.List;
 import java.util.Optional;

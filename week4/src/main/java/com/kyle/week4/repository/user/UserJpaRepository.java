@@ -1,9 +1,7 @@
-package com.kyle.week4.repository;
+package com.kyle.week4.repository.user;
 
 import com.kyle.week4.entity.User;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 

@@ -4,7 +4,7 @@ import com.kyle.week4.controller.request.CommentCreateRequest;
 import com.kyle.week4.controller.request.PostCreateRequest;
 import com.kyle.week4.controller.request.UserCreateRequest;
 import com.kyle.week4.controller.response.PostDetailResponse;
-import com.kyle.week4.repository.UserMemoryRepository;
+import com.kyle.week4.repository.user.UserMemoryRepository;
 import com.kyle.week4.service.CommentService;
 import com.kyle.week4.service.PostService;
 import com.kyle.week4.service.UserService;

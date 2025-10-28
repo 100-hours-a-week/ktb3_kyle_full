@@ -2,6 +2,8 @@ package com.kyle.week4.repository;
 
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
+import com.kyle.week4.repository.post.PostRepository;
+import com.kyle.week4.repository.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,8 +1,7 @@
-package com.kyle.week4.repository;
+package com.kyle.week4.repository.user;
 
 import com.kyle.week4.entity.User;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

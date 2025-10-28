@@ -7,9 +7,9 @@ import com.kyle.week4.entity.Comment;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
-import com.kyle.week4.repository.CommentRepository;
-import com.kyle.week4.repository.PostRepository;
-import com.kyle.week4.repository.UserRepository;
+import com.kyle.week4.repository.comment.CommentRepository;
+import com.kyle.week4.repository.post.PostRepository;
+import com.kyle.week4.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

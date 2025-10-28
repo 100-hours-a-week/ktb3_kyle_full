@@ -1,7 +1,8 @@
-package com.kyle.week4.repository;
+package com.kyle.week4.repository.user;
 
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
+import com.kyle.week4.repository.MemoryClearRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -9,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static com.kyle.week4.exception.ErrorCode.DUPLICATE_EMAIL_ERROR;
 import static com.kyle.week4.exception.ErrorCode.DUPLICATE_NICKNAME_ERROR;
