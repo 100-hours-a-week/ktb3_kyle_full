@@ -44,7 +44,6 @@ class PostLikeServiceTest {
 
     @AfterEach
     void tearDown() {
-        postRepository.clear();
         postLikeRepository.clear();
         postLikeCountCache.clear();
         memoryClearRepositoryList.forEach(MemoryClearRepository::clear);

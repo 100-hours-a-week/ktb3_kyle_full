@@ -35,7 +35,6 @@ class PostRepositoryTest {
 
     @AfterEach
     void tearDown() {
-        postRepository.clear();
         memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 

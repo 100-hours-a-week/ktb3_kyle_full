@@ -12,5 +12,4 @@ public interface PostRepository {
     List<Post> findAllInfiniteScroll(Long lastPostId, int limit);
     void increaseCommentCount(Long postId);
     boolean notExistsById(Long postId);
-    void clear();
 }

@@ -1,6 +1,7 @@
 package com.kyle.week4.repository.post;
 
 import com.kyle.week4.entity.Post;
+import com.kyle.week4.repository.MemoryClearRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Repository
-public class PostMemoryRepository implements PostRepository {
+public class PostMemoryRepository implements PostRepository, MemoryClearRepository {
     private final AtomicLong primaryKey = new AtomicLong(1);
     private final ConcurrentSkipListMap<Long, Post> database = new ConcurrentSkipListMap<>();
     private final ConcurrentHashMap<Long, ReentrantLock> commentCountLock = new ConcurrentHashMap<>();

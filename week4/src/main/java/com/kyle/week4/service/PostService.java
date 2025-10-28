@@ -13,6 +13,7 @@ import com.kyle.week4.repository.post.PostRepository;
 import com.kyle.week4.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import static com.kyle.week4.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PostService {
     private static final int COMMENT_PAGE_SIZE = 10;
 
@@ -30,6 +32,7 @@ public class PostService {
     private final CountCache postViewCountCache;
     private final CountCache postLikeCountCache;
 
+    @Transactional
     public PostDetailResponse createPost(Long userId, PostCreateRequest request) {
         User user = userRepository.findById(userId)
           .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
@@ -73,6 +76,7 @@ public class PostService {
         return PostDetailResponse.of(post, userId, viewCount);
     }
 
+    @Transactional
     public PostDetailResponse updatePost(Long userId, Long postId, PostUpdateRequest request) {
         Post post = findPostBy(postId);
 
@@ -86,6 +90,7 @@ public class PostService {
         return PostDetailResponse.of(post, userId, viewCount);
     }
 
+    @Transactional
     public void deletePost(Long userId, Long postId) {
         Post post = findPostBy(postId);
 

@@ -32,7 +32,6 @@ class CommentRepositoryTest {
 
     @AfterEach
     void tearDown() {
-        postRepository.clear();
         commentRepository.clear();
         memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }

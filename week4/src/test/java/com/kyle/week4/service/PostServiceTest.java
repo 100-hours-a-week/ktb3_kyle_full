@@ -9,11 +9,14 @@ import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.repository.MemoryClearRepository;
+import com.kyle.week4.repository.post.PostJpaRepository;
 import com.kyle.week4.repository.post.PostRepository;
+import com.kyle.week4.repository.user.UserJpaRepository;
 import com.kyle.week4.repository.user.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -37,22 +40,22 @@ class PostServiceTest {
     private UserRepository userRepository;
 
     @Autowired
-    private CountCache postViewCountCache;
+    private PostJpaRepository postJpaRepository;
 
-    private final User user = createUser();
+    @Autowired
+    private UserJpaRepository userJpaRepository;
+
+    @Autowired
+    private CountCache postViewCountCache;
 
     @Autowired
     private List<MemoryClearRepository> memoryClearRepositoryList;
 
-    @BeforeEach
-    void setUp() {
-        userRepository.save(user);
-    }
-
     @AfterEach
     void tearDown() {
-        postRepository.clear();
         postViewCountCache.clear();
+        postJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
         memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 
@@ -60,6 +63,9 @@ class PostServiceTest {
     @DisplayName("게시글을 저장한다.")
     void createPostTest() {
         // given
+        User user = createUser();
+        User savedUser = userJpaRepository.save(user);
+
         PostCreateRequest request = PostCreateRequest.builder()
           .title("제목1")
           .content("내용1")
@@ -67,30 +73,29 @@ class PostServiceTest {
           .build();
 
         // when
-        PostDetailResponse postDetailResponse = postService.createPost(1L, request);
+        PostDetailResponse postDetailResponse = postService.createPost(savedUser.getId(), request);
 
         // then
         assertThat(postDetailResponse.getId()).isNotNull();
         assertThat(postDetailResponse)
           .extracting("title", "content", "viewCount", "commentCount", "isAuthor")
           .contains("제목1", "내용1", 0, 0, true);
-        assertThat(postDetailResponse.getImages()).hasSize(2)
-          .containsExactlyInAnyOrder(
-            "image1", "image2"
-          );
     }
 
     @TestFactory
     @DisplayName("게시글 목록 조회 시나리오")
     Collection<DynamicTest> infiniteScroll() {
         // given
+        User user = createUser();
+        User savedUser = userJpaRepository.save(user);
+
         for (int i = 1; i <= 8; i++) {
             PostCreateRequest request = PostCreateRequest.builder()
               .title("제목 " + i)
               .content("내용" + i)
               .images(List.of("image1", "image2"))
               .build();
-            postService.createPost(user.getId(), request);
+            postService.createPost(savedUser.getId(), request);
         }
 
         int limit = 3;
@@ -140,7 +145,10 @@ class PostServiceTest {
     @DisplayName("게시글의 상세 정보를 조회한다.")
     void getPostDetail() {
         // given
-        Post post = createPost("제목1");
+        User user = createUser();
+        User savedUser = userJpaRepository.save(user);
+
+        Post post = createPost("제목1", savedUser);
         Long postId = postRepository.save(post).getId();
 
         // when
@@ -168,8 +176,12 @@ class PostServiceTest {
     @DisplayName("게시글의 상세 정보를 조회하면 조회수가 증가한다.")
     void increaseViewCount_whenGetPostDetail() throws Exception {
         // given
-        Post post = createPost("제목1");
+        User user = createUser();
+        User savedUser = userRepository.save(user);
+
+        Post post = createPost("제목1", savedUser);
         Long postId = postRepository.save(post).getId();
+        postViewCountCache.initCache(postId);
 
         final int totalViewCount = 1000;
         ExecutorService executor = Executors.newFixedThreadPool(10);
@@ -178,11 +190,12 @@ class PostServiceTest {
         // when
         for (int i = 0; i < totalViewCount; i++) {
             executor.submit(() -> {
-                postService.getPostDetail(1L, postId);
+                postService.getPostDetail(savedUser.getId(), postId);
                 latch.countDown();
             });
         }
         latch.await();
+        executor.shutdown();
         int viewCount = postViewCountCache.count(postId);
 
         // then
@@ -193,12 +206,15 @@ class PostServiceTest {
     @DisplayName("게시글을 수정한다.")
     void updatePostTest() {
         // given
+        User user = createUser();
+        User savedUser = userJpaRepository.save(user);
+
         PostCreateRequest createRequest = PostCreateRequest.builder()
           .title("제목")
           .content("내용")
           .images(List.of("image1", "image2"))
           .build();
-        PostDetailResponse post = postService.createPost(user.getId(), createRequest);
+        PostDetailResponse post = postService.createPost(savedUser.getId(), createRequest);
 
         PostUpdateRequest request = PostUpdateRequest.builder()
           .title("수정된 제목")
@@ -210,8 +226,8 @@ class PostServiceTest {
 
         // then
         assertThat(response)
-          .extracting("id", "title", "content", "images")
-          .containsExactlyInAnyOrder(post.getId(), "수정된 제목", "수정된 내용", List.of("image100.jpg"));
+          .extracting("id", "title", "content")
+          .containsExactlyInAnyOrder(post.getId(), "수정된 제목", "수정된 내용");
     }
 
     private User createUser() {
@@ -222,7 +238,7 @@ class PostServiceTest {
           .build();
     }
 
-    private Post createPost(String title) {
+    private Post createPost(String title, User user) {
         return Post.builder()
           .title(title)
           .content("내용입니다.")

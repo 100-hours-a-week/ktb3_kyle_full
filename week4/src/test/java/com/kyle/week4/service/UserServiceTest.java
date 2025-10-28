@@ -22,7 +22,6 @@ import static com.kyle.week4.exception.ErrorCode.USER_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@Transactional
 @SpringBootTest
 class UserServiceTest {
     @Autowired
