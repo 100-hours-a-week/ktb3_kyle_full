@@ -15,7 +15,7 @@ import static com.kyle.week4.exception.ErrorCode.DUPLICATE_EMAIL_ERROR;
 import static com.kyle.week4.exception.ErrorCode.DUPLICATE_NICKNAME_ERROR;
 
 @Repository
-public class UserMemoryRepository implements UserRepository {
+public class UserMemoryRepository implements UserRepository, MemoryClearRepository {
     private final AtomicLong primaryKey = new AtomicLong(1);
     private final ConcurrentHashMap<Long, User> database = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, User> emailIndex = new ConcurrentHashMap<>();
@@ -46,17 +46,6 @@ public class UserMemoryRepository implements UserRepository {
     }
 
     @Override
-    public List<User> saveAll(Iterable<User> users) {
-        List<User> result = new ArrayList<>();
-
-        for (User user : users) {
-            result.add(save(user));
-        }
-
-        return result;
-    }
-
-    @Override
     public boolean existsByNickname(String nickname) {
         return nicknameIndex.containsKey(nickname);
     }
@@ -74,6 +63,16 @@ public class UserMemoryRepository implements UserRepository {
     @Override
     public Optional<User> findByEmail(String email) {
         return Optional.ofNullable(emailIndex.get(email));
+    }
+
+    @Override
+    public List<User> saveAll(Iterable<User> users) {
+        List<User> result = new ArrayList<>();
+
+        for (User user : users) {
+            result.add(save(user));
+        }
+        return result;
     }
 
     @Override
