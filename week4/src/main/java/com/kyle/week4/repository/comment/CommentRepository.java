@@ -10,5 +10,4 @@ public interface CommentRepository {
     Optional<Comment> findById(Long id);
     List<Comment> findAllInfiniteScroll(Long postId, int limit);
     List<Comment> findAllInfiniteScroll(Long postId, Long lastCommentId, int limit);
-    void clear();
 }

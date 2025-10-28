@@ -48,4 +48,9 @@ public class PostRepositoryAdapter implements PostRepository {
     public boolean notExistsById(Long postId) {
         return !postJpaRepository.existsById(postId);
     }
+
+    @Override
+    public Optional<Post> findLockedById(Long postId) {
+        return postJpaRepository.findLockedById(postId);
+    }
 }

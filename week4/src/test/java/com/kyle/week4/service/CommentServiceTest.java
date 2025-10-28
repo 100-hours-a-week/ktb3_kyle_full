@@ -7,9 +7,12 @@ import com.kyle.week4.entity.Comment;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
-import com.kyle.week4.repository.comment.CommentRepository;
 import com.kyle.week4.repository.MemoryClearRepository;
+import com.kyle.week4.repository.comment.CommentJpaRepository;
+import com.kyle.week4.repository.comment.CommentRepository;
+import com.kyle.week4.repository.post.PostJpaRepository;
 import com.kyle.week4.repository.post.PostRepository;
+import com.kyle.week4.repository.user.UserJpaRepository;
 import com.kyle.week4.repository.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,11 +44,22 @@ class CommentServiceTest {
     private CommentRepository commentRepository;
 
     @Autowired
+    private PostJpaRepository postJpaRepository;
+
+    @Autowired
+    private UserJpaRepository userJpaRepository;
+
+    @Autowired
+    private CommentJpaRepository commentJpaRepository;
+
+    @Autowired
     private List<MemoryClearRepository> memoryClearRepositoryList;
 
     @AfterEach
     void tearDown() {
-        commentRepository.clear();
+        commentJpaRepository.deleteAllInBatch();
+        postJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
         memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 
@@ -61,7 +75,7 @@ class CommentServiceTest {
 
         CommentCreateRequest request = new CommentCreateRequest("댓글");
 
-        final int totalCommentCount = 3000;
+        final int totalCommentCount = 10000;
         ExecutorService executor = Executors.newFixedThreadPool(10);
         CountDownLatch latch = new CountDownLatch(totalCommentCount);
 
@@ -73,10 +87,11 @@ class CommentServiceTest {
             });
         }
         latch.await();
+        executor.shutdown();
 
         // then
-        executor.shutdown();
-        assertThat(post.getCommentCount()).isEqualTo(totalCommentCount);
+        Post result = postJpaRepository.findById(post.getId()).orElseThrow();
+        assertThat(result.getCommentCount()).isEqualTo(totalCommentCount);
     }
 
     @Test
@@ -118,8 +133,8 @@ class CommentServiceTest {
 
         // when // then
         assertThatThrownBy(() -> commentService.updateComment(user.getId(), post.getId(), 10L, request))
-          .isInstanceOf(CustomException.class)
-          .hasFieldOrPropertyWithValue("errorCode", COMMENT_NOT_FOUND);
+                .isInstanceOf(CustomException.class)
+                .hasFieldOrPropertyWithValue("errorCode", COMMENT_NOT_FOUND);
     }
 
     @Test
@@ -139,8 +154,8 @@ class CommentServiceTest {
 
         // when // then
         assertThatThrownBy(() -> commentService.updateComment(user.getId(), 10L, comment.getId(), request))
-          .isInstanceOf(CustomException.class)
-          .hasFieldOrPropertyWithValue("errorCode", POST_NOT_FOUND);
+                .isInstanceOf(CustomException.class)
+                .hasFieldOrPropertyWithValue("errorCode", POST_NOT_FOUND);
     }
 
     @Test
@@ -160,31 +175,31 @@ class CommentServiceTest {
 
         // when // then
         assertThatThrownBy(() -> commentService.updateComment(10L, post.getId(), comment.getId(), request))
-          .isInstanceOf(CustomException.class)
-          .hasFieldOrPropertyWithValue("errorCode", PERMISSION_DENIED);
+                .isInstanceOf(CustomException.class)
+                .hasFieldOrPropertyWithValue("errorCode", PERMISSION_DENIED);
     }
 
     private User createUser() {
         return User.builder()
-          .email("test@test.com")
-          .nickname("test")
-          .profileImage("image.jpg")
-          .build();
+                .email("test@test.com")
+                .nickname("test")
+                .profileImage("image.jpg")
+                .build();
     }
 
     private Post createPost(User user, String title) {
         return Post.builder()
-          .title(title)
-          .content("내용입니다.")
-          .user(user)
-          .build();
+                .title(title)
+                .content("내용입니다.")
+                .user(user)
+                .build();
     }
 
     private Comment createComment(User user, Post post, String content) {
         return Comment.builder()
-          .user(user)
-          .post(post)
-          .content(content)
-          .build();
+                .user(user)
+                .post(post)
+                .content(content)
+                .build();
     }
 }

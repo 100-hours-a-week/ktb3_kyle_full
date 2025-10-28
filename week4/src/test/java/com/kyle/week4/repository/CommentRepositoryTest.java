@@ -3,8 +3,11 @@ package com.kyle.week4.repository;
 import com.kyle.week4.entity.Comment;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
+import com.kyle.week4.repository.comment.CommentJpaRepository;
 import com.kyle.week4.repository.comment.CommentRepository;
+import com.kyle.week4.repository.post.PostJpaRepository;
 import com.kyle.week4.repository.post.PostRepository;
+import com.kyle.week4.repository.user.UserJpaRepository;
 import com.kyle.week4.repository.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,11 +31,22 @@ class CommentRepositoryTest {
     private UserRepository userRepository;
 
     @Autowired
+    private PostJpaRepository postJpaRepository;
+
+    @Autowired
+    private UserJpaRepository userJpaRepository;
+
+    @Autowired
+    private CommentJpaRepository commentJpaRepository;
+
+    @Autowired
     private List<MemoryClearRepository> memoryClearRepositoryList;
 
     @AfterEach
     void tearDown() {
-        commentRepository.clear();
+        commentJpaRepository.deleteAllInBatch();
+        postJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
         memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 

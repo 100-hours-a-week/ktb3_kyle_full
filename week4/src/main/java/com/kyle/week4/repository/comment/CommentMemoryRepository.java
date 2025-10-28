@@ -1,6 +1,7 @@
 package com.kyle.week4.repository.comment;
 
 import com.kyle.week4.entity.Comment;
+import com.kyle.week4.repository.MemoryClearRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
-public class CommentMemoryRepository implements CommentRepository {
+public class CommentMemoryRepository implements CommentRepository, MemoryClearRepository {
     private final AtomicLong primaryKey = new AtomicLong(1);
     private final ConcurrentSkipListMap<Long, Comment> database = new ConcurrentSkipListMap<>();
 

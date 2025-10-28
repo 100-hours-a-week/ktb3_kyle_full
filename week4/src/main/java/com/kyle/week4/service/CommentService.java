@@ -12,6 +12,7 @@ import com.kyle.week4.repository.post.PostRepository;
 import com.kyle.week4.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,14 +20,17 @@ import static com.kyle.week4.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CommentService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 
+    @Transactional
     public Long createComment(Long userId, Long postId, CommentCreateRequest request) {
         User user = findUserBy(userId);
-        Post post = findPostBy(postId);
+        Post post = postRepository.findLockedById(postId)
+                .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
 
         Comment comment = request.toEntity(user, post);
         Comment savedComment = commentRepository.save(comment);
@@ -45,6 +49,7 @@ public class CommentService {
           .toList();
     }
 
+    @Transactional
     public CommentResponse updateComment(Long userId, Long postId, Long commentId, CommentUpdateRequest request) {
         Post post = findPostBy(postId);
         Comment comment = findCommentBy(commentId);
@@ -57,6 +62,7 @@ public class CommentService {
         return CommentResponse.of(comment, userId);
     }
 
+    @Transactional
     public void deleteComment(Long userId, Long postId, Long commentId) {
         Post post = findPostBy(postId);
         Comment comment = findCommentBy(commentId);
