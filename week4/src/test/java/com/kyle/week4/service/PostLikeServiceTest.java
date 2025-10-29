@@ -8,8 +8,11 @@ import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.exception.ErrorCode;
 import com.kyle.week4.repository.MemoryClearRepository;
-import com.kyle.week4.repository.postlike.PostLikeRepository;
+import com.kyle.week4.repository.post.PostJpaRepository;
 import com.kyle.week4.repository.post.PostRepository;
+import com.kyle.week4.repository.postlike.PostLikeJpaRepository;
+import com.kyle.week4.repository.postlike.PostLikeRepository;
+import com.kyle.week4.repository.user.UserJpaRepository;
 import com.kyle.week4.repository.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +40,15 @@ class PostLikeServiceTest {
     private PostLikeRepository postLikeRepository;
 
     @Autowired
+    private PostJpaRepository postJpaRepository;
+
+    @Autowired
+    private UserJpaRepository userJpaRepository;
+
+    @Autowired
+    private PostLikeJpaRepository postLikeJpaRepository;
+
+    @Autowired
     private CountCache postLikeCountCache;
 
     @Autowired
@@ -44,8 +56,10 @@ class PostLikeServiceTest {
 
     @AfterEach
     void tearDown() {
-        postLikeRepository.clear();
         postLikeCountCache.clear();
+        postLikeJpaRepository.deleteAllInBatch();
+        postJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
         memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 
@@ -53,7 +67,7 @@ class PostLikeServiceTest {
     @DisplayName("게시글의 좋아요를 생성한다.")
     void createPostLikeTest() {
         // given
-        User user = createUser();
+        User user = createUser("test@test.com", "test");
         userRepository.save(user);
 
         Post post = createPost(user, "제목");
@@ -64,17 +78,17 @@ class PostLikeServiceTest {
 
         // then
         assertThat(response)
-          .extracting("likeCount", "isLiked")
-          .containsExactly(1, true);
+                .extracting("likeCount", "isLiked")
+                .containsExactly(1, true);
     }
 
     @Test
     @DisplayName("좋아요가 눌린 회수만큼 좋아요수가 증가해야 한다.")
     void createPostLike_count() {
         // given
-        User user1 = createUser();
-        User user2 = createUser();
-        User user3 = createUser();
+        User user1 = createUser("test1@test.com", "test1");
+        User user2 = createUser("test2@test.com", "test2");
+        User user3 = createUser("test3@test.com", "test3");
         List<User> users = userRepository.saveAll(List.of(user1, user2, user3));
 
         Post post = createPost(user1, "제목");
@@ -94,7 +108,7 @@ class PostLikeServiceTest {
     @DisplayName("좋아요를 누른 게시글에 다시 좋아요를 누를 경우 예외가 발생한다.")
     void createPostLike_whenDuplicateLike() {
         // given
-        User user = createUser();
+        User user = createUser("test@test.com", "test");
         userRepository.save(user);
 
         Post post = createPost(user, "제목");
@@ -105,15 +119,15 @@ class PostLikeServiceTest {
 
         // when // then
         assertThatThrownBy(() -> postLikeService.like(user.getId(), post.getId()))
-          .isInstanceOf(CustomException.class)
-          .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ALREADY_LIKED_ERROR);
+                .isInstanceOf(CustomException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ALREADY_LIKED_ERROR);
     }
 
     @Test
     @DisplayName("좋아요를 누를 게시글이 존재하지 않으면 예외가 발생한다.")
     void createPostLike_whenPostNotFound() {
         // given
-        User user = createUser();
+        User user = createUser("test@test.com", "test");
         userRepository.save(user);
 
         Post post = createPost(user, "제목");
@@ -121,15 +135,15 @@ class PostLikeServiceTest {
 
         // when // then
         assertThatThrownBy(() -> postLikeService.like(user.getId(), 10L))
-          .isInstanceOf(CustomException.class)
-          .hasFieldOrPropertyWithValue("errorCode", ErrorCode.POST_NOT_FOUND);
+                .isInstanceOf(CustomException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.POST_NOT_FOUND);
     }
 
     @Test
     @DisplayName("좋아요를 취소한다.")
     void deletePostLike() {
         // given
-        User user = createUser();
+        User user = createUser("test@test.com", "test");
         userRepository.save(user);
 
         Post post = createPost(user, "제목");
@@ -142,17 +156,17 @@ class PostLikeServiceTest {
 
         // then
         assertThat(response)
-          .extracting("likeCount", "isLiked")
-          .containsExactly(0, false);
+                .extracting("likeCount", "isLiked")
+                .containsExactly(0, false);
     }
 
     @Test
     @DisplayName("좋아요가 취소되면 좋아요수가 감소해야 한다.")
     void deletePostLike_count() {
         // given
-        User user1 = createUser();
-        User user2 = createUser();
-        User user3 = createUser();
+        User user1 = createUser("test1@test.com", "test1");
+        User user2 = createUser("test2@test.com", "test2");
+        User user3 = createUser("test3@test.com", "test3");
         List<User> users = userRepository.saveAll(List.of(user1, user2, user3));
 
         Post post = createPost(user1, "제목");
@@ -174,7 +188,7 @@ class PostLikeServiceTest {
     @DisplayName("좋아요를 취소 할 게시글이 존재하지 않으면 예외가 발생한다.")
     void deletePostLike_whenPostNotFound() {
         // given
-        User user = createUser();
+        User user = createUser("test@test.com", "test");
         userRepository.save(user);
 
         Post post = createPost(user, "제목");
@@ -185,15 +199,15 @@ class PostLikeServiceTest {
 
         // when // then
         assertThatThrownBy(() -> postLikeService.removeLike(user.getId(), 10L))
-          .isInstanceOf(CustomException.class)
-          .hasFieldOrPropertyWithValue("errorCode", ErrorCode.POST_NOT_FOUND);
+                .isInstanceOf(CustomException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.POST_NOT_FOUND);
     }
 
     @Test
     @DisplayName("좋아요를 누르지 않았는데, 좋아요를 취소하려고 하는 경우 예외가 발생한다.")
     void deletePostLike_whenDoNotLike() {
         // given
-        User user = createUser();
+        User user = createUser("test@test.com", "test");
         userRepository.save(user);
 
         Post post = createPost(user, "제목");
@@ -201,24 +215,24 @@ class PostLikeServiceTest {
 
         // when // then
         assertThatThrownBy(() -> postLikeService.removeLike(user.getId(), post.getId()))
-          .isInstanceOf(CustomException.class)
-          .hasFieldOrPropertyWithValue("errorCode", ErrorCode.POST_LIKE_NOT_FOUND);
+                .isInstanceOf(CustomException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.POST_LIKE_NOT_FOUND);
     }
 
-    private User createUser() {
+    private User createUser(String email, String nickname) {
         return User.builder()
-          .email("test@test.com")
-          .nickname("test")
-          .profileImage("image.jpg")
-          .build();
+                .email(email)
+                .nickname(nickname)
+                .profileImage("image.jpg")
+                .build();
     }
 
     private Post createPost(User user, String title) {
         return Post.builder()
-          .title(title)
-          .content("내용입니다.")
-          .user(user)
-          .build();
+                .title(title)
+                .content("내용입니다.")
+                .user(user)
+                .build();
     }
 
     private PostLike createPostLike(User user, Post post) {

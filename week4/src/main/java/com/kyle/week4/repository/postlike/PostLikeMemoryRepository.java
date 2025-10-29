@@ -1,13 +1,14 @@
 package com.kyle.week4.repository.postlike;
 
 import com.kyle.week4.entity.PostLike;
+import com.kyle.week4.repository.MemoryClearRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
-public class PostLikeMemoryRepository implements PostLikeRepository {
+public class PostLikeMemoryRepository implements PostLikeRepository, MemoryClearRepository {
     private final ConcurrentHashMap<String, PostLike> database = new ConcurrentHashMap<>();
 
     @Override
