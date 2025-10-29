@@ -11,10 +11,17 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        show_sql: false
 
   output:
     ansi:
       enabled: ALWAYS
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+
 server:
   servlet:
     session:
