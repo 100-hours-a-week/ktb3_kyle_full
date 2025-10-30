@@ -20,13 +20,14 @@ import static com.kyle.week4.exception.ErrorCode.FAILED_AUTHENTICATE;
 @Component
 @RequiredArgsConstructor
 public class AuthenticationFilter extends OncePerRequestFilter {
-
+    
     private static final String[] EXCLUDED_PATHS = {
       "/users",
       "/auth/sessions",
       "/swagger-ui/**",
       "/v3/api-docs/**",
-      "/api-test"
+      "/api-test",
+            "/h2-console/**"
     };
 
     private final AuthenticationProvider provider;
@@ -36,6 +37,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         if (!provider.isAuthenticated(request, response)) {
+            System.out.println(path);
             throw new CustomException(FAILED_AUTHENTICATE);
         }
         filterChain.doFilter(request, response);

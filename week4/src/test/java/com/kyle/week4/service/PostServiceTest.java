@@ -9,6 +9,7 @@ import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.repository.MemoryClearRepository;
+import com.kyle.week4.repository.post.CommentCountRepository;
 import com.kyle.week4.repository.post.PostJpaRepository;
 import com.kyle.week4.repository.post.PostRepository;
 import com.kyle.week4.repository.user.UserJpaRepository;
@@ -16,6 +17,9 @@ import com.kyle.week4.repository.user.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
@@ -29,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class PostServiceTest {
     @Autowired
     private PostService postService;
@@ -46,17 +51,28 @@ class PostServiceTest {
     private UserJpaRepository userJpaRepository;
 
     @Autowired
+    private CommentCountRepository commentCountRepository;
+
+    @Autowired
     private CountCache postViewCountCache;
 
     @Autowired
     private List<MemoryClearRepository> memoryClearRepositoryList;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @AfterEach
     void tearDown() {
         postViewCountCache.clear();
+        commentCountRepository.deleteAllInBatch();
         postJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
         memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
+
+        jdbcTemplate.execute("ALTER TABLE post ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.execute("ALTER TABLE users ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.execute("ALTER TABLE comment ALTER COLUMN id RESTART WITH 1");
     }
 
     @Test
@@ -229,6 +245,33 @@ class PostServiceTest {
           .extracting("id", "title", "content")
           .containsExactlyInAnyOrder(post.getId(), "수정된 제목", "수정된 내용");
     }
+
+//    @Test
+//    @DisplayName("변경 감지와 벌크 업데이트")
+//    void updatePostTest2() {
+//        // given
+//        User user = createUser();
+//        User savedUser = userJpaRepository.save(user);
+//
+//        PostCreateRequest createRequest = PostCreateRequest.builder()
+//                .title("제목")
+//                .content("내용")
+//                .images(List.of("image1", "image2"))
+//                .build();
+//        PostDetailResponse post = postService.createPost(savedUser.getId(), createRequest);
+//
+//        PostUpdateRequest request = PostUpdateRequest.builder()
+//                .title("Dirty Checking")
+//                .content("수정된 내용")
+//                .build();
+//
+//        // when
+//        PostDetailResponse response = postService.updatePostTest(user.getId(), post.getId(), request);
+//
+//        // then
+//        Post findPost = postRepository.findById(post.getId()).orElseThrow();
+//        System.out.println("title: " + findPost.getTitle());
+//    }
 
     private User createUser() {
         return User.builder()

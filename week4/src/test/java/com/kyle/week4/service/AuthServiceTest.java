@@ -4,6 +4,7 @@ import com.kyle.week4.controller.request.LoginRequest;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.repository.MemoryClearRepository;
+import com.kyle.week4.repository.user.UserJpaRepository;
 import com.kyle.week4.repository.user.UserRepository;
 import com.kyle.week4.utils.PasswordEncoder;
 import org.junit.jupiter.api.AfterEach;
@@ -11,14 +12,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-import static com.kyle.week4.exception.ErrorCode.*;
+import static com.kyle.week4.exception.ErrorCode.INVALID_EMAIL;
+import static com.kyle.week4.exception.ErrorCode.INVALID_PASSWORD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class AuthServiceTest {
 
     @Autowired
@@ -28,6 +32,9 @@ class AuthServiceTest {
     private UserRepository userRepository;
 
     @Autowired
+    private UserJpaRepository userJpaRepository;
+
+    @Autowired
     private List<MemoryClearRepository> memoryClearRepositoryList;
 
     @Autowired
@@ -35,6 +42,7 @@ class AuthServiceTest {
 
     @AfterEach
     void tearDown() {
+        userJpaRepository.deleteAllInBatch();
         memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 
@@ -50,9 +58,9 @@ class AuthServiceTest {
         userRepository.save(user);
 
         LoginRequest request = LoginRequest.builder()
-          .email(email)
-          .password(password)
-          .build();
+                .email(email)
+                .password(password)
+                .build();
 
         // when
         Long userId = authService.login(request);
@@ -73,14 +81,14 @@ class AuthServiceTest {
         userRepository.save(user);
 
         LoginRequest request = LoginRequest.builder()
-          .email("test1@test.com")
-          .password(password)
-          .build();
+                .email("test1@test.com")
+                .password(password)
+                .build();
 
         // when // then
         assertThatThrownBy(() -> authService.login(request))
-          .isInstanceOf(CustomException.class)
-          .hasFieldOrPropertyWithValue("errorCode", INVALID_EMAIL);
+                .isInstanceOf(CustomException.class)
+                .hasFieldOrPropertyWithValue("errorCode", INVALID_EMAIL);
     }
 
     @Test
@@ -95,21 +103,21 @@ class AuthServiceTest {
         userRepository.save(user);
 
         LoginRequest request = LoginRequest.builder()
-          .email(email)
-          .password("Test123456789")
-          .build();
+                .email(email)
+                .password("Test123456789")
+                .build();
 
         // when // then
         assertThatThrownBy(() -> authService.login(request))
-          .isInstanceOf(CustomException.class)
-          .hasFieldOrPropertyWithValue("errorCode", INVALID_PASSWORD);
+                .isInstanceOf(CustomException.class)
+                .hasFieldOrPropertyWithValue("errorCode", INVALID_PASSWORD);
     }
 
     private User createUser(String email) {
         return User.builder()
-          .email(email)
-          .nickname("test")
-          .profileImage("image")
-          .build();
+                .email(email)
+                .nickname("test")
+                .profileImage("image")
+                .build();
     }
 }

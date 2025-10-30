@@ -12,6 +12,6 @@ public interface CommentJpaRepository extends JpaRepository<Comment, Long> {
     @Query("select c from Comment c where c.post.id = :postId")
     List<Comment> findAllInfiniteScroll(Long postId, Pageable pageable);
 
-    @Query("select c from Comment c where c.post.id = :postId and c.id < :lastCommentId")
+    @Query("select c from Comment c where c.post.id = :postId and c.id > :lastCommentId")
     List<Comment> findAllInfiniteScroll(Long postId, Long lastCommentId, Pageable pageable);
 }

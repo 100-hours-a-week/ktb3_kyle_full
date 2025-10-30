@@ -11,6 +11,7 @@ import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.repository.post.CommentCountRepository;
 import com.kyle.week4.repository.comment.CommentRepository;
+import com.kyle.week4.repository.post.PostJpaRepository;
 import com.kyle.week4.repository.post.PostRepository;
 import com.kyle.week4.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,8 @@ public class PostService {
     private final CommentCountRepository commentCountRepository;
     private final CountCache postViewCountCache;
     private final CountCache postLikeCountCache;
+
+    private final PostJpaRepository postJpaRepository;
 
     @Transactional
     public PostDetailResponse createPost(Long userId, PostCreateRequest request) {
@@ -89,6 +92,22 @@ public class PostService {
             throw new CustomException(PERMISSION_DENIED);
         }
         post.updatePost(request);
+
+        int viewCount = postViewCountCache.count(post.getId());
+
+        return PostDetailResponse.of(post, userId, viewCount);
+    }
+
+    @Transactional
+    public PostDetailResponse updatePostTest(Long userId, Long postId, PostUpdateRequest request) {
+        Post post = findPostBy(postId);
+
+        if (post.isNotAuthor(userId)) {
+            throw new CustomException(PERMISSION_DENIED);
+        }
+
+        post.updatePost(request); // "Dirty Checking"
+        postJpaRepository.updateTitle(postId, "UPDATE"); // "Bulk UPDATE"
 
         int viewCount = postViewCountCache.count(post.getId());
 

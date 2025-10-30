@@ -2,7 +2,9 @@ package com.kyle.week4.repository;
 
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
+import com.kyle.week4.repository.post.PostJpaRepository;
 import com.kyle.week4.repository.post.PostRepository;
+import com.kyle.week4.repository.user.UserJpaRepository;
 import com.kyle.week4.repository.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,12 +12,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class PostRepositoryTest {
     @Autowired
     private PostRepository postRepository;
@@ -24,7 +30,16 @@ class PostRepositoryTest {
     private UserRepository userRepository;
 
     @Autowired
+    private PostJpaRepository postJpaRepository;
+
+    @Autowired
+    private UserJpaRepository userJpaRepository;
+
+    @Autowired
     private List<MemoryClearRepository> memoryClearRepositoryList;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private final User user = createUser();
 
@@ -35,7 +50,12 @@ class PostRepositoryTest {
 
     @AfterEach
     void tearDown() {
+        postJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
         memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
+
+        jdbcTemplate.execute("ALTER TABLE post ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.execute("ALTER TABLE users ALTER COLUMN id RESTART WITH 1");
     }
 
     @Test

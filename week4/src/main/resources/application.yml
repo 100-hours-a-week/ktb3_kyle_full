@@ -1,4 +1,17 @@
+server:
+  servlet:
+    session:
+      timeout: 1h
+
 spring:
+  profiles:
+    active: local
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
   datasource:
     url: jdbc:mysql://localhost:3306/kyle_week7?serverTimezone=UTC
     username: root
@@ -22,11 +35,38 @@ decorator:
     p6spy:
       enable-logging: true
 
-server:
-  servlet:
-    session:
-      timeout: 1h
+
 
 springdoc:
   swagger-ui:
     path: /api-test
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:~/test
+    username: sa
+    password:
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: false
+        show_sql: false
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false

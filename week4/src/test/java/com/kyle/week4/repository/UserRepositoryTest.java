@@ -2,12 +2,14 @@ package com.kyle.week4.repository;
 
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
+import com.kyle.week4.repository.user.UserJpaRepository;
 import com.kyle.week4.repository.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,15 +22,20 @@ import java.util.concurrent.Future;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserJpaRepository userJpaRepository;
 
     @Autowired
     private List<MemoryClearRepository> memoryClearRepositoryList;
 
     @AfterEach
     void tearDown() {
+        userJpaRepository.deleteAllInBatch();
         memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 

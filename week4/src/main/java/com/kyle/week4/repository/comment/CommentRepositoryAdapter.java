@@ -29,13 +29,13 @@ public class CommentRepositoryAdapter implements CommentRepository {
 
     @Override
     public List<Comment> findAllInfiniteScroll(Long postId, int limit) {
-        Pageable pageable = PageRequest.of(0, limit,  Sort.by(Sort.Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(0, limit,  Sort.by(Sort.Direction.ASC, "id"));
         return commentJpaRepository.findAllInfiniteScroll(postId, pageable);
     }
 
     @Override
     public List<Comment> findAllInfiniteScroll(Long postId, Long lastCommentId, int limit) {
-        Pageable pageable = PageRequest.of(0, limit,  Sort.by(Sort.Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(0, limit,  Sort.by(Sort.Direction.ASC, "id"));
         return commentJpaRepository.findAllInfiniteScroll(postId, lastCommentId, pageable);
     }
 }

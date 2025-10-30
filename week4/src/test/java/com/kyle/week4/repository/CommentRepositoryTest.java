@@ -14,12 +14,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class CommentRepositoryTest {
     @Autowired
     private CommentRepository commentRepository;
@@ -42,12 +45,19 @@ class CommentRepositoryTest {
     @Autowired
     private List<MemoryClearRepository> memoryClearRepositoryList;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @AfterEach
     void tearDown() {
         commentJpaRepository.deleteAllInBatch();
         postJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
         memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
+
+        jdbcTemplate.execute("ALTER TABLE post ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.execute("ALTER TABLE users ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.execute("ALTER TABLE comment ALTER COLUMN id RESTART WITH 1");
     }
 
     @Test
