@@ -61,6 +61,7 @@ public class CommentService {
 
         Comment comment = request.toEntity(user, post);
         Comment savedComment = commentRepository.save(comment);
+
         CommentCount commentCount = commentCountRepository.findLockedByPostId(postId)
                 .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
         commentCount.increase();
@@ -75,6 +76,7 @@ public class CommentService {
 
         Comment comment = request.toEntity(user, post);
         Comment savedComment = commentRepository.save(comment);
+
         CommentCount commentCount = commentCountRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
         commentCount.increase();

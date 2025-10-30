@@ -22,7 +22,7 @@ public class CommentController implements CommentControllerDocs {
       @PathVariable("postId") Long postId,
       @Valid @RequestBody CommentCreateRequest request
     ) {
-        return BaseResponse.created(commentService.createComment(userId, postId, request));
+        return BaseResponse.created(commentService.createCommentPessimistic1(userId, postId, request));
     }
 
     @GetMapping("/posts/{postId}/comments")
