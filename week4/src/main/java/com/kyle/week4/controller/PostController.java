@@ -8,7 +8,9 @@ import com.kyle.week4.controller.response.PostResponse;
 import com.kyle.week4.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -23,6 +25,15 @@ public class PostController implements PostControllerDocs {
       @Valid @RequestBody PostCreateRequest request
     ) {
         return BaseResponse.created(postService.createPost(userId, request));
+    }
+
+    @PostMapping(value = "/posts/image",  consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public BaseResponse<PostDetailResponse> createPostAndImage(
+            @SessionAttribute("userId") Long userId,
+            @Valid @RequestPart(value = "request") PostCreateRequest request,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images
+    ) {
+        return BaseResponse.created(postService.createPostAndImage(userId, request, images));
     }
 
     @GetMapping("/posts")

@@ -7,16 +7,19 @@ import com.kyle.week4.controller.response.PostDetailResponse;
 import com.kyle.week4.controller.response.PostResponse;
 import com.kyle.week4.entity.CommentCount;
 import com.kyle.week4.entity.Post;
+import com.kyle.week4.entity.PostImage;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
-import com.kyle.week4.repository.post.CommentCountRepository;
 import com.kyle.week4.repository.comment.CommentRepository;
+import com.kyle.week4.repository.post.CommentCountRepository;
 import com.kyle.week4.repository.post.PostJpaRepository;
 import com.kyle.week4.repository.post.PostRepository;
 import com.kyle.week4.repository.user.UserRepository;
+import com.kyle.week4.utils.ImageUploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -27,24 +30,40 @@ import static com.kyle.week4.exception.ErrorCode.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PostService {
-    private static final int COMMENT_PAGE_SIZE = 10;
-
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final CommentCountRepository commentCountRepository;
     private final CountCache postViewCountCache;
     private final CountCache postLikeCountCache;
+    private final ImageUploader imageUploader;
 
     private final PostJpaRepository postJpaRepository;
 
     @Transactional
     public PostDetailResponse createPost(Long userId, PostCreateRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        User user = findUserBy(userId);
 
         Post post = request.toEntity(user);
         Post savedPost = postRepository.save(post);
+        CommentCount commentCount = new CommentCount(post.getId(), 0);
+        commentCountRepository.save(commentCount);
+
+        postViewCountCache.initCache(post.getId());
+        postLikeCountCache.initCache(post.getId());
+
+        return PostDetailResponse.of(savedPost, userId, 0);
+    }
+
+    @Transactional
+    public PostDetailResponse createPostAndImage(Long userId, PostCreateRequest request, List<MultipartFile> images) {
+        User user = findUserBy(userId);
+
+        Post post = request.toEntity(user);
+        Post savedPost = postRepository.save(post);
+
+        imageUpload(images, savedPost);
+
         CommentCount commentCount = new CommentCount(post.getId(), 0);
         commentCountRepository.save(commentCount);
 
@@ -123,6 +142,19 @@ public class PostService {
         }
 
         post.delete();
+    }
+
+    private void imageUpload(List<MultipartFile> images, Post post) {
+        List<String> paths = imageUploader.uploadImages(images);
+        for (String path : paths) {
+            PostImage postImage = new PostImage(path);
+            postImage.connectPost(post);
+        }
+    }
+
+    private User findUserBy(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     }
 
     private Post findPostBy(Long postId) {

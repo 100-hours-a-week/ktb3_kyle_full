@@ -1,6 +1,7 @@
 package com.kyle.week4.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,4 +20,16 @@ public class PostImage {
     private Post post;
 
     private String imagePath;
+
+    public PostImage(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public void connectPost(Post post) {
+        this.post = post;
+
+        if (!post.getPostImages().contains(this)) {
+            post.getPostImages().add(this);
+        }
+    }
 }

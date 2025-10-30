@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static jakarta.persistence.FetchType.*;
@@ -36,6 +37,9 @@ public class Post extends BaseTime {
 
     private boolean isDeleted;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST)
+    private List<PostImage> postImages = new ArrayList<>();
+
     @Builder
     public Post(User user, String title, String content) {
         this.user = user;
@@ -53,6 +57,10 @@ public class Post extends BaseTime {
 
     public void increaseCommentCount() {
         commentCount++;
+    }
+
+    public void addPostImage(PostImage postImage) {
+        postImages.add(postImage);
     }
 
     public void updatePost(PostUpdateRequest request) {
