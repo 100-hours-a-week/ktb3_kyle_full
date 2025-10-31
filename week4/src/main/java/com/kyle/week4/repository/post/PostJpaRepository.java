@@ -3,10 +3,7 @@ package com.kyle.week4.repository.post;
 import com.kyle.week4.entity.Post;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -27,6 +24,9 @@ public interface PostJpaRepository extends JpaRepository<Post, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select p from Post p where p.id = :postId")
     Optional<Post> findLockedById(@Param("postId") Long postId);
+
+    @EntityGraph(attributePaths = {"user"})
+    Optional<Post> findWithUserById(@Param("postId") Long postId);
 
     @Modifying
     @Query("update Post p set p.title = :title where p.id = :postId")

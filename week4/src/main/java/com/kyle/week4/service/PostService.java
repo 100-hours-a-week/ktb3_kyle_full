@@ -96,7 +96,8 @@ public class PostService {
     }
 
     public PostDetailResponse getPostDetail(Long userId, Long postId) {
-        Post post = findPostBy(postId);
+        Post post = postRepository.findWithUserById(postId)
+                .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
 
         int viewCount = postViewCountCache.increase(postId);
 
@@ -145,6 +146,8 @@ public class PostService {
     }
 
     private void imageUpload(List<MultipartFile> images, Post post) {
+        if (images == null || images.isEmpty()) return;
+
         List<String> paths = imageUploader.uploadImages(images);
         for (String path : paths) {
             PostImage postImage = new PostImage(path);

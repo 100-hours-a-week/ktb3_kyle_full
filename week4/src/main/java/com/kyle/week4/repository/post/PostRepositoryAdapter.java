@@ -53,4 +53,8 @@ public class PostRepositoryAdapter implements PostRepository {
     public Optional<Post> findLockedById(Long postId) {
         return postJpaRepository.findLockedById(postId);
     }
+
+    public Optional<Post> findWithUserById(Long postId) {
+        return postJpaRepository.findWithUserById(postId);
+    }
 }

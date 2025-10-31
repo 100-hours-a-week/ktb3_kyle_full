@@ -70,6 +70,11 @@ public class PostMemoryRepository implements PostRepository, MemoryClearReposito
     }
 
     @Override
+    public Optional<Post> findWithUserById(Long postId) {
+        return Optional.ofNullable(database.get(postId));
+    }
+
+    @Override
     public void clear() {
         primaryKey.set(1);
         database.clear();
