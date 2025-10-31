@@ -68,7 +68,7 @@ public interface CommentControllerDocs {
       @Parameter(hidden = true)
       Long userId,
       @Parameter(
-        name = "게시글 ID",
+        name = "postId",
         description = "댓글을 조회할 게시글의 ID",
         in = ParameterIn.PATH,
         required = true
