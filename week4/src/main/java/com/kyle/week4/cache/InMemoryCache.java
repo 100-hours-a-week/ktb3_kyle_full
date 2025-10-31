@@ -18,7 +18,7 @@ public class InMemoryCache<T extends Map<Long, AtomicInteger>> implements CountC
 
     @Override
     public int count(Long postId) {
-        return countCache.get(postId).get();
+        return countCache.computeIfAbsent(postId, key -> new AtomicInteger(0)).get();
     }
 
     @Override
@@ -26,7 +26,7 @@ public class InMemoryCache<T extends Map<Long, AtomicInteger>> implements CountC
         return postIds.stream().collect(
           Collectors.toMap(
             postId -> postId,
-            postId -> countCache.get(postId).get()
+            postId -> count(postId)
           )
         );
     }
