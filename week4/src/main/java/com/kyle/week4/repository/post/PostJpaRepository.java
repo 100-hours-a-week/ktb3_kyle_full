@@ -15,9 +15,11 @@ public interface PostJpaRepository extends JpaRepository<Post, Long> {
             "where p.id = :postId")
     void increaseCommentCount(@Param("postId") Long postId);
 
+    @EntityGraph(attributePaths = {"user"})
     @Query("select p from Post p")
     List<Post> findAllInfiniteScroll(Pageable pageable);
 
+    @EntityGraph(attributePaths = {"user"})
     @Query("select p from Post p where p.id < :lastPostId")
     List<Post> findAllInfiniteScroll(@Param("lastPostId") Long lastPostId, Pageable pageable);
 
