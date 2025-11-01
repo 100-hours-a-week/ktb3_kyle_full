@@ -15,6 +15,9 @@ import com.kyle.week4.repository.post.PostRepository;
 import com.kyle.week4.repository.user.UserJpaRepository;
 import com.kyle.week4.repository.user.UserRepository;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -27,12 +30,13 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 
 import static com.kyle.week4.exception.ErrorCode.POST_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
+@SpringBootTest(properties = "decorator.datasource.enabled=false")
 @ActiveProfiles("test")
 class PostServiceTest {
     @Autowired
@@ -70,9 +74,9 @@ class PostServiceTest {
         userJpaRepository.deleteAllInBatch();
         memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
 
-        jdbcTemplate.execute("ALTER TABLE post ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.execute("ALTER TABLE users ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.execute("ALTER TABLE comment ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.execute("ALTER TABLE post AUTO_INCREMENT = 1");
+        jdbcTemplate.execute("ALTER TABLE users AUTO_INCREMENT = 1");
+        jdbcTemplate.execute("ALTER TABLE comment AUTO_INCREMENT = 1");
     }
 
     @Test
@@ -98,6 +102,7 @@ class PostServiceTest {
           .contains("제목1", "내용1", 0, 0, true);
     }
 
+    @Disabled
     @TestFactory
     @DisplayName("게시글 목록 조회 시나리오")
     Collection<DynamicTest> infiniteScroll() {
@@ -107,53 +112,88 @@ class PostServiceTest {
 
         for (int i = 1; i <= 8; i++) {
             PostCreateRequest request = PostCreateRequest.builder()
-              .title("제목 " + i)
-              .content("내용" + i)
-              .images(List.of("image1", "image2"))
-              .build();
+                .title("제목 " + i)
+                .content("내용" + i)
+                .images(List.of("image1", "image2"))
+                .build();
             postService.createPost(savedUser.getId(), request);
         }
 
         int limit = 3;
 
         return List.of(
-          DynamicTest.dynamicTest("lastPostId가 null 이면 가장 최신 게시글부터 조회한다.", () -> {
-              // when
-              List<PostResponse> responses = postService.infiniteScroll(null, limit);
+            DynamicTest.dynamicTest("lastPostId가 null 이면 가장 최신 게시글부터 조회한다.", () -> {
+                // when
+                List<PostResponse> responses = postService.infiniteScroll(null, limit);
 
-              // then
-              assertThat(responses).hasSize(3);
-              assertThat(responses)
-                .extracting(PostResponse::getId)
-                .containsExactly(8L, 7L, 6L);
-          }),
-          DynamicTest.dynamicTest("다음 페이지에 lastPostId 보다 작은 게시글부터 조회한다.", () -> {
-              // when
-              List<PostResponse> responses = postService.infiniteScroll(6L, limit);
+                // then
+                assertThat(responses).hasSize(3);
+                assertThat(responses)
+                    .extracting(PostResponse::getId)
+                    .containsExactly(8L, 7L, 6L);
+            }),
+            DynamicTest.dynamicTest("다음 페이지에 lastPostId 보다 작은 게시글부터 조회한다.", () -> {
+                // when
+                List<PostResponse> responses = postService.infiniteScroll(6L, limit);
 
-              // then
-              assertThat(responses).hasSize(3);
-              assertThat(responses)
-                .extracting(PostResponse::getId)
-                .containsExactly(5L, 4L, 3L);
-          }),
-          DynamicTest.dynamicTest("limit이 남은 게시글 수보다 클 경우 모든 게시글을 반환한다.", () -> {
-              // when
-              List<PostResponse> responses = postService.infiniteScroll(3L, limit);
+                // then
+                assertThat(responses).hasSize(3);
+                assertThat(responses)
+                    .extracting(PostResponse::getId)
+                    .containsExactly(5L, 4L, 3L);
+            }),
+            DynamicTest.dynamicTest("limit이 남은 게시글 수보다 클 경우 모든 게시글을 반환한다.", () -> {
+                // when
+                List<PostResponse> responses = postService.infiniteScroll(3L, limit);
 
-              // then
-              assertThat(responses).hasSize(2);
-              assertThat(responses)
-                .extracting(PostResponse::getId)
-                .containsExactly(2L, 1L);
-          }),
-          DynamicTest.dynamicTest("lastPostId 보다 작은 게시글이 없다면 빈 리스트를 반환한다.", () -> {
-              // when
-              List<PostResponse> responses = postService.infiniteScroll(1L, limit);
+                // then
+                assertThat(responses).hasSize(2);
+                assertThat(responses)
+                    .extracting(PostResponse::getId)
+                    .containsExactly(2L, 1L);
+            }),
+            DynamicTest.dynamicTest("lastPostId 보다 작은 게시글이 없다면 빈 리스트를 반환한다.", () -> {
+                // when
+                List<PostResponse> responses = postService.infiniteScroll(1L, limit);
 
-              // then
-              assertThat(responses).isEmpty();
-          })
+                // then
+                assertThat(responses).isEmpty();
+            })
+        );
+    }
+
+    @ParameterizedTest(name = "[{index}] lastPostId={0}, limit={1} → expected={2}")
+    @MethodSource("infiniteScrollArguments")
+    @DisplayName("게시글 무한 스크롤 동작 검증")
+    void infiniteScrollTest(Long lastPostId, int limit, List<Long> expectedIds) {
+        // given
+        User user = createUser();
+        User savedUser = userJpaRepository.save(user);
+
+        for (int i = 1; i <= 8; i++) {
+            PostCreateRequest request = PostCreateRequest.builder()
+                .title("제목 " + i)
+                .content("내용" + i)
+                .images(List.of("image1", "image2"))
+                .build();
+            postService.createPost(savedUser.getId(), request);
+        }
+
+        // when
+        List<PostResponse> responses = postService.infiniteScroll(lastPostId, limit);
+
+        // then
+        assertThat(responses)
+            .extracting(PostResponse::getId)
+            .containsExactlyElementsOf(expectedIds);
+    }
+
+    private static Stream<Arguments> infiniteScrollArguments() {
+        return Stream.of(
+            Arguments.of(null, 3, List.of(8L, 7L, 6L)),  // 최신부터 조회
+            Arguments.of(6L, 3, List.of(5L, 4L, 3L)),    // 다음 페이지
+            Arguments.of(3L, 3, List.of(2L, 1L)),        // 남은 게시글보다 limit이 큰 경우
+            Arguments.of(1L, 3, List.of())               // 더 이상 존재하지 않을 때
         );
     }
 

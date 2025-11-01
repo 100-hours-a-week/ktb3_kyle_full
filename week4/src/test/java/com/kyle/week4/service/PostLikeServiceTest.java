@@ -26,7 +26,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
+@SpringBootTest(properties = "decorator.datasource.enabled=false")
 @ActiveProfiles("test")
 class PostLikeServiceTest {
     @Autowired

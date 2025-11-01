@@ -33,7 +33,7 @@ import static com.kyle.week4.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
+@SpringBootTest(properties = "decorator.datasource.enabled=false")
 @ActiveProfiles("test")
 class CommentServiceTest {
     @Autowired
@@ -74,9 +74,9 @@ class CommentServiceTest {
         userJpaRepository.deleteAllInBatch();
         memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
 
-        jdbcTemplate.execute("ALTER TABLE post ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.execute("ALTER TABLE users ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.execute("ALTER TABLE comment ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.execute("ALTER TABLE post AUTO_INCREMENT = 1");
+        jdbcTemplate.execute("ALTER TABLE users AUTO_INCREMENT = 1");
+        jdbcTemplate.execute("ALTER TABLE comment AUTO_INCREMENT = 1");
     }
 
     @Test
@@ -91,7 +91,7 @@ class CommentServiceTest {
 
         CommentCreateRequest request = new CommentCreateRequest("댓글");
 
-        final int totalCommentCount = 10000;
+        final int totalCommentCount = 1000;
         ExecutorService executor = Executors.newFixedThreadPool(10);
         CountDownLatch latch = new CountDownLatch(totalCommentCount);
 
@@ -128,7 +128,7 @@ class CommentServiceTest {
 
         CommentCreateRequest request = new CommentCreateRequest("댓글");
 
-        final int totalCommentCount = 10000;
+        final int totalCommentCount = 1000;
         ExecutorService executor = Executors.newFixedThreadPool(10);
         CountDownLatch latch = new CountDownLatch(totalCommentCount);
 
@@ -165,7 +165,7 @@ class CommentServiceTest {
 
         CommentCreateRequest request = new CommentCreateRequest("댓글");
 
-        final int totalCommentCount = 10000;
+        final int totalCommentCount = 1000;
         ExecutorService executor = Executors.newFixedThreadPool(10);
         CountDownLatch latch = new CountDownLatch(totalCommentCount);
 

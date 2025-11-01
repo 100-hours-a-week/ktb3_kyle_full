@@ -23,7 +23,7 @@ import static com.kyle.week4.exception.ErrorCode.USER_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
+@SpringBootTest(properties = "decorator.datasource.enabled=false")
 @ActiveProfiles("test")
 class UserServiceTest {
     @Autowired
