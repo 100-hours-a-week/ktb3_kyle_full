@@ -106,19 +106,24 @@ public class PostService {
     }
 
     public PostDetailResponse getPostDetail(Long userId, Long postId) {
-        Post post = postRepository.findWithUserById(postId)
+        Post post = postRepository.findWithUserAndPostImagesById(postId)
             .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
 
         int viewCount = postViewCountCache.increase(postId);
 
-        List<PostImageResponse> postImageResponses = getPostImageResponses(postId);
+        List<PostImageResponse> postImageResponses = post.getPostImages().stream()
+            .map(postImage ->
+                PostImageResponse.of(postImage.getId(), postImage.getImagePath())
+            )
+            .toList();
 
         return PostDetailResponse.of(post, userId, viewCount, postImageResponses);
     }
 
     @Transactional
     public PostDetailResponse updatePost(Long userId, Long postId, PostUpdateRequest request) {
-        Post post = findPostBy(postId);
+        Post post = postRepository.findWithUserAndPostImagesById(postId)
+            .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
 
         if (post.isNotAuthor(userId)) {
             throw new CustomException(PERMISSION_DENIED);
@@ -127,7 +132,11 @@ public class PostService {
 
         int viewCount = postViewCountCache.count(post.getId());
 
-        List<PostImageResponse> postImageResponses = getPostImageResponses(postId);
+        List<PostImageResponse> postImageResponses = post.getPostImages().stream()
+            .map(postImage ->
+                PostImageResponse.of(postImage.getId(), postImage.getImagePath())
+            )
+            .toList();
 
         return PostDetailResponse.of(post, userId, viewCount, postImageResponses);
     }

@@ -27,8 +27,8 @@ public interface PostJpaRepository extends JpaRepository<Post, Long> {
     @Query("select p from Post p where p.id = :postId")
     Optional<Post> findLockedById(@Param("postId") Long postId);
 
-    @EntityGraph(attributePaths = {"user"})
-    Optional<Post> findWithUserById(@Param("postId") Long postId);
+    @EntityGraph(attributePaths = {"user", "postImages"})
+    Optional<Post> findWithUserAndPostImagesById(@Param("postId") Long postId);
 
     @Modifying
     @Query("update Post p set p.title = :title where p.id = :postId")

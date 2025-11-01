@@ -70,7 +70,7 @@ public class PostMemoryRepository implements PostRepository, MemoryClearReposito
     }
 
     @Override
-    public Optional<Post> findWithUserById(Long postId) {
+    public Optional<Post> findWithUserAndPostImagesById(Long postId) {
         return Optional.ofNullable(database.get(postId));
     }
 

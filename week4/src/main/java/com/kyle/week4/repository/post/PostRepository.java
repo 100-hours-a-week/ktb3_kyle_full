@@ -13,5 +13,5 @@ public interface PostRepository {
     void increaseCommentCount(Long postId);
     boolean notExistsById(Long postId);
     Optional<Post> findLockedById(Long postId);
-    Optional<Post> findWithUserById(Long postId);
+    Optional<Post> findWithUserAndPostImagesById(Long postId);
 }
