@@ -37,7 +37,7 @@ public class Post extends BaseTime {
 
     private boolean isDeleted;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "post")
     private List<PostImage> postImages = new ArrayList<>();
 
     @Builder

@@ -36,14 +36,14 @@ public class PostDetailResponse {
     @Schema(description = "게시글을 조회한 사용자가 해당 게시글의 작성자와 일치하는지 여부", example = "true")
     private boolean isAuthor;
 
-    @Schema(description = "업로드 한 이미지 경로", example = "[\"image1.jpg\", \"image2.jpg\"]")
-    private List<String> images;
-
     @Schema(description = "게시글 생성 날짜", example = "2025-10-12T20:16:04.3440899")
     private LocalDateTime createdAt;
 
+    @Schema(description = "업로드 한 이미지 경로")
+    private List<PostImageResponse> imagePaths;
+
     @Builder
-    public PostDetailResponse(Long id, String title, String content, String authorNickname, String authorProfileImage, int viewCount, int commentCount, boolean isAuthor, List<String> images, LocalDateTime createdAt) {
+    public PostDetailResponse(Long id, String title, String content, String authorNickname, String authorProfileImage, int viewCount, int commentCount, boolean isAuthor, List<PostImageResponse> imagePaths, LocalDateTime createdAt) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -52,21 +52,22 @@ public class PostDetailResponse {
         this.viewCount = viewCount;
         this.commentCount = commentCount;
         this.isAuthor = isAuthor;
-        this.images = images;
         this.createdAt = createdAt;
+        this.imagePaths = imagePaths;
     }
 
-    public static PostDetailResponse of(Post post, Long userId, int viewCount) {
+    public static PostDetailResponse of(Post post, Long userId, int viewCount, List<PostImageResponse> imagePaths) {
         return PostDetailResponse.builder()
-          .id(post.getId())
-          .title(post.getTitle())
-          .content(post.getContent())
-          .viewCount(viewCount)
-          .commentCount(post.getCommentCount())
-          .isAuthor(post.getUser().getId().equals(userId))
-          .authorNickname(post.getUser().getNickname())
-          .authorProfileImage(post.getUser().getProfileImage())
-          .createdAt(post.getCreatedAt())
-          .build();
+            .id(post.getId())
+            .title(post.getTitle())
+            .content(post.getContent())
+            .viewCount(viewCount)
+            .commentCount(post.getCommentCount())
+            .isAuthor(post.getUser().getId().equals(userId))
+            .authorNickname(post.getUser().getNickname())
+            .authorProfileImage(post.getUser().getProfileImage())
+            .createdAt(post.getCreatedAt())
+            .imagePaths(imagePaths)
+            .build();
     }
 }
