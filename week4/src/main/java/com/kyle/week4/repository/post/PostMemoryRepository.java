@@ -53,7 +53,7 @@ public class PostMemoryRepository implements PostRepository, MemoryClearReposito
     public void increaseCommentCount(Long postId) {
         try {
             commentCountLock.get(postId).lock();
-            database.get(postId).increaseCommentCount();
+            // database.get(postId).increaseCommentCount();
         } finally {
             commentCountLock.get(postId).unlock();
         }

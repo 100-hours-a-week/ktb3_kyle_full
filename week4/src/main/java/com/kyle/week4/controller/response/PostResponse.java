@@ -47,13 +47,13 @@ public class PostResponse {
         this.createdAt = createdAt;
     }
 
-    public static PostResponse of(Post post, int viewCount, int likeCount) {
+    public static PostResponse of(Post post, int commentCount, int viewCount, int likeCount) {
         return PostResponse.builder()
           .id(post.getId())
           .title(post.getTitle())
           .likeCount(likeCount)
           .viewCount(viewCount)
-          .commentCount(post.getCommentCount())
+          .commentCount(commentCount)
           .authorNickname(post.getUser().getNickname())
           .authorProfileImage(post.getUser().getProfileImage())
           .createdAt(post.getCreatedAt())

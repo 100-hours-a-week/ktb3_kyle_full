@@ -41,7 +41,7 @@ public class PostRepositoryAdapter implements PostRepository {
 
     @Override
     public void increaseCommentCount(Long postId) {
-        postJpaRepository.increaseCommentCount(postId);
+        // postJpaRepository.increaseCommentCount(postId);
     }
 
     @Override

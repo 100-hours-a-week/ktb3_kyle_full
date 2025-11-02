@@ -14,7 +14,6 @@ import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.repository.comment.CommentRepository;
 import com.kyle.week4.repository.post.CommentCountRepository;
 import com.kyle.week4.repository.post.PostImageRepository;
-import com.kyle.week4.repository.post.PostJpaRepository;
 import com.kyle.week4.repository.post.PostRepository;
 import com.kyle.week4.repository.user.UserRepository;
 import com.kyle.week4.utils.ImageUploader;
@@ -26,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.kyle.week4.exception.ErrorCode.*;
 
@@ -42,8 +42,6 @@ public class PostService {
     private final CountCache postLikeCountCache;
     private final ImageUploader imageUploader;
 
-    private final PostJpaRepository postJpaRepository;
-
     @Deprecated
     @Transactional
     public PostDetailResponse createPost(Long userId, PostCreateRequest request) {
@@ -51,13 +49,13 @@ public class PostService {
 
         Post post = request.toEntity(user);
         Post savedPost = postRepository.save(post);
-        CommentCount commentCount = new CommentCount(post.getId(), 0);
+        CommentCount commentCount = new CommentCount(savedPost, 0);
         commentCountRepository.save(commentCount);
 
         postViewCountCache.initCache(post.getId());
         postLikeCountCache.initCache(post.getId());
 
-        return PostDetailResponse.of(savedPost, userId, 0, List.of());
+        return PostDetailResponse.of(savedPost, userId, 0, 0, List.of());
     }
 
     @Transactional
@@ -67,20 +65,21 @@ public class PostService {
         Post post = request.toEntity(user);
         Post savedPost = postRepository.save(post);
 
-        // TODO: 게시글 이미지 조회 방식 고민해보자.
-        // TODO: 영속성 전이를 통한 저장으로 이 트랜잭션에서는 PostImage의 ID값을 받아올 수 없음.
         List<PostImage> postImages = imageUpload(images, savedPost);
-        postImageRepository.saveAll(postImages); // 개별 INSERT 쿼리 발생
+        List<PostImage> savedPostImages = postImageRepository.saveAll(postImages);// FIXME: 개별 INSERT 쿼리 발생
+        List<PostImageResponse> postImageResponses = savedPostImages.stream()
+            .map(postImage ->
+                PostImageResponse.of(postImage.getId(), postImage.getImagePath())
+            )
+            .toList();
 
-        List<PostImageResponse> postImageResponses = getPostImageResponses(savedPost.getId());
-
-        CommentCount commentCount = new CommentCount(savedPost.getId(), 0);
+        CommentCount commentCount = new CommentCount(savedPost, 0);
         commentCountRepository.save(commentCount);
 
         postViewCountCache.initCache(savedPost.getId());
         postLikeCountCache.initCache(savedPost.getId());
 
-        return PostDetailResponse.of(savedPost, userId, 0, postImageResponses);
+        return PostDetailResponse.of(savedPost, userId, 0, 0, postImageResponses);
     }
 
     public List<PostResponse> infiniteScroll(Long lastPostId, int limit) {
@@ -92,6 +91,7 @@ public class PostService {
             .map(Post::getId)
             .toList();
 
+        Map<Long, Integer> commentCountMap = getCommentCounts(postIds);
         Map<Long, Integer> viewCountMap = postViewCountCache.getCounts(postIds);
         Map<Long, Integer> likeCountMap = postLikeCountCache.getCounts(postIds);
 
@@ -99,6 +99,7 @@ public class PostService {
             .map(post ->
                 PostResponse.of(
                     post,
+                    commentCountMap.get(post.getId()),
                     viewCountMap.get(post.getId()),
                     likeCountMap.get(post.getId()))
             )
@@ -110,6 +111,7 @@ public class PostService {
             .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
 
         int viewCount = postViewCountCache.increase(postId);
+        int commentCount = getCommentCount(postId);
 
         List<PostImageResponse> postImageResponses = post.getPostImages().stream()
             .map(postImage ->
@@ -117,7 +119,7 @@ public class PostService {
             )
             .toList();
 
-        return PostDetailResponse.of(post, userId, viewCount, postImageResponses);
+        return PostDetailResponse.of(post, userId, commentCount, viewCount, postImageResponses);
     }
 
     @Transactional
@@ -131,6 +133,7 @@ public class PostService {
         post.updatePost(request);
 
         int viewCount = postViewCountCache.count(post.getId());
+        int commentCount = getCommentCount(postId);
 
         List<PostImageResponse> postImageResponses = post.getPostImages().stream()
             .map(postImage ->
@@ -138,7 +141,7 @@ public class PostService {
             )
             .toList();
 
-        return PostDetailResponse.of(post, userId, viewCount, postImageResponses);
+        return PostDetailResponse.of(post, userId, commentCount, viewCount, postImageResponses);
     }
 
     @Transactional
@@ -173,6 +176,22 @@ public class PostService {
     private Post findPostBy(Long postId) {
         return postRepository.findById(postId)
             .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
+    }
+
+    private int getCommentCount(Long postId) {
+        return commentCountRepository.findById(postId)
+            .orElseThrow(() -> new CustomException(POST_NOT_FOUND))
+            .getCount();
+    }
+
+    private Map<Long, Integer> getCommentCounts(List<Long> postIds) {
+        List<CommentCount> commentCounts = commentCountRepository.findCommentCountInPostIds(postIds);
+        return commentCounts.stream().collect(
+            Collectors.toMap(
+                CommentCount::getPostId,
+                CommentCount::getCount
+            )
+        );
     }
 
     private List<PostImageResponse> getPostImageResponses(Long postId) {

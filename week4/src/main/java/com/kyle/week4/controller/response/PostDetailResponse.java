@@ -56,13 +56,13 @@ public class PostDetailResponse {
         this.imagePaths = imagePaths;
     }
 
-    public static PostDetailResponse of(Post post, Long userId, int viewCount, List<PostImageResponse> imagePaths) {
+    public static PostDetailResponse of(Post post, Long userId, int commentCount, int viewCount, List<PostImageResponse> imagePaths) {
         return PostDetailResponse.builder()
             .id(post.getId())
             .title(post.getTitle())
             .content(post.getContent())
             .viewCount(viewCount)
-            .commentCount(post.getCommentCount())
+            .commentCount(commentCount)
             .isAuthor(post.getUser().getId().equals(userId))
             .authorNickname(post.getUser().getNickname())
             .authorProfileImage(post.getUser().getProfileImage())

@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostJpaRepository extends JpaRepository<Post, Long> {
-    @Modifying
-    @Query("update Post p set p.commentCount = p.commentCount + 1 " +
-            "where p.id = :postId")
-    void increaseCommentCount(@Param("postId") Long postId);
+//    @Modifying
+//    @Query("update Post p set p.commentCount = p.commentCount + 1 " +
+//            "where p.id = :postId")
+//    void increaseCommentCount(@Param("postId") Long postId);
 
     @EntityGraph(attributePaths = {"user"})
     @Query("select p from Post p")

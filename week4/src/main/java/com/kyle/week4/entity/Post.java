@@ -33,8 +33,6 @@ public class Post extends BaseTime {
 
     private int viewCount;
 
-    private int commentCount;
-
     private boolean isDeleted;
 
     @OneToMany(mappedBy = "post")
@@ -48,15 +46,10 @@ public class Post extends BaseTime {
         this.isDeleted = false;
         this.likeCount = 0;
         this.viewCount = 0;
-        this.commentCount = 0;
     }
 
     public void assignId(Long id) {
         this.id = id;
-    }
-
-    public void increaseCommentCount() {
-        commentCount++;
     }
 
     public void addPostImage(PostImage postImage) {

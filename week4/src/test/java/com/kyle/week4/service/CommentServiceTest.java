@@ -79,36 +79,36 @@ class CommentServiceTest {
         jdbcTemplate.execute("ALTER TABLE comment AUTO_INCREMENT = 1");
     }
 
-    @Test
-    @DisplayName("테이블 분리 전(Post 조회 시 PESSIMISTIC_WRITE) - 댓글이 작성되면 게시글의 댓글수가 증가한다.")
-    void increaseCommentCount_whenCreateComment() throws Exception {
-        // given
-        User user = createUser();
-        userRepository.save(user);
-
-        Post post = createPost(user, "제목");
-        postRepository.save(post);
-
-        CommentCreateRequest request = new CommentCreateRequest("댓글");
-
-        final int totalCommentCount = 1000;
-        ExecutorService executor = Executors.newFixedThreadPool(10);
-        CountDownLatch latch = new CountDownLatch(totalCommentCount);
-
-        // when
-        for (int i = 0; i < totalCommentCount; i++) {
-            executor.submit(() -> {
-                commentService.createComment(user.getId(), post.getId(), request);
-                latch.countDown();
-            });
-        }
-        latch.await();
-        executor.shutdown();
-
-        // then
-        Post result = postJpaRepository.findById(post.getId()).orElseThrow();
-        assertThat(result.getCommentCount()).isEqualTo(totalCommentCount);
-    }
+//    @Test
+//    @DisplayName("테이블 분리 전(Post 조회 시 PESSIMISTIC_WRITE) - 댓글이 작성되면 게시글의 댓글수가 증가한다.")
+//    void increaseCommentCount_whenCreateComment() throws Exception {
+//        // given
+//        User user = createUser();
+//        userRepository.save(user);
+//
+//        Post post = createPost(user, "제목");
+//        postRepository.save(post);
+//
+//        CommentCreateRequest request = new CommentCreateRequest("댓글");
+//
+//        final int totalCommentCount = 1000;
+//        ExecutorService executor = Executors.newFixedThreadPool(10);
+//        CountDownLatch latch = new CountDownLatch(totalCommentCount);
+//
+//        // when
+//        for (int i = 0; i < totalCommentCount; i++) {
+//            executor.submit(() -> {
+//                commentService.createComment(user.getId(), post.getId(), request);
+//                latch.countDown();
+//            });
+//        }
+//        latch.await();
+//        executor.shutdown();
+//
+//        // then
+//        Post result = postJpaRepository.findById(post.getId()).orElseThrow();
+//        assertThat(result.getCommentCount()).isEqualTo(totalCommentCount);
+//    }
 
     @Test
     @DisplayName("테이블 분리 후(벌크성 update 쿼리) - 댓글이 작성되면 게시글의 댓글수가 증가한다.")
@@ -121,8 +121,8 @@ class CommentServiceTest {
         postRepository.save(post);
 
         CommentCount commentCount = CommentCount.builder()
-                .postId(post.getId())
-                .commentCount(0)
+                .post(post)
+                .count(0)
                 .build();
         commentCountRepository.save(commentCount);
 
@@ -144,7 +144,7 @@ class CommentServiceTest {
 
         // then
         CommentCount findCommentCount = commentCountRepository.findById(post.getId()).orElseThrow();
-        assertThat(findCommentCount.getCommentCount()).isEqualTo(totalCommentCount);
+        assertThat(findCommentCount.getCount()).isEqualTo(totalCommentCount);
     }
 
     @Test
@@ -158,8 +158,8 @@ class CommentServiceTest {
         postRepository.save(post);
 
         CommentCount commentCount = CommentCount.builder()
-                .postId(post.getId())
-                .commentCount(0)
+                .post(post)
+                .count(0)
                 .build();
         commentCountRepository.save(commentCount);
 
@@ -181,7 +181,7 @@ class CommentServiceTest {
 
         // then
         CommentCount findCommentCount = commentCountRepository.findById(post.getId()).orElseThrow();
-        assertThat(findCommentCount.getCommentCount()).isEqualTo(totalCommentCount);
+        assertThat(findCommentCount.getCount()).isEqualTo(totalCommentCount);
     }
 
 //    @Test
