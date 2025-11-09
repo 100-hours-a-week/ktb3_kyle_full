@@ -11,6 +11,9 @@ public class SessionAuthenticationProvider implements AuthenticationProvider {
     @Override
     public boolean isAuthenticated(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession(false);
+        if (session != null) {
+            System.out.println(session.getAttribute("userId"));
+        }
         return session != null && session.getAttribute("userId") != null;
     }
 }

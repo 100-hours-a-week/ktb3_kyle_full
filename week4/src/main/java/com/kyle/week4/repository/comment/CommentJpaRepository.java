@@ -11,10 +11,10 @@ import java.util.List;
 public interface CommentJpaRepository extends JpaRepository<Comment, Long> {
 
     @EntityGraph(attributePaths = {"user"})
-    @Query("select c from Comment c where c.post.id = :postId")
+    @Query("select c from Comment c where c.post.id = :postId and c.isDeleted = false ")
     List<Comment> findAllInfiniteScroll(Long postId, Pageable pageable);
 
     @EntityGraph(attributePaths = {"user"})
-    @Query("select c from Comment c where c.post.id = :postId and c.id > :lastCommentId")
+    @Query("select c from Comment c where c.post.id = :postId and c.id > :lastCommentId and c.isDeleted = false ")
     List<Comment> findAllInfiniteScroll(Long postId, Long lastCommentId, Pageable pageable);
 }

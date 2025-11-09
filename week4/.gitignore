@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+*.yml
+kyle-community-storage-f18d498cc0da.json

@@ -43,6 +43,14 @@ public class UserService {
         return UserProfileResponse.of(user);
     }
 
+    public boolean checkEmailDuplicate(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public boolean checkNicknameDuplicate(String nickname) {
+        return userRepository.existsByNickname(nickname);
+    }
+
     @Transactional
     @CustomCacheEvict(cacheName = "UserProfile", key = "#userId")
     public UserProfileResponse updateUserProfile(Long userId, UserProfileUpdateRequest request) {

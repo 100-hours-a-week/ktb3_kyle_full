@@ -1,7 +1,8 @@
 package com.kyle.week4.filter;
 
 import com.kyle.week4.exception.CustomException;
-import jakarta.servlet.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Set;
 
 import static com.kyle.week4.exception.ErrorCode.FAILED_AUTHENTICATE;
 
@@ -20,14 +20,16 @@ import static com.kyle.week4.exception.ErrorCode.FAILED_AUTHENTICATE;
 @Component
 @RequiredArgsConstructor
 public class AuthenticationFilter extends OncePerRequestFilter {
-    
+
     private static final String[] EXCLUDED_PATHS = {
-      "/users",
-      "/auth/sessions",
-      "/swagger-ui/**",
-      "/v3/api-docs/**",
-      "/api-test",
-            "/h2-console/**"
+        "/users",
+        "/users/nickname/duplicate",
+        "/users/email/duplicate",
+        "/auth/sessions",
+        "/swagger-ui/**",
+        "/v3/api-docs/**",
+        "/api-test",
+        "/h2-console/**"
     };
 
     private final AuthenticationProvider provider;
@@ -49,6 +51,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         AntPathMatcher antPathMatcher = new AntPathMatcher();
 
         return Arrays.stream(EXCLUDED_PATHS)
-          .anyMatch(path -> antPathMatcher.match(path, requestURI));
+            .anyMatch(path -> antPathMatcher.match(path, requestURI));
     }
 }

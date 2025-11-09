@@ -16,11 +16,11 @@ public interface PostJpaRepository extends JpaRepository<Post, Long> {
 //    void increaseCommentCount(@Param("postId") Long postId);
 
     @EntityGraph(attributePaths = {"user"})
-    @Query("select p from Post p")
+    @Query("select p from Post p where p.isDeleted = false")
     List<Post> findAllInfiniteScroll(Pageable pageable);
 
     @EntityGraph(attributePaths = {"user"})
-    @Query("select p from Post p where p.id < :lastPostId")
+    @Query("select p from Post p where p.id < :lastPostId and p.isDeleted = false")
     List<Post> findAllInfiniteScroll(@Param("lastPostId") Long lastPostId, Pageable pageable);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

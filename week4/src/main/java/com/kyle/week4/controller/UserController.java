@@ -27,6 +27,20 @@ public class UserController implements UserControllerDocs {
         return BaseResponse.ok(userService.getUserProfile(userId));
     }
 
+    @GetMapping("/users/email/duplicate")
+    public BaseResponse<Boolean> checkEmailDuplicate(
+        @RequestParam("email") String email
+    ) {
+        return BaseResponse.ok(userService.checkEmailDuplicate(email));
+    }
+
+    @GetMapping("/users/nickname/duplicate")
+    public BaseResponse<Boolean> checkNicknameDuplicate(
+        @RequestParam("nickname") String nickname
+    ) {
+        return BaseResponse.ok(userService.checkNicknameDuplicate(nickname));
+    }
+
     @PatchMapping("/users/profile")
     public BaseResponse<UserProfileResponse> updateUserProfile(
       @SessionAttribute("userId") Long userId,
