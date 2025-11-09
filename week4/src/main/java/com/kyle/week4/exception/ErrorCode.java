@@ -20,7 +20,8 @@ public enum ErrorCode {
     DUPLICATE_EMAIL_ERROR(409, HttpStatus.CONFLICT, "이미 가입된 이메일입니다."),
     DUPLICATE_NICKNAME_ERROR(409, HttpStatus.CONFLICT, "이미 가입된 닉네임입니다."),
     ALREADY_LIKED_ERROR(409, HttpStatus.CONFLICT, "이미 좋아요를 눌렀습니다."),
-    INTERNAL_SERVER_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.");
+    INTERNAL_SERVER_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
+    GCS_IMAGE_UPLOAD_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "GCS 이미지 업로드 오류입니다.");
 
     private final Integer code;
     private final HttpStatus httpStatus;

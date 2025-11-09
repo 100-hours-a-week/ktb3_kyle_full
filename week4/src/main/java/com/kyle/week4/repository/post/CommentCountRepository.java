@@ -17,6 +17,11 @@ public interface CommentCountRepository extends JpaRepository<CommentCount, Long
             "where c.postId = :postId")
     void increase(@Param("postId") Long postId);
 
+    @Modifying
+    @Query("update CommentCount c set c.count = c.count - 1 " +
+        "where c.postId = :postId")
+    void decrease(@Param("postId") Long postId);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select c from CommentCount c where c.postId = :postId")
     Optional<CommentCount> findLockedByPostId(@Param("postId") Long postId);

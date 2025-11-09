@@ -29,22 +29,17 @@ public class UserCreateRequest {
     @Schema(description = "닉네임", defaultValue = "kyle")
     private String nickname;
 
-    @Schema(description = "사용자 프로필 이미지 경로", defaultValue = "kyle.jpg")
-    private String profileImage;
-
     @Builder
     public UserCreateRequest(String email, String password, String nickname, String profileImage) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
-        this.profileImage = profileImage;
     }
 
     public User toEntity() {
         return User.builder()
           .email(email)
           .nickname(nickname)
-          .profileImage(profileImage)
           .build();
     }
 }

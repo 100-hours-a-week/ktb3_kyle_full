@@ -117,6 +117,7 @@ public class CommentService {
         }
 
         comment.delete();
+        commentCountRepository.decrease(postId);
     }
 
     private Comment findCommentBy(Long commentId) {

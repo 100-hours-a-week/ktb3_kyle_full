@@ -8,8 +8,7 @@ import com.kyle.week4.utils.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import static com.kyle.week4.exception.ErrorCode.INVALID_EMAIL;
-import static com.kyle.week4.exception.ErrorCode.INVALID_PASSWORD;
+import static com.kyle.week4.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +19,10 @@ public class AuthService {
     public Long login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
           .orElseThrow(() -> new CustomException(INVALID_EMAIL));
+
+        if (user.isDeleted()) {
+            throw new CustomException(USER_NOT_FOUND);
+        }
 
         if (isNotSamePassword(request.getPassword(), user.getPassword())) {
             throw new CustomException(INVALID_PASSWORD);

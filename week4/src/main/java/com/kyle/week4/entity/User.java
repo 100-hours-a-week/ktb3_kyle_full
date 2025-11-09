@@ -27,11 +27,14 @@ public class User extends BaseTime {
     @Column(length = 200)
     private String profileImage;
 
+    private boolean isDeleted;
+
     @Builder
     public User(String email, String nickname, String profileImage) {
         this.email = email;
         this.nickname = nickname;
         this.profileImage = profileImage;
+        this.isDeleted = false;
     }
 
     public boolean isSameNickname(String nickname) {
@@ -50,12 +53,19 @@ public class User extends BaseTime {
         this.id = id;
     }
 
+    public void withdraw() {
+        this.isDeleted = true;
+    }
+
+    public void changeImage(String imagePath) {
+        this.profileImage = imagePath;
+    }
+
     public void encodePassword(String encodedPassword) {
         this.password = encodedPassword;
     }
 
     public void updateUserProfile(UserProfileUpdateRequest request) {
         this.nickname = request.getNickname();
-        this.profileImage = request.getProfileImage();
     }
 }
