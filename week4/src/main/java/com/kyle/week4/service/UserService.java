@@ -94,8 +94,8 @@ public class UserService {
             throw new CustomException(DUPLICATE_NICKNAME_ERROR);
         }
 
-        imageUploader.delete(user.getProfileImage());
         if (image != null) {
+            imageUploader.delete(user.getProfileImage());
             String imagePath = imageUploader.upload(image);
             user.changeImage(imagePath);
         }
@@ -120,6 +120,6 @@ public class UserService {
 
     private User findUserBy(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+            .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     }
 }
