@@ -11,8 +11,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
@@ -56,9 +54,9 @@ class AuthServiceTest extends IntegrationTestSupport {
         userRepository.save(user);
 
         LoginRequest request = LoginRequest.builder()
-                .email(email)
-                .password(password)
-                .build();
+            .email(email)
+            .password(password)
+            .build();
 
         // when
         Long userId = authService.login(request);
@@ -79,14 +77,14 @@ class AuthServiceTest extends IntegrationTestSupport {
         userRepository.save(user);
 
         LoginRequest request = LoginRequest.builder()
-                .email("test1@test.com")
-                .password(password)
-                .build();
+            .email("test1@test.com")
+            .password(password)
+            .build();
 
         // when // then
         assertThatThrownBy(() -> authService.login(request))
-                .isInstanceOf(CustomException.class)
-                .hasFieldOrPropertyWithValue("errorCode", INVALID_EMAIL);
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", INVALID_EMAIL);
     }
 
     @Test
@@ -101,21 +99,21 @@ class AuthServiceTest extends IntegrationTestSupport {
         userRepository.save(user);
 
         LoginRequest request = LoginRequest.builder()
-                .email(email)
-                .password("Test123456789")
-                .build();
+            .email(email)
+            .password("Test123456789")
+            .build();
 
         // when // then
         assertThatThrownBy(() -> authService.login(request))
-                .isInstanceOf(CustomException.class)
-                .hasFieldOrPropertyWithValue("errorCode", INVALID_PASSWORD);
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", INVALID_PASSWORD);
     }
 
     private User createUser(String email) {
         return User.builder()
-                .email(email)
-                .nickname("test")
-                .profileImage("image")
-                .build();
+            .email(email)
+            .nickname("test")
+            .profileImage("image")
+            .build();
     }
 }

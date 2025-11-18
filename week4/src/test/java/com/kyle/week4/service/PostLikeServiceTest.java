@@ -18,15 +18,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class PostLikeServiceTest extends IntegrationTestSupport{
+class PostLikeServiceTest extends IntegrationTestSupport {
     @Autowired
     private PostLikeService postLikeService;
 
@@ -79,8 +77,8 @@ class PostLikeServiceTest extends IntegrationTestSupport{
 
         // then
         assertThat(response)
-                .extracting("likeCount", "isLiked")
-                .containsExactly(1, true);
+            .extracting("likeCount", "isLiked")
+            .containsExactly(1, true);
     }
 
     @Test
@@ -120,8 +118,8 @@ class PostLikeServiceTest extends IntegrationTestSupport{
 
         // when // then
         assertThatThrownBy(() -> postLikeService.like(user.getId(), post.getId()))
-                .isInstanceOf(CustomException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ALREADY_LIKED_ERROR);
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ALREADY_LIKED_ERROR);
     }
 
     @Test
@@ -136,8 +134,8 @@ class PostLikeServiceTest extends IntegrationTestSupport{
 
         // when // then
         assertThatThrownBy(() -> postLikeService.like(user.getId(), 10L))
-                .isInstanceOf(CustomException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.POST_NOT_FOUND);
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.POST_NOT_FOUND);
     }
 
     @Test
@@ -157,8 +155,8 @@ class PostLikeServiceTest extends IntegrationTestSupport{
 
         // then
         assertThat(response)
-                .extracting("likeCount", "isLiked")
-                .containsExactly(0, false);
+            .extracting("likeCount", "isLiked")
+            .containsExactly(0, false);
     }
 
     @Test
@@ -200,8 +198,8 @@ class PostLikeServiceTest extends IntegrationTestSupport{
 
         // when // then
         assertThatThrownBy(() -> postLikeService.removeLike(user.getId(), 10L))
-                .isInstanceOf(CustomException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.POST_NOT_FOUND);
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.POST_NOT_FOUND);
     }
 
     @Test
@@ -216,24 +214,24 @@ class PostLikeServiceTest extends IntegrationTestSupport{
 
         // when // then
         assertThatThrownBy(() -> postLikeService.removeLike(user.getId(), post.getId()))
-                .isInstanceOf(CustomException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.POST_LIKE_NOT_FOUND);
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.POST_LIKE_NOT_FOUND);
     }
 
     private User createUser(String email, String nickname) {
         return User.builder()
-                .email(email)
-                .nickname(nickname)
-                .profileImage("image.jpg")
-                .build();
+            .email(email)
+            .nickname(nickname)
+            .profileImage("image.jpg")
+            .build();
     }
 
     private Post createPost(User user, String title) {
         return Post.builder()
-                .title(title)
-                .content("내용입니다.")
-                .user(user)
-                .build();
+            .title(title)
+            .content("내용입니다.")
+            .user(user)
+            .build();
     }
 
     private PostLike createPostLike(User user, Post post) {

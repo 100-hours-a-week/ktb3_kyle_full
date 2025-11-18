@@ -2,7 +2,9 @@ package com.kyle.week4.service;
 
 import com.kyle.week4.controller.request.CommentCreateRequest;
 import com.kyle.week4.controller.request.CommentUpdateRequest;
+import com.kyle.week4.controller.request.PostCreateRequest;
 import com.kyle.week4.controller.response.CommentResponse;
+import com.kyle.week4.controller.response.PostDetailResponse;
 import com.kyle.week4.entity.Comment;
 import com.kyle.week4.entity.CommentCount;
 import com.kyle.week4.entity.Post;
@@ -20,9 +22,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -36,6 +35,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class CommentServiceTest extends IntegrationTestSupport {
     @Autowired
     private CommentService commentService;
+
+    @Autowired
+    private PostService postService;
 
     @Autowired
     private PostRepository postRepository;
@@ -79,16 +81,14 @@ class CommentServiceTest extends IntegrationTestSupport {
     void increaseCommentCount_whenCreateCommentPessimistic1() throws Exception {
         // given
         User user = createUser();
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-        Post post = createPost(user, "제목");
-        postRepository.save(post);
-
-        CommentCount commentCount = CommentCount.builder()
-                .post(post)
-                .count(0)
-                .build();
-        commentCountRepository.save(commentCount);
+        PostCreateRequest postRequest = PostCreateRequest.builder()
+            .title("제목1")
+            .content("내용1")
+            .images(List.of("image1", "image2"))
+            .build();
+        PostDetailResponse postResponse = postService.createPostAndImage(savedUser.getId(), postRequest, null);
 
         CommentCreateRequest request = new CommentCreateRequest("댓글");
 
@@ -99,7 +99,7 @@ class CommentServiceTest extends IntegrationTestSupport {
         // when
         for (int i = 0; i < totalCommentCount; i++) {
             executor.submit(() -> {
-                commentService.createComment(user.getId(), post.getId(), request);
+                commentService.createComment(user.getId(), postResponse.getId(), request);
                 latch.countDown();
             });
         }
@@ -107,7 +107,7 @@ class CommentServiceTest extends IntegrationTestSupport {
         executor.shutdown();
 
         // then
-        CommentCount findCommentCount = commentCountRepository.findById(post.getId()).orElseThrow();
+        CommentCount findCommentCount = commentCountRepository.findById(postResponse.getId()).orElseThrow();
         assertThat(findCommentCount.getCount()).isEqualTo(totalCommentCount);
     }
 
@@ -150,8 +150,8 @@ class CommentServiceTest extends IntegrationTestSupport {
 
         // when // then
         assertThatThrownBy(() -> commentService.updateComment(user.getId(), post.getId(), 10L, request))
-                .isInstanceOf(CustomException.class)
-                .hasFieldOrPropertyWithValue("errorCode", COMMENT_NOT_FOUND);
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", COMMENT_NOT_FOUND);
     }
 
     @Test
@@ -171,8 +171,8 @@ class CommentServiceTest extends IntegrationTestSupport {
 
         // when // then
         assertThatThrownBy(() -> commentService.updateComment(user.getId(), 10L, comment.getId(), request))
-                .isInstanceOf(CustomException.class)
-                .hasFieldOrPropertyWithValue("errorCode", POST_NOT_FOUND);
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", POST_NOT_FOUND);
     }
 
     @Test
@@ -192,31 +192,31 @@ class CommentServiceTest extends IntegrationTestSupport {
 
         // when // then
         assertThatThrownBy(() -> commentService.updateComment(10L, post.getId(), comment.getId(), request))
-                .isInstanceOf(CustomException.class)
-                .hasFieldOrPropertyWithValue("errorCode", PERMISSION_DENIED);
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", PERMISSION_DENIED);
     }
 
     private User createUser() {
         return User.builder()
-                .email("test@test.com")
-                .nickname("test")
-                .profileImage("image.jpg")
-                .build();
+            .email("test@test.com")
+            .nickname("test")
+            .profileImage("image.jpg")
+            .build();
     }
 
     private Post createPost(User user, String title) {
         return Post.builder()
-                .title(title)
-                .content("내용입니다.")
-                .user(user)
-                .build();
+            .title(title)
+            .content("내용입니다.")
+            .user(user)
+            .build();
     }
 
     private Comment createComment(User user, Post post, String content) {
         return Comment.builder()
-                .user(user)
-                .post(post)
-                .content(content)
-                .build();
+            .user(user)
+            .post(post)
+            .content(content)
+            .build();
     }
 }

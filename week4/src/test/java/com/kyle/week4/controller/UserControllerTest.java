@@ -6,8 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -19,24 +20,31 @@ class UserControllerTest extends ControllerTestSupport {
     void createUser() throws Exception {
         // given
         UserCreateRequest request = UserCreateRequest.builder()
-          .email("kyle@example.com")
-          .password("Kyle1234!")
-          .nickname("kyle")
-          .profileImage("https://image.kr/img.jpg")
-          .build();
+            .email("kyle@example.com")
+            .password("Kyle1234!")
+            .nickname("kyle")
+            .profileImage("https://image.kr/img.jpg")
+            .build();
+
+        MockMultipartFile requestPart = new MockMultipartFile(
+            "request",        // @RequestPart name
+            "",
+            "application/json",
+            objectMapper.writeValueAsBytes(request)
+        );
 
         // when // then
         mockMvc.perform(
-            post("/users")
-              .content(objectMapper.writeValueAsString(request))
-              .contentType(MediaType.APPLICATION_JSON)
-          )
-          .andDo(print())
-          .andExpect(status().isCreated())
-          .andExpect(jsonPath("$.httpStatus").value("CREATED"))
-          .andExpect(jsonPath("$.success").value(true))
-          .andExpect(jsonPath("$.data").isNumber())
-          .andExpect(jsonPath("$.errorMessage").isEmpty());
+                multipart("/users")
+                    .file(requestPart)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+            )
+            .andDo(print())
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.httpStatus").value("CREATED"))
+            .andExpect(jsonPath("$.success").value(true))
+            .andExpect(jsonPath("$.data").isNumber())
+            .andExpect(jsonPath("$.errorMessage").isEmpty());
     }
 
     @Test
@@ -44,24 +52,31 @@ class UserControllerTest extends ControllerTestSupport {
     void validationEmailIsEmpty() throws Exception {
         // given
         UserCreateRequest request = UserCreateRequest.builder()
-          .email("")
-          .password("Kyle1234!")
-          .nickname("kyle")
-          .profileImage("https://image.kr/img.jpg")
-          .build();
+            .email("")
+            .password("Kyle1234!")
+            .nickname("kyle")
+            .profileImage("https://image.kr/img.jpg")
+            .build();
+
+        MockMultipartFile requestPart = new MockMultipartFile(
+            "request",        // @RequestPart name
+            "",
+            "application/json",
+            objectMapper.writeValueAsBytes(request)
+        );
 
         // when // then
         mockMvc.perform(
-            post("/users")
-              .content(objectMapper.writeValueAsString(request))
-              .contentType(MediaType.APPLICATION_JSON)
-          )
-          .andDo(print())
-          .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").value(false))
-          .andExpect(jsonPath("$.data").isEmpty())
-          .andExpect(jsonPath("$.errorMessage").value("이메일은 비어있을 수 없습니다."));
+                multipart("/users")
+                    .file(requestPart)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.data").isEmpty())
+            .andExpect(jsonPath("$.errorMessage").value("이메일은 비어있을 수 없습니다."));
     }
 
     @Test
@@ -69,24 +84,31 @@ class UserControllerTest extends ControllerTestSupport {
     void validationEmail() throws Exception {
         // given
         UserCreateRequest request = UserCreateRequest.builder()
-          .email("kyleexample.com")
-          .password("Kyle1234!")
-          .nickname("kyle")
-          .profileImage("https://image.kr/img.jpg")
-          .build();
+            .email("kyleexample.com")
+            .password("Kyle1234!")
+            .nickname("kyle")
+            .profileImage("https://image.kr/img.jpg")
+            .build();
+
+        MockMultipartFile requestPart = new MockMultipartFile(
+            "request",        // @RequestPart name
+            "",
+            "application/json",
+            objectMapper.writeValueAsBytes(request)
+        );
 
         // when // then
         mockMvc.perform(
-            post("/users")
-              .content(objectMapper.writeValueAsString(request))
-              .contentType(MediaType.APPLICATION_JSON)
-          )
-          .andDo(print())
-          .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").value(false))
-          .andExpect(jsonPath("$.data").isEmpty())
-          .andExpect(jsonPath("$.errorMessage").value("올바른 이메일 주소 형식을 입력해주세요."));
+                multipart("/users")
+                    .file(requestPart)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.data").isEmpty())
+            .andExpect(jsonPath("$.errorMessage").value("올바른 이메일 주소 형식을 입력해주세요."));
     }
 
     @ParameterizedTest
@@ -95,24 +117,31 @@ class UserControllerTest extends ControllerTestSupport {
     void validationPassword(String password) throws Exception {
         // given
         UserCreateRequest request = UserCreateRequest.builder()
-          .email("kyle@example.com")
-          .password(password)
-          .nickname("kyle")
-          .profileImage("https://image.kr/img.jpg")
-          .build();
+            .email("kyle@example.com")
+            .password(password)
+            .nickname("kyle")
+            .profileImage("https://image.kr/img.jpg")
+            .build();
+
+        MockMultipartFile requestPart = new MockMultipartFile(
+            "request",        // @RequestPart name
+            "",
+            "application/json",
+            objectMapper.writeValueAsBytes(request)
+        );
 
         // when // then
         mockMvc.perform(
-            post("/users")
-              .content(objectMapper.writeValueAsString(request))
-              .contentType(MediaType.APPLICATION_JSON)
-          )
-          .andDo(print())
-          .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").value(false))
-          .andExpect(jsonPath("$.data").isEmpty())
-          .andExpect(jsonPath("$.errorMessage").value("비밀번호는 8자 이상 20자 이하 까지 가능합니다."));
+                multipart("/users")
+                    .file(requestPart)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.data").isEmpty())
+            .andExpect(jsonPath("$.errorMessage").value("비밀번호는 8자 이상 20자 이하 까지 가능합니다."));
     }
 
     @Test
@@ -120,24 +149,31 @@ class UserControllerTest extends ControllerTestSupport {
     void validationPasswordRegex() throws Exception {
         // given
         UserCreateRequest request = UserCreateRequest.builder()
-          .email("kyle@example.com")
-          .password("Kyle1234")
-          .nickname("kyle")
-          .profileImage("https://image.kr/img.jpg")
-          .build();
+            .email("kyle@example.com")
+            .password("Kyle1234")
+            .nickname("kyle")
+            .profileImage("https://image.kr/img.jpg")
+            .build();
+
+        MockMultipartFile requestPart = new MockMultipartFile(
+            "request",        // @RequestPart name
+            "",
+            "application/json",
+            objectMapper.writeValueAsBytes(request)
+        );
 
         // when // then
         mockMvc.perform(
-            post("/users")
-              .content(objectMapper.writeValueAsString(request))
-              .contentType(MediaType.APPLICATION_JSON)
-          )
-          .andDo(print())
-          .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").value(false))
-          .andExpect(jsonPath("$.data").isEmpty())
-          .andExpect(jsonPath("$.errorMessage").value("비밀번호는 대문자, 소문자, 숫자, 특수문자를 각각 1자 이상 포함해야 합니다."));
+                multipart("/users")
+                    .file(requestPart)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.data").isEmpty())
+            .andExpect(jsonPath("$.errorMessage").value("비밀번호는 대문자, 소문자, 숫자, 특수문자를 각각 1자 이상 포함해야 합니다."));
     }
 
     @Test
@@ -145,24 +181,31 @@ class UserControllerTest extends ControllerTestSupport {
     void validationNickname() throws Exception {
         // given
         UserCreateRequest request = UserCreateRequest.builder()
-          .email("kyle@example.com")
-          .password("Kyle1234!")
-          .nickname("kyle1234567")
-          .profileImage("https://image.kr/img.jpg")
-          .build();
+            .email("kyle@example.com")
+            .password("Kyle1234!")
+            .nickname("kyle1234567")
+            .profileImage("https://image.kr/img.jpg")
+            .build();
+
+        MockMultipartFile requestPart = new MockMultipartFile(
+            "request",        // @RequestPart name
+            "",
+            "application/json",
+            objectMapper.writeValueAsBytes(request)
+        );
 
         // when // then
         mockMvc.perform(
-            post("/users")
-              .content(objectMapper.writeValueAsString(request))
-              .contentType(MediaType.APPLICATION_JSON)
-          )
-          .andDo(print())
-          .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").value(false))
-          .andExpect(jsonPath("$.data").isEmpty())
-          .andExpect(jsonPath("$.errorMessage").value("닉네임은 최대 10자 까지 작성 가능합니다."));
+                multipart("/users")
+                    .file(requestPart)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.data").isEmpty())
+            .andExpect(jsonPath("$.errorMessage").value("닉네임은 최대 10자 까지 작성 가능합니다."));
     }
 
     @ParameterizedTest
@@ -171,23 +214,30 @@ class UserControllerTest extends ControllerTestSupport {
     void validationNicknameNotBlank(String nickname) throws Exception {
         // given
         UserCreateRequest request = UserCreateRequest.builder()
-          .email("kyle@example.com")
-          .password("Kyle123!")
-          .nickname(nickname)
-          .profileImage("https://image.kr/img.jpg")
-          .build();
+            .email("kyle@example.com")
+            .password("Kyle123!")
+            .nickname(nickname)
+            .profileImage("https://image.kr/img.jpg")
+            .build();
+
+        MockMultipartFile requestPart = new MockMultipartFile(
+            "request",        // @RequestPart name
+            "",
+            "application/json",
+            objectMapper.writeValueAsBytes(request)
+        );
 
         // when // then
         mockMvc.perform(
-            post("/users")
-              .content(objectMapper.writeValueAsString(request))
-              .contentType(MediaType.APPLICATION_JSON)
-          )
-          .andDo(print())
-          .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").value(false))
-          .andExpect(jsonPath("$.data").isEmpty())
-          .andExpect(jsonPath("$.errorMessage").value("닉네임을 작성하지 않거나, 공백을 포함할 수 없습니다."));
+                multipart("/users")
+                    .file(requestPart)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.data").isEmpty())
+            .andExpect(jsonPath("$.errorMessage").value("닉네임을 작성하지 않거나, 공백을 포함할 수 없습니다."));
     }
 }

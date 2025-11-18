@@ -19,11 +19,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -84,10 +79,10 @@ class PostServiceTest extends IntegrationTestSupport {
         User savedUser = userJpaRepository.save(user);
 
         PostCreateRequest request = PostCreateRequest.builder()
-          .title("제목1")
-          .content("내용1")
-          .images(List.of("image1", "image2"))
-          .build();
+            .title("제목1")
+            .content("내용1")
+            .images(List.of("image1", "image2"))
+            .build();
 
         // when
         PostDetailResponse postDetailResponse = postService.createPostAndImage(savedUser.getId(), request, null);
@@ -95,8 +90,8 @@ class PostServiceTest extends IntegrationTestSupport {
         // then
         assertThat(postDetailResponse.getId()).isNotNull();
         assertThat(postDetailResponse)
-          .extracting("title", "content", "viewCount", "commentCount", "isAuthor")
-          .contains("제목1", "내용1", 0, 0, true);
+            .extracting("title", "content", "viewCount", "commentCount", "isAuthor")
+            .contains("제목1", "내용1", 0, 0, true);
     }
 
     @Disabled
@@ -207,15 +202,15 @@ class PostServiceTest extends IntegrationTestSupport {
         User savedUser = userJpaRepository.save(user);
 
         Post post = createPost("제목1", savedUser);
-        Long postId = postService.createPostAndImage(savedUser.getId(), request ,null).getId();
+        Long postId = postService.createPostAndImage(savedUser.getId(), request, null).getId();
 
         // when
         PostDetailResponse response = postService.getPostDetail(1L, postId);
 
         // then
         assertThat(response)
-          .extracting("id", "title")
-          .containsExactlyInAnyOrder(postId, "제목1");
+            .extracting("id", "title")
+            .containsExactlyInAnyOrder(postId, "제목1");
     }
 
     @Test
@@ -226,8 +221,8 @@ class PostServiceTest extends IntegrationTestSupport {
 
         // when // then
         assertThatThrownBy(() -> postService.getPostDetail(1L, postId))
-          .isInstanceOf(CustomException.class)
-          .hasFieldOrPropertyWithValue("errorCode", POST_NOT_FOUND);
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", POST_NOT_FOUND);
     }
 
     @Test
@@ -243,7 +238,7 @@ class PostServiceTest extends IntegrationTestSupport {
         User savedUser = userRepository.save(user);
 
         Post post = createPost("제목1", savedUser);
-        Long postId = postService.createPostAndImage(savedUser.getId(), request ,null).getId();
+        Long postId = postService.createPostAndImage(savedUser.getId(), request, null).getId();
         postViewCountCache.initCache(postId);
 
         final int totalViewCount = 1000;
@@ -273,39 +268,39 @@ class PostServiceTest extends IntegrationTestSupport {
         User savedUser = userJpaRepository.save(user);
 
         PostCreateRequest createRequest = PostCreateRequest.builder()
-          .title("제목")
-          .content("내용")
-          .images(List.of("image1", "image2"))
-          .build();
+            .title("제목")
+            .content("내용")
+            .images(List.of("image1", "image2"))
+            .build();
         PostDetailResponse post = postService.createPostAndImage(savedUser.getId(), createRequest, null);
 
         PostUpdateRequest request = PostUpdateRequest.builder()
-          .title("수정된 제목")
-          .content("수정된 내용")
-          .build();
+            .title("수정된 제목")
+            .content("수정된 내용")
+            .build();
 
         // when
         PostDetailResponse response = postService.updatePost(user.getId(), post.getId(), request);
 
         // then
         assertThat(response)
-          .extracting("id", "title", "content")
-          .containsExactlyInAnyOrder(post.getId(), "수정된 제목", "수정된 내용");
+            .extracting("id", "title", "content")
+            .containsExactlyInAnyOrder(post.getId(), "수정된 제목", "수정된 내용");
     }
 
     private User createUser() {
         return User.builder()
-          .email("test@test.com")
-          .nickname("test")
-          .profileImage("image.jpg")
-          .build();
+            .email("test@test.com")
+            .nickname("test")
+            .profileImage("image.jpg")
+            .build();
     }
 
     private Post createPost(String title, User user) {
         return Post.builder()
-          .title(title)
-          .content("내용입니다.")
-          .user(user)
-          .build();
+            .title(title)
+            .content("내용입니다.")
+            .user(user)
+            .build();
     }
 }

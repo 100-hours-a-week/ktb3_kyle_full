@@ -12,9 +12,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -50,11 +47,11 @@ class UserServiceTest extends IntegrationTestSupport {
         userRepository.save(user);
 
         UserCreateRequest request = UserCreateRequest.builder()
-          .email("test2@test.com")
-          .password("test1234!")
-          .profileImage("test2")
-          .nickname("test2")
-          .build();
+            .email("test2@test.com")
+            .password("test1234!")
+            .profileImage("test2")
+            .nickname("test2")
+            .build();
 
         // when
         Long userId = userService.createUser(request);
@@ -62,8 +59,8 @@ class UserServiceTest extends IntegrationTestSupport {
         // then
         User savedUser = userRepository.findById(userId).orElseThrow();
         assertThat(savedUser)
-          .extracting("email", "nickname")
-          .containsExactlyInAnyOrder("test2@test.com", "test2");
+            .extracting("email", "nickname")
+            .containsExactlyInAnyOrder("test2@test.com", "test2");
     }
 
     @Test
@@ -76,16 +73,16 @@ class UserServiceTest extends IntegrationTestSupport {
         userRepository.save(user);
 
         UserCreateRequest request = UserCreateRequest.builder()
-          .email("test@test.com")
-          .nickname(nickname)
-          .password("test1234!")
-          .build();
+            .email("test@test.com")
+            .nickname(nickname)
+            .password("test1234!")
+            .build();
 
         // when // then
         assertThatThrownBy(() -> userService.createUser(request))
-          .isInstanceOf(CustomException.class)
-          .hasFieldOrPropertyWithValue("errorCode", DUPLICATE_NICKNAME_ERROR)
-          .hasMessage("이미 가입된 닉네임입니다.");
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", DUPLICATE_NICKNAME_ERROR)
+            .hasMessage("이미 가입된 닉네임입니다.");
     }
 
     @Test
@@ -98,15 +95,15 @@ class UserServiceTest extends IntegrationTestSupport {
         userRepository.save(user);
 
         UserCreateRequest request = UserCreateRequest.builder()
-          .email(email)
-          .nickname("test2")
-          .password("test1234!")
-          .build();
+            .email(email)
+            .nickname("test2")
+            .password("test1234!")
+            .build();
 
         // when // then
         assertThatThrownBy(() -> userService.createUser(request))
-          .isInstanceOf(CustomException.class)
-          .hasMessage("이미 가입된 이메일입니다.");
+            .isInstanceOf(CustomException.class)
+            .hasMessage("이미 가입된 이메일입니다.");
     }
 
     @Test
@@ -121,8 +118,8 @@ class UserServiceTest extends IntegrationTestSupport {
 
         // then
         assertThat(response)
-          .extracting("email", "nickname", "profileImage")
-          .containsExactlyInAnyOrder("test1@test.com", "test1", "image.jpg");
+            .extracting("email", "nickname", "profileImage")
+            .containsExactlyInAnyOrder("test1@test.com", "test1", "image.jpg");
     }
 
     @Test
@@ -133,8 +130,8 @@ class UserServiceTest extends IntegrationTestSupport {
 
         // when // then
         assertThatThrownBy(() -> userService.getUserProfile(userId))
-          .isInstanceOf(CustomException.class)
-          .hasFieldOrPropertyWithValue("errorCode", USER_NOT_FOUND);
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", USER_NOT_FOUND);
     }
 
     @Test
@@ -151,8 +148,8 @@ class UserServiceTest extends IntegrationTestSupport {
 
         // then
         assertThat(response)
-          .extracting("email", "nickname")
-          .containsExactlyInAnyOrder("test1@test.com", "update");
+            .extracting("email", "nickname")
+            .containsExactlyInAnyOrder("test1@test.com", "update");
     }
 
     @Test
@@ -164,8 +161,8 @@ class UserServiceTest extends IntegrationTestSupport {
 
         // when // then
         assertThatThrownBy(() -> userService.updateUserProfile(userId, request))
-          .isInstanceOf(CustomException.class)
-          .hasFieldOrPropertyWithValue("errorCode", USER_NOT_FOUND);
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", USER_NOT_FOUND);
     }
 
     @Test
@@ -179,15 +176,15 @@ class UserServiceTest extends IntegrationTestSupport {
 
         // when // then
         assertThatThrownBy(() -> userService.updateUserProfile(user.getId(), request))
-          .isInstanceOf(CustomException.class)
-          .hasFieldOrPropertyWithValue("errorCode", DUPLICATE_NICKNAME_ERROR);
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", DUPLICATE_NICKNAME_ERROR);
     }
 
     private User createUser(String email, String nickname, String profileImage) {
         return User.builder()
-          .email(email)
-          .nickname(nickname)
-          .profileImage(profileImage)
-          .build();
+            .email(email)
+            .nickname(nickname)
+            .profileImage(profileImage)
+            .build();
     }
 }
