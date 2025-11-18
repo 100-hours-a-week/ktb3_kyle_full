@@ -286,33 +286,6 @@ class PostServiceTest {
           .containsExactlyInAnyOrder(post.getId(), "수정된 제목", "수정된 내용");
     }
 
-//    @Test
-//    @DisplayName("변경 감지와 벌크 업데이트")
-//    void updatePostTest2() {
-//        // given
-//        User user = createUser();
-//        User savedUser = userJpaRepository.save(user);
-//
-//        PostCreateRequest createRequest = PostCreateRequest.builder()
-//                .title("제목")
-//                .content("내용")
-//                .images(List.of("image1", "image2"))
-//                .build();
-//        PostDetailResponse post = postService.createPost(savedUser.getId(), createRequest);
-//
-//        PostUpdateRequest request = PostUpdateRequest.builder()
-//                .title("Dirty Checking")
-//                .content("수정된 내용")
-//                .build();
-//
-//        // when
-//        PostDetailResponse response = postService.updatePostTest(user.getId(), post.getId(), request);
-//
-//        // then
-//        Post findPost = postRepository.findById(post.getId()).orElseThrow();
-//        System.out.println("title: " + findPost.getTitle());
-//    }
-
     private User createUser() {
         return User.builder()
           .email("test@test.com")

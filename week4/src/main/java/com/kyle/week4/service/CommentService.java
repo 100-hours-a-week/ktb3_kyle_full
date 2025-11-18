@@ -32,54 +32,11 @@ public class CommentService {
     @Transactional
     public Long createComment(Long userId, Long postId, CommentCreateRequest request) {
         User user = findUserBy(userId);
-        Post post = postRepository.findLockedById(postId)
-                .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
-
-        Comment comment = request.toEntity(user, post);
-        Comment savedComment = commentRepository.save(comment);
-        postRepository.increaseCommentCount(postId);
-
-        return savedComment.getId();
-    }
-
-    @Transactional
-    public Long createCommentPessimistic1(Long userId, Long postId, CommentCreateRequest request) {
-        User user = findUserBy(userId);
         Post post = findPostBy(postId);
 
         Comment comment = request.toEntity(user, post);
         Comment savedComment = commentRepository.save(comment);
         commentCountRepository.increase(postId);
-
-        return savedComment.getId();
-    }
-
-    @Transactional
-    public Long createCommentPessimistic2(Long userId, Long postId, CommentCreateRequest request) {
-        User user = findUserBy(userId);
-        Post post = findPostBy(postId);
-
-        Comment comment = request.toEntity(user, post);
-        Comment savedComment = commentRepository.save(comment);
-
-        CommentCount commentCount = commentCountRepository.findLockedByPostId(postId)
-                .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
-        commentCount.increase();
-
-        return savedComment.getId();
-    }
-
-    @Transactional
-    public Long createCommentOptimistic(Long userId, Long postId, CommentCreateRequest request) {
-        User user = findUserBy(userId);
-        Post post = findPostBy(postId);
-
-        Comment comment = request.toEntity(user, post);
-        Comment savedComment = commentRepository.save(comment);
-
-        CommentCount commentCount = commentCountRepository.findById(postId)
-                .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
-        commentCount.increase();
 
         return savedComment.getId();
     }
