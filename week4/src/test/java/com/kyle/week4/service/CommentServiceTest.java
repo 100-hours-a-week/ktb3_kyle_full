@@ -33,9 +33,7 @@ import static com.kyle.week4.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest(properties = "decorator.datasource.enabled=false")
-@ActiveProfiles("test")
-class CommentServiceTest {
+class CommentServiceTest extends IntegrationTestSupport {
     @Autowired
     private CommentService commentService;
 
@@ -62,9 +60,6 @@ class CommentServiceTest {
 
     @Autowired
     private List<MemoryClearRepository> memoryClearRepositoryList;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @AfterEach
     void tearDown() {

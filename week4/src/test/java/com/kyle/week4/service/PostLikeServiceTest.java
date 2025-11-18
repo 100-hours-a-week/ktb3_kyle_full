@@ -26,9 +26,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest(properties = "decorator.datasource.enabled=false")
-@ActiveProfiles("test")
-class PostLikeServiceTest {
+class PostLikeServiceTest extends IntegrationTestSupport{
     @Autowired
     private PostLikeService postLikeService;
 
@@ -62,6 +60,7 @@ class PostLikeServiceTest {
         postLikeJpaRepository.deleteAllInBatch();
         postJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
+        redisTemplate.delete(redisTemplate.keys("post::like_count::*"));
         memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 

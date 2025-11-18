@@ -23,16 +23,13 @@ import static com.kyle.week4.exception.ErrorCode.USER_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest(properties = "decorator.datasource.enabled=false")
-@ActiveProfiles("test")
-class UserServiceTest {
+class UserServiceTest extends IntegrationTestSupport {
     @Autowired
     private UserService userService;
 
     @Autowired
     private UserRepository userRepository;
 
-    // TODO: 테스트에만 필요한 deleteAllInBatch를 인터페이스에 포함하여야 할까?
     @Autowired
     private UserJpaRepository userJpaRepository;
 
@@ -65,8 +62,8 @@ class UserServiceTest {
         // then
         User savedUser = userRepository.findById(userId).orElseThrow();
         assertThat(savedUser)
-          .extracting("email", "nickname", "profileImage")
-          .containsExactlyInAnyOrder("test2@test.com", "test2", "test2");
+          .extracting("email", "nickname")
+          .containsExactlyInAnyOrder("test2@test.com", "test2");
     }
 
     @Test
@@ -154,8 +151,8 @@ class UserServiceTest {
 
         // then
         assertThat(response)
-          .extracting("email", "nickname", "profileImage")
-          .containsExactlyInAnyOrder("test1@test.com", "update", "update.jpg");
+          .extracting("email", "nickname")
+          .containsExactlyInAnyOrder("test1@test.com", "update");
     }
 
     @Test

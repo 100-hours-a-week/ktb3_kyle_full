@@ -69,8 +69,8 @@ class PostRepositoryTest {
 
         // then
         assertThat(savedPost)
-          .extracting("id", "title", "content", "likeCount", "viewCount", "commentCount")
-          .contains(1L, "제목1", "내용입니다.", 0, 0, 0);
+          .extracting("id", "title", "content", "likeCount", "viewCount")
+          .contains(1L, "제목1", "내용입니다.", 0, 0);
     }
 
     @Test

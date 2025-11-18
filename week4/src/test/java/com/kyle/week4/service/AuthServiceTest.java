@@ -21,9 +21,7 @@ import static com.kyle.week4.exception.ErrorCode.INVALID_PASSWORD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest(properties = "decorator.datasource.enabled=false")
-@ActiveProfiles("test")
-class AuthServiceTest {
+class AuthServiceTest extends IntegrationTestSupport {
 
     @Autowired
     private AuthService authService;

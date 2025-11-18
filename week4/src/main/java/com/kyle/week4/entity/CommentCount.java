@@ -19,9 +19,6 @@ public class CommentCount {
 
     private int count;
 
-    @Version
-    private Long version;
-
     @Builder
     public CommentCount(Post post, int count) {
         this.post = post;

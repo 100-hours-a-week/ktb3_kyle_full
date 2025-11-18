@@ -36,9 +36,7 @@ import static com.kyle.week4.exception.ErrorCode.POST_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest(properties = "decorator.datasource.enabled=false")
-@ActiveProfiles("test")
-class PostServiceTest {
+class PostServiceTest extends IntegrationTestSupport {
     @Autowired
     private PostService postService;
 
@@ -63,9 +61,6 @@ class PostServiceTest {
     @Autowired
     private List<MemoryClearRepository> memoryClearRepositoryList;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
     @AfterEach
     void tearDown() {
         postViewCountCache.clear();
@@ -73,6 +68,8 @@ class PostServiceTest {
         postJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
         memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
+        redisTemplate.delete(redisTemplate.keys("post::view_count::*"));
+        redisTemplate.delete(redisTemplate.keys("post::like_count::*"));
 
         jdbcTemplate.execute("ALTER TABLE post AUTO_INCREMENT = 1");
         jdbcTemplate.execute("ALTER TABLE users AUTO_INCREMENT = 1");
@@ -93,7 +90,7 @@ class PostServiceTest {
           .build();
 
         // when
-        PostDetailResponse postDetailResponse = postService.createPost(savedUser.getId(), request);
+        PostDetailResponse postDetailResponse = postService.createPostAndImage(savedUser.getId(), request, null);
 
         // then
         assertThat(postDetailResponse.getId()).isNotNull();
@@ -116,7 +113,7 @@ class PostServiceTest {
                 .content("내용" + i)
                 .images(List.of("image1", "image2"))
                 .build();
-            postService.createPost(savedUser.getId(), request);
+            postService.createPostAndImage(savedUser.getId(), request, null);
         }
 
         int limit = 3;
@@ -176,7 +173,7 @@ class PostServiceTest {
                 .content("내용" + i)
                 .images(List.of("image1", "image2"))
                 .build();
-            postService.createPost(savedUser.getId(), request);
+            postService.createPostAndImage(savedUser.getId(), request, null);
         }
 
         // when
@@ -201,11 +198,16 @@ class PostServiceTest {
     @DisplayName("게시글의 상세 정보를 조회한다.")
     void getPostDetail() {
         // given
+        PostCreateRequest request = PostCreateRequest.builder()
+            .title("제목1")
+            .content("내용1")
+            .build();
+
         User user = createUser();
         User savedUser = userJpaRepository.save(user);
 
         Post post = createPost("제목1", savedUser);
-        Long postId = postRepository.save(post).getId();
+        Long postId = postService.createPostAndImage(savedUser.getId(), request ,null).getId();
 
         // when
         PostDetailResponse response = postService.getPostDetail(1L, postId);
@@ -232,11 +234,16 @@ class PostServiceTest {
     @DisplayName("게시글의 상세 정보를 조회하면 조회수가 증가한다.")
     void increaseViewCount_whenGetPostDetail() throws Exception {
         // given
+        PostCreateRequest request = PostCreateRequest.builder()
+            .title("제목1")
+            .content("내용1")
+            .build();
+
         User user = createUser();
         User savedUser = userRepository.save(user);
 
         Post post = createPost("제목1", savedUser);
-        Long postId = postRepository.save(post).getId();
+        Long postId = postService.createPostAndImage(savedUser.getId(), request ,null).getId();
         postViewCountCache.initCache(postId);
 
         final int totalViewCount = 1000;
@@ -270,7 +277,7 @@ class PostServiceTest {
           .content("내용")
           .images(List.of("image1", "image2"))
           .build();
-        PostDetailResponse post = postService.createPost(savedUser.getId(), createRequest);
+        PostDetailResponse post = postService.createPostAndImage(savedUser.getId(), createRequest, null);
 
         PostUpdateRequest request = PostUpdateRequest.builder()
           .title("수정된 제목")
