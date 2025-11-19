@@ -1,5 +1,6 @@
 package com.kyle.week4.repository;
 
+import com.kyle.week4.IntegrationTestSupport;
 import com.kyle.week4.entity.Comment;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
@@ -13,17 +14,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@ActiveProfiles("test")
-class CommentRepositoryTest {
+class CommentRepositoryTest extends IntegrationTestSupport {
     @Autowired
     private CommentRepository commentRepository;
 
@@ -42,18 +38,11 @@ class CommentRepositoryTest {
     @Autowired
     private CommentJpaRepository commentJpaRepository;
 
-    @Autowired
-    private List<MemoryClearRepository> memoryClearRepositoryList;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
     @AfterEach
     void tearDown() {
         commentJpaRepository.deleteAllInBatch();
         postJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
-        memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
 
         jdbcTemplate.execute("ALTER TABLE post AUTO_INCREMENT = 1");
         jdbcTemplate.execute("ALTER TABLE users AUTO_INCREMENT = 1");
@@ -78,8 +67,8 @@ class CommentRepositoryTest {
         // then
         assertThat(savedComment.getId()).isNotNull();
         assertThat(savedComment)
-          .extracting("user", "post", "content")
-          .contains(user, post, "댓글 내용");
+            .extracting("user", "post", "content")
+            .contains(user, post, "댓글 내용");
     }
 
     @Test
@@ -105,8 +94,8 @@ class CommentRepositoryTest {
         // then
         assertThat(comments.size()).isEqualTo(3);
         assertThat(comments)
-          .extracting(Comment::getId)
-          .isSortedAccordingTo(Long::compare);
+            .extracting(Comment::getId)
+            .isSortedAccordingTo(Long::compare);
     }
 
     @Test
@@ -132,8 +121,8 @@ class CommentRepositoryTest {
         // then
         assertThat(comments.size()).isEqualTo(2);
         assertThat(comments)
-          .extracting(Comment::getId)
-          .isSortedAccordingTo(Long::compare);
+            .extracting(Comment::getId)
+            .isSortedAccordingTo(Long::compare);
     }
 
     @Test
@@ -179,10 +168,10 @@ class CommentRepositoryTest {
         // then
         assertThat(comments.size()).isEqualTo(3);
         assertThat(comments)
-          .extracting(Comment::getId)
-          .isSortedAccordingTo(Long::compare);
+            .extracting(Comment::getId)
+            .isSortedAccordingTo(Long::compare);
         assertThat(comments)
-          .allMatch(comment -> comment.getId() > lastCommentId);
+            .allMatch(comment -> comment.getId() > lastCommentId);
     }
 
     @Test
@@ -209,8 +198,8 @@ class CommentRepositoryTest {
         // then
         assertThat(comments.size()).isEqualTo(2);
         assertThat(comments)
-          .extracting(Comment::getId)
-          .containsExactly(3L, 4L);
+            .extracting(Comment::getId)
+            .containsExactly(3L, 4L);
     }
 
     @Test
@@ -240,25 +229,25 @@ class CommentRepositoryTest {
 
     private User createUser() {
         return User.builder()
-          .email("test@test.com")
-          .nickname("test")
-          .profileImage("image.jpg")
-          .build();
+            .email("test@test.com")
+            .nickname("test")
+            .profileImage("image.jpg")
+            .build();
     }
 
     private Post createPost(User user, String title) {
         return Post.builder()
-          .title(title)
-          .content("내용입니다.")
-          .user(user)
-          .build();
+            .title(title)
+            .content("내용입니다.")
+            .user(user)
+            .build();
     }
 
     private Comment createComment(User user, Post post, String content) {
         return Comment.builder()
-          .user(user)
-          .post(post)
-          .content(content)
-          .build();
+            .user(user)
+            .post(post)
+            .content(content)
+            .build();
     }
 }

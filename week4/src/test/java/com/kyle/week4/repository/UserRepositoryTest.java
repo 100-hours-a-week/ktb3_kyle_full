@@ -1,5 +1,6 @@
 package com.kyle.week4.repository;
 
+import com.kyle.week4.IntegrationTestSupport;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.repository.user.UserJpaRepository;
@@ -8,8 +9,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,22 +20,16 @@ import java.util.concurrent.Future;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@ActiveProfiles("test")
-class UserRepositoryTest {
+class UserRepositoryTest extends IntegrationTestSupport {
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private UserJpaRepository userJpaRepository;
 
-    @Autowired
-    private List<MemoryClearRepository> memoryClearRepositoryList;
-
     @AfterEach
     void tearDown() {
         userJpaRepository.deleteAllInBatch();
-        memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 
     @Test
@@ -99,8 +92,8 @@ class UserRepositoryTest {
 
         // then
         assertThat(findUser).isPresent().get()
-                .extracting("email", "nickname", "profileImage")
-                .contains("user1@example.com", "user1", "image1");
+            .extracting("email", "nickname", "profileImage")
+            .contains("user1@example.com", "user1", "image1");
     }
 
     @Test
@@ -116,8 +109,8 @@ class UserRepositoryTest {
 
         // then
         assertThat(findUser).isPresent().get()
-                .extracting("email", "nickname", "profileImage")
-                .contains(email, "user1", "image1");
+            .extracting("email", "nickname", "profileImage")
+            .contains(email, "user1", "image1");
     }
 
     @Test
@@ -134,38 +127,35 @@ class UserRepositoryTest {
 
         for (int i = 0; i < threadCount; i++) {
             results.add(executor.submit(() -> {
-                readyLatch.countDown(); // 스레드 준비 완료
-                startLatch.await();     // 모든 스레드 동시 시작
+                readyLatch.countDown();
+                startLatch.await();
                 try {
                     User user = createUser("same@example.com", "same", "image.jpg");
                     userRepository.save(user);
-                    return true; // 저장 성공
+                    return true;
                 } catch (CustomException e) {
-                    return false; // 중복 예외 발생 (정상 동작)
+                    return false;
                 } finally {
                     doneLatch.countDown();
                 }
             }));
         }
 
-        // 모든 스레드가 준비될 때까지 대기
         readyLatch.await();
-        // 스레드 동시에 시작
         startLatch.countDown();
-        // 스레드 종료 대기
         doneLatch.await();
         executor.shutdown();
 
-        // then: 성공한 스레드는 정확히 1명이어야 함
+        // then
         long successCount = results.stream()
-                .filter(f -> {
-                    try {
-                        return f.get();
-                    } catch (Exception e) {
-                        return false;
-                    }
-                })
-                .count();
+            .filter(f -> {
+                try {
+                    return f.get();
+                } catch (Exception e) {
+                    return false;
+                }
+            })
+            .count();
 
         assertThat(successCount).isEqualTo(1);
         assertThat(userRepository.existsByEmail("same@example.com")).isTrue();
@@ -174,9 +164,9 @@ class UserRepositoryTest {
 
     private User createUser(String email, String nickname, String profileImage) {
         return User.builder()
-                .email(email)
-                .nickname(nickname)
-                .profileImage(profileImage)
-                .build();
+            .email(email)
+            .nickname(nickname)
+            .profileImage(profileImage)
+            .build();
     }
 }

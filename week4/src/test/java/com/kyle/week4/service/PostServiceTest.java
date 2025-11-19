@@ -1,5 +1,6 @@
 package com.kyle.week4.service;
 
+import com.kyle.week4.IntegrationTestSupport;
 import com.kyle.week4.cache.CountCache;
 import com.kyle.week4.controller.request.PostCreateRequest;
 import com.kyle.week4.controller.request.PostUpdateRequest;

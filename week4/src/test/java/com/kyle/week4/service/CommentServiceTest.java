@@ -1,5 +1,6 @@
 package com.kyle.week4.service;
 
+import com.kyle.week4.IntegrationTestSupport;
 import com.kyle.week4.controller.request.CommentCreateRequest;
 import com.kyle.week4.controller.request.CommentUpdateRequest;
 import com.kyle.week4.controller.request.PostCreateRequest;
