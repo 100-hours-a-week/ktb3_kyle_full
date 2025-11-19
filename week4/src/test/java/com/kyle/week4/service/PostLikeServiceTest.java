@@ -170,12 +170,12 @@ class PostLikeServiceTest extends IntegrationTestSupport {
         for (User user : users) {
             postLikeService.like(user.getId(), post.getId());
         }
-        postLikeService.removeLike(user1.getId(), post.getId());
 
         // when
-        int likeCount = postLikeCountCache.count(post.getId());
+        postLikeService.removeLike(user1.getId(), post.getId());
 
         // then
+        int likeCount = postLikeCountCache.count(post.getId());
         assertThat(likeCount).isEqualTo(2);
     }
 
