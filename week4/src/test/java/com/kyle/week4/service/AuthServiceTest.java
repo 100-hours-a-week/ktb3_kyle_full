@@ -6,11 +6,11 @@ import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.repository.MemoryClearRepository;
 import com.kyle.week4.repository.user.UserJpaRepository;
 import com.kyle.week4.repository.user.UserRepository;
-import com.kyle.week4.utils.PasswordEncoder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ class AuthServiceTest extends IntegrationTestSupport {
     private List<MemoryClearRepository> memoryClearRepositoryList;
 
     @Autowired
-    private PasswordEncoder encoder;
+    private PasswordEncoder passwordEncoder;
 
     @AfterEach
     void tearDown() {
@@ -50,7 +50,7 @@ class AuthServiceTest extends IntegrationTestSupport {
         String password = "Test1234!";
 
         User user = createUser(email);
-        user.encodePassword(encoder.encode(password));
+        user.encodePassword(passwordEncoder.encode(password));
         userRepository.save(user);
 
         LoginRequest request = LoginRequest.builder()
@@ -73,7 +73,7 @@ class AuthServiceTest extends IntegrationTestSupport {
         String password = "Test1234!";
 
         User user = createUser(email);
-        user.encodePassword(encoder.encode(password));
+        user.encodePassword(passwordEncoder.encode(password));
         userRepository.save(user);
 
         LoginRequest request = LoginRequest.builder()
@@ -95,7 +95,7 @@ class AuthServiceTest extends IntegrationTestSupport {
         String password = "Test1234!";
 
         User user = createUser(email);
-        user.encodePassword(encoder.encode(password));
+        user.encodePassword(passwordEncoder.encode(password));
         userRepository.save(user);
 
         LoginRequest request = LoginRequest.builder()

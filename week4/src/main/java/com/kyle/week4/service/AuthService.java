@@ -4,8 +4,8 @@ import com.kyle.week4.controller.request.LoginRequest;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.repository.user.UserRepository;
-import com.kyle.week4.utils.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import static com.kyle.week4.exception.ErrorCode.*;
@@ -18,7 +18,7 @@ public class AuthService {
 
     public Long login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-          .orElseThrow(() -> new CustomException(INVALID_EMAIL));
+            .orElseThrow(() -> new CustomException(INVALID_EMAIL));
 
         if (user.isDeleted()) {
             throw new CustomException(USER_NOT_FOUND);
