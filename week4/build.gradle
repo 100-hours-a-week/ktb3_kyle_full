@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.6'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
 }
 
 group = 'com.kyle'
@@ -16,6 +17,10 @@ java {
 
 repositories {
     mavenCentral()
+}
+
+jacoco {
+    toolVersion = '0.8.12'
 }
 
 dependencies {
@@ -54,4 +59,39 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+def coverageExclusions = [
+        'com/kyle/week4/config/**',
+        'com/kyle/week4/security/**',
+        'com/kyle/week4/aop/**',
+        'com/kyle/week4/cache/InMemoryCache.class',
+        'com/kyle/week4/utils/**',
+        'com/kyle/week4/redis/**',
+        'com/kyle/week4/exception/**',
+        'com/kyle/week4/swagger/**',
+        'com/kyle/week4/controller/docs',
+        'com/kyle/week4/controller/request',
+        'com/kyle/week4/controller/response',
+        'com/kyle/week4/controller/AuthController.class',
+        'com/kyle/week4/repository/**/*Memory*.class',
+        'com/kyle/week4/P6spySqlFormatter.class',
+        'com/kyle/week4/Week4Application.class',
+]
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)   // CI 커버리지 업로드 용
+        html.required.set(true)  // build/reports/jacoco/test/html
+        csv.required.set(false)
+    }
+    classDirectories.setFrom(
+            files(classDirectories.files.collect { fileTree(dir: it, exclude: coverageExclusions) })
+    )
+}
+
+tasks.test {
+    useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
 }
