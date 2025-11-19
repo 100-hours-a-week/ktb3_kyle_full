@@ -1,6 +1,7 @@
 package com.kyle.week4.service;
 
 import com.kyle.week4.IntegrationTestSupport;
+import com.kyle.week4.controller.request.PasswordUpdateRequest;
 import com.kyle.week4.controller.request.UserCreateRequest;
 import com.kyle.week4.controller.request.UserProfileUpdateRequest;
 import com.kyle.week4.controller.response.UserProfileResponse;
@@ -11,12 +12,18 @@ import com.kyle.week4.repository.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static com.kyle.week4.exception.ErrorCode.DUPLICATE_NICKNAME_ERROR;
-import static com.kyle.week4.exception.ErrorCode.USER_NOT_FOUND;
+import java.util.UUID;
+
+import static com.kyle.week4.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.*;
 
 class UserServiceTest extends IntegrationTestSupport {
     @Autowired
@@ -28,33 +35,39 @@ class UserServiceTest extends IntegrationTestSupport {
     @Autowired
     private UserJpaRepository userJpaRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @AfterEach
     void tearDown() {
         userJpaRepository.deleteAllInBatch();
     }
 
     @Test
-    @DisplayName("사용자 정보를 저장한다. 사용자의 식별자는 최근 저장된 사용자의 식별자에서 1 증가한 값이다.")
+    @DisplayName("사용자 정보를 저장한다.")
     void createUser() {
         // given
-        User user = createUser("test1@test.com", "test1", "test1");
+        String imagePath = UUID.randomUUID().toString();
+        given(imageUploader.upload(any()))
+            .willReturn(imagePath);
+
+        User user = createUser("test1@test.com", "test1", imagePath);
         userRepository.save(user);
 
         UserCreateRequest request = UserCreateRequest.builder()
             .email("test2@test.com")
             .password("test1234!")
-            .profileImage("test2")
             .nickname("test2")
             .build();
 
         // when
-        Long userId = userService.createUser(request);
+        Long userId = userService.createUserAndImage(request, null);
 
         // then
         User savedUser = userRepository.findById(userId).orElseThrow();
         assertThat(savedUser)
-            .extracting("email", "nickname")
-            .containsExactlyInAnyOrder("test2@test.com", "test2");
+            .extracting("email", "nickname", "profileImage")
+            .containsExactlyInAnyOrder("test2@test.com", "test2", imagePath);
     }
 
     @Test
@@ -73,7 +86,7 @@ class UserServiceTest extends IntegrationTestSupport {
             .build();
 
         // when // then
-        assertThatThrownBy(() -> userService.createUser(request))
+        assertThatThrownBy(() -> userService.createUserAndImage(request, null))
             .isInstanceOf(CustomException.class)
             .hasFieldOrPropertyWithValue("errorCode", DUPLICATE_NICKNAME_ERROR)
             .hasMessage("이미 가입된 닉네임입니다.");
@@ -95,7 +108,7 @@ class UserServiceTest extends IntegrationTestSupport {
             .build();
 
         // when // then
-        assertThatThrownBy(() -> userService.createUser(request))
+        assertThatThrownBy(() -> userService.createUserAndImage(request, null))
             .isInstanceOf(CustomException.class)
             .hasMessage("이미 가입된 이메일입니다.");
     }
@@ -129,21 +142,53 @@ class UserServiceTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("사용자의 정보를 수정한다.")
+    @DisplayName("사용자의 정보를 수정한다. 프로필 이미지를 변경하면 이미지 경로도 같이 변경된다.")
     void updateUserProfile() {
         // given
+        String imagePath = UUID.randomUUID().toString();
+        given(imageUploader.upload(any()))
+            .willReturn(imagePath);
+        willDoNothing().given(imageUploader).delete(anyString());
+
+        MockMultipartFile profileImage = new MockMultipartFile(
+            "image",                // 파라미터 이름
+            "avatar.png",                  // 원본 파일명
+            "image/png",                   // Content-Type
+            "dummy image bytes".getBytes() // 파일 내용
+        );
+
         User user = createUser("test1@test.com", "test1", "image.jpg");
         userRepository.save(user);
 
         UserProfileUpdateRequest request = new UserProfileUpdateRequest("update", "update.jpg");
 
         // when
-        UserProfileResponse response = userService.updateUserProfile(user.getId(), request);
+        UserProfileResponse response = userService.updateUserProfileAndImage(user.getId(), request, profileImage);
 
         // then
         assertThat(response)
-            .extracting("email", "nickname")
-            .containsExactlyInAnyOrder("test1@test.com", "update");
+            .extracting("email", "nickname", "profileImage")
+            .containsExactlyInAnyOrder("test1@test.com", "update", imagePath);
+    }
+
+    @Test
+    @DisplayName("사용자의 정보를 수정한다. 프로필 이미지를 변경하지 않으면 이미지 경로가 변경되지 않는다.")
+    void updateUserProfile_noImage() {
+        // given
+        String imagePath = UUID.randomUUID().toString();
+
+        User user = createUser("test1@test.com", "test1", "image.jpg");
+        userRepository.save(user);
+
+        UserProfileUpdateRequest request = new UserProfileUpdateRequest("update", "update.jpg");
+
+        // when
+        UserProfileResponse response = userService.updateUserProfileAndImage(user.getId(), request, null);
+
+        // then
+        assertThat(response)
+            .extracting("email", "nickname", "profileImage")
+            .containsExactlyInAnyOrder("test1@test.com", "update", user.getProfileImage());
     }
 
     @Test
@@ -154,7 +199,7 @@ class UserServiceTest extends IntegrationTestSupport {
         UserProfileUpdateRequest request = new UserProfileUpdateRequest("update", "update.jpg");
 
         // when // then
-        assertThatThrownBy(() -> userService.updateUserProfile(userId, request))
+        assertThatThrownBy(() -> userService.updateUserProfileAndImage(userId, request, null))
             .isInstanceOf(CustomException.class)
             .hasFieldOrPropertyWithValue("errorCode", USER_NOT_FOUND);
     }
@@ -169,9 +214,64 @@ class UserServiceTest extends IntegrationTestSupport {
         UserProfileUpdateRequest request = new UserProfileUpdateRequest("test1", "update.jpg");
 
         // when // then
-        assertThatThrownBy(() -> userService.updateUserProfile(user.getId(), request))
+        assertThatThrownBy(() -> userService.updateUserProfileAndImage(user.getId(), request, null))
             .isInstanceOf(CustomException.class)
             .hasFieldOrPropertyWithValue("errorCode", DUPLICATE_NICKNAME_ERROR);
+    }
+
+    @Test
+    @DisplayName("사용자의 비밀번호를 수정한다.")
+    void updatePassword() {
+        // given
+        String oldPassword = passwordEncoder.encode("oldPassword");
+        String newPassword = "newPassword";
+
+        User user = createUser("test1", "test1", "image.jpg");
+        user.encodePassword(oldPassword);
+        userRepository.save(user);
+
+        PasswordUpdateRequest request = new PasswordUpdateRequest(newPassword);
+
+        // when
+        userService.updatePassword(user.getId(), request);
+
+        // then
+        User findUser = userRepository.findById(user.getId()).orElseThrow();
+        assertThat(passwordEncoder.matches(newPassword, findUser.getPassword())).isTrue();
+    }
+
+    @Test
+    @DisplayName("비밀번호 수정 시 이전과 같은 비밀번호로 수정할 수 없습니다.")
+    void updatePassword_newPasswordEqualToOldPassword() {
+        // given
+        String oldPassword = passwordEncoder.encode("oldPassword");
+        String newPassword = "oldPassword";
+
+        User user = createUser("test1", "test1", "image.jpg");
+        user.encodePassword(oldPassword);
+        userRepository.save(user);
+
+        PasswordUpdateRequest request = new PasswordUpdateRequest(newPassword);
+
+        // when
+        assertThatThrownBy(() -> userService.updatePassword(user.getId(), request))
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", PASSWORD_SAME_BEFORE_ERROR);
+    }
+
+    @Test
+    @DisplayName("사용자 탈퇴 시 Soft Delete를 적용한다.")
+    void deleteUser() {
+        // given
+        User user = createUser("test1", "test1", "image.jpg");
+        User savedUser = userRepository.save(user);
+
+        // when
+        userService.deleteUser(savedUser.getId());
+
+        // then
+        User findUser = userRepository.findById(savedUser.getId()).orElseThrow();
+        assertThat(findUser.isDeleted()).isTrue();
     }
 
     private User createUser(String email, String nickname, String profileImage) {

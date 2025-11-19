@@ -27,20 +27,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public Long createUser(UserCreateRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new CustomException(DUPLICATE_EMAIL_ERROR);
-        }
-        if (userRepository.existsByNickname(request.getNickname())) {
-            throw new CustomException(DUPLICATE_NICKNAME_ERROR);
-        }
-        User user = request.toEntity();
-        user.encodePassword(passwordEncoder.encode(request.getPassword()));
-        User savedUser = userRepository.save(user);
-        return savedUser.getId();
-    }
-
-    @Transactional
     public Long createUserAndImage(UserCreateRequest request, MultipartFile image) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new CustomException(DUPLICATE_EMAIL_ERROR);
@@ -70,19 +56,6 @@ public class UserService {
 
     public boolean checkNicknameDuplicate(String nickname) {
         return userRepository.existsByNickname(nickname);
-    }
-
-    @Transactional
-    @CustomCacheEvict(cacheName = "UserProfile", key = "#userId")
-    public UserProfileResponse updateUserProfile(Long userId, UserProfileUpdateRequest request) {
-        User user = findUserBy(userId);
-
-        if (userRepository.existsByNickname(request.getNickname())) {
-            throw new CustomException(DUPLICATE_NICKNAME_ERROR);
-        }
-
-        user.updateUserProfile(request);
-        return UserProfileResponse.of(user);
     }
 
     @Transactional

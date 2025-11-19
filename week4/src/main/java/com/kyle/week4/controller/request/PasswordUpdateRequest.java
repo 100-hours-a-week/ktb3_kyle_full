@@ -3,11 +3,13 @@ package com.kyle.week4.controller.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "비밀번호 변경 요청 DTO")
 public class PasswordUpdateRequest {
     @Size(min = 8, max = 20, message = "비밀번호는 8자 이상 20자 이하 까지 가능합니다.")
