@@ -51,7 +51,7 @@ class UserServiceTest extends IntegrationTestSupport {
         given(imageUploader.upload(any()))
             .willReturn(imagePath);
 
-        User user = createUser("test1@test.com", "test1", imagePath);
+        User user = createUser("test1@test.com", "test1");
         userRepository.save(user);
 
         UserCreateRequest request = UserCreateRequest.builder()
@@ -76,7 +76,7 @@ class UserServiceTest extends IntegrationTestSupport {
         // given
         String nickname = "test";
 
-        User user = createUser("test1@test.com", nickname, "test1");
+        User user = createUser("test1@test.com", nickname);
         userRepository.save(user);
 
         UserCreateRequest request = UserCreateRequest.builder()
@@ -98,7 +98,7 @@ class UserServiceTest extends IntegrationTestSupport {
         // given
         String email = "test@test.com";
 
-        User user = createUser(email, "test1", "test1");
+        User user = createUser(email, "test1");
         userRepository.save(user);
 
         UserCreateRequest request = UserCreateRequest.builder()
@@ -117,7 +117,7 @@ class UserServiceTest extends IntegrationTestSupport {
     @DisplayName("사용자의 정보를 조회한다.")
     void getUserProfile() {
         // given
-        User user = createUser("test1@test.com", "test1", "image.jpg");
+        User user = createUser("test1@test.com", "test1");
         userRepository.save(user);
 
         // when
@@ -157,7 +157,7 @@ class UserServiceTest extends IntegrationTestSupport {
             "dummy image bytes".getBytes() // 파일 내용
         );
 
-        User user = createUser("test1@test.com", "test1", "image.jpg");
+        User user = createUser("test1@test.com", "test1");
         userRepository.save(user);
 
         UserProfileUpdateRequest request = new UserProfileUpdateRequest("update", "update.jpg");
@@ -175,9 +175,7 @@ class UserServiceTest extends IntegrationTestSupport {
     @DisplayName("사용자의 정보를 수정한다. 프로필 이미지를 변경하지 않으면 이미지 경로가 변경되지 않는다.")
     void updateUserProfile_noImage() {
         // given
-        String imagePath = UUID.randomUUID().toString();
-
-        User user = createUser("test1@test.com", "test1", "image.jpg");
+        User user = createUser("test1@test.com", "test1");
         userRepository.save(user);
 
         UserProfileUpdateRequest request = new UserProfileUpdateRequest("update", "update.jpg");
@@ -208,7 +206,7 @@ class UserServiceTest extends IntegrationTestSupport {
     @DisplayName("사용자 정보 수정 시 이전 닉네임과 같거나 이미 존재하는 닉네임일 경우 예외가 발생한다.")
     void updateUserProfile_whenDuplicateNickname() {
         // given
-        User user = createUser("test1@test.com", "test1", "image.jpg");
+        User user = createUser("test1@test.com", "test1");
         userRepository.save(user);
 
         UserProfileUpdateRequest request = new UserProfileUpdateRequest("test1", "update.jpg");
@@ -226,7 +224,7 @@ class UserServiceTest extends IntegrationTestSupport {
         String oldPassword = passwordEncoder.encode("oldPassword");
         String newPassword = "newPassword";
 
-        User user = createUser("test1", "test1", "image.jpg");
+        User user = createUser("test1", "test1");
         user.encodePassword(oldPassword);
         userRepository.save(user);
 
@@ -247,7 +245,7 @@ class UserServiceTest extends IntegrationTestSupport {
         String oldPassword = passwordEncoder.encode("oldPassword");
         String newPassword = "oldPassword";
 
-        User user = createUser("test1", "test1", "image.jpg");
+        User user = createUser("test1", "test1");
         user.encodePassword(oldPassword);
         userRepository.save(user);
 
@@ -263,7 +261,7 @@ class UserServiceTest extends IntegrationTestSupport {
     @DisplayName("사용자 탈퇴 시 Soft Delete를 적용한다.")
     void deleteUser() {
         // given
-        User user = createUser("test1", "test1", "image.jpg");
+        User user = createUser("test1", "test1");
         User savedUser = userRepository.save(user);
 
         // when
@@ -274,11 +272,10 @@ class UserServiceTest extends IntegrationTestSupport {
         assertThat(findUser.isDeleted()).isTrue();
     }
 
-    private User createUser(String email, String nickname, String profileImage) {
+    private User createUser(String email, String nickname) {
         return User.builder()
             .email(email)
             .nickname(nickname)
-            .profileImage(profileImage)
             .build();
     }
 }
