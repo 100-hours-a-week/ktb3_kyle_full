@@ -9,7 +9,6 @@ import com.kyle.week4.controller.response.PostResponse;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
-import com.kyle.week4.repository.MemoryClearRepository;
 import com.kyle.week4.repository.post.CommentCountRepository;
 import com.kyle.week4.repository.post.PostJpaRepository;
 import com.kyle.week4.repository.post.PostRepository;
@@ -54,16 +53,20 @@ class PostServiceTest extends IntegrationTestSupport {
     @Autowired
     private CountCache postViewCountCache;
 
-    @Autowired
-    private List<MemoryClearRepository> memoryClearRepositoryList;
+    @BeforeEach
+    void setUp() {
+        postJpaRepository.deleteAll();
+        userJpaRepository.deleteAll();
+
+        jdbcTemplate.execute("ALTER TABLE post AUTO_INCREMENT = 1");
+        jdbcTemplate.execute("ALTER TABLE users AUTO_INCREMENT = 1");
+    }
 
     @AfterEach
     void tearDown() {
-        postViewCountCache.clear();
         commentCountRepository.deleteAllInBatch();
         postJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
-        memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
         redisTemplate.delete(redisTemplate.keys("post::view_count::*"));
         redisTemplate.delete(redisTemplate.keys("post::like_count::*"));
 
@@ -183,10 +186,10 @@ class PostServiceTest extends IntegrationTestSupport {
 
     private static Stream<Arguments> infiniteScrollArguments() {
         return Stream.of(
-            Arguments.of(null, 3, List.of(8L, 7L, 6L)),  // 최신부터 조회
-            Arguments.of(6L, 3, List.of(5L, 4L, 3L)),    // 다음 페이지
-            Arguments.of(3L, 3, List.of(2L, 1L)),        // 남은 게시글보다 limit이 큰 경우
-            Arguments.of(1L, 3, List.of())               // 더 이상 존재하지 않을 때
+            Arguments.of(null, 3, List.of(8L, 7L, 6L)),
+            Arguments.of(6L, 3, List.of(5L, 4L, 3L)),
+            Arguments.of(3L, 3, List.of(2L, 1L)),
+            Arguments.of(1L, 3, List.of())
         );
     }
 

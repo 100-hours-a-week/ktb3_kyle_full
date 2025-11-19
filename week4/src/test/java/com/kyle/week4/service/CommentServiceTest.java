@@ -11,7 +11,6 @@ import com.kyle.week4.entity.CommentCount;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
-import com.kyle.week4.repository.MemoryClearRepository;
 import com.kyle.week4.repository.comment.CommentJpaRepository;
 import com.kyle.week4.repository.comment.CommentRepository;
 import com.kyle.week4.repository.post.CommentCountRepository;
@@ -61,16 +60,12 @@ class CommentServiceTest extends IntegrationTestSupport {
     @Autowired
     private CommentCountRepository commentCountRepository;
 
-    @Autowired
-    private List<MemoryClearRepository> memoryClearRepositoryList;
-
     @AfterEach
     void tearDown() {
         commentCountRepository.deleteAllInBatch();
         commentJpaRepository.deleteAllInBatch();
         postJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
-        memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
 
         jdbcTemplate.execute("ALTER TABLE post AUTO_INCREMENT = 1");
         jdbcTemplate.execute("ALTER TABLE users AUTO_INCREMENT = 1");

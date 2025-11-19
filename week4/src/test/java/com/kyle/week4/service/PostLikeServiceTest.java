@@ -8,7 +8,6 @@ import com.kyle.week4.entity.PostLike;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
 import com.kyle.week4.exception.ErrorCode;
-import com.kyle.week4.repository.MemoryClearRepository;
 import com.kyle.week4.repository.post.PostJpaRepository;
 import com.kyle.week4.repository.post.PostRepository;
 import com.kyle.week4.repository.postlike.PostLikeJpaRepository;
@@ -50,9 +49,6 @@ class PostLikeServiceTest extends IntegrationTestSupport {
     @Autowired
     private CountCache postLikeCountCache;
 
-    @Autowired
-    private List<MemoryClearRepository> memoryClearRepositoryList;
-
     @AfterEach
     void tearDown() {
         postLikeCountCache.clear();
@@ -60,7 +56,6 @@ class PostLikeServiceTest extends IntegrationTestSupport {
         postJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
         redisTemplate.delete(redisTemplate.keys("post::like_count::*"));
-        memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 
     @Test

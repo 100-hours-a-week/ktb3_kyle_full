@@ -6,15 +6,12 @@ import com.kyle.week4.controller.request.UserProfileUpdateRequest;
 import com.kyle.week4.controller.response.UserProfileResponse;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
-import com.kyle.week4.repository.MemoryClearRepository;
 import com.kyle.week4.repository.user.UserJpaRepository;
 import com.kyle.week4.repository.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 import static com.kyle.week4.exception.ErrorCode.DUPLICATE_NICKNAME_ERROR;
 import static com.kyle.week4.exception.ErrorCode.USER_NOT_FOUND;
@@ -31,13 +28,9 @@ class UserServiceTest extends IntegrationTestSupport {
     @Autowired
     private UserJpaRepository userJpaRepository;
 
-    @Autowired
-    private List<MemoryClearRepository> memoryClearRepositoryList;
-
     @AfterEach
     void tearDown() {
         userJpaRepository.deleteAllInBatch();
-        memoryClearRepositoryList.forEach(MemoryClearRepository::clear);
     }
 
     @Test

@@ -9,7 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @ActiveProfiles("test")
-@SpringBootTest(properties = "decorator.datasource.enabled=true")
+@SpringBootTest(properties = "decorator.datasource.enabled=false")
 public abstract class IntegrationTestSupport {
     @Autowired
     protected JdbcTemplate jdbcTemplate;
