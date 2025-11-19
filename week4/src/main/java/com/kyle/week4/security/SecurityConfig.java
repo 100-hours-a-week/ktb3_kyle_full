@@ -2,6 +2,7 @@ package com.kyle.week4.security;
 
 import com.kyle.week4.security.filter.LoginFilter;
 import com.kyle.week4.security.provider.LoginAuthenticationProvider;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,6 +65,13 @@ public class SecurityConfig {
             )
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessHandler((request, response, authentication) -> {
+                    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                })
+                .deleteCookies("JSESSIONID", "XSRF-TOKEN")
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/csrf").permitAll()
                 .requestMatchers(AUTH_WHITELIST).permitAll()
