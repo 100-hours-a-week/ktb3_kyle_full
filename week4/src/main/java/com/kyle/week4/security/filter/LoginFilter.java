@@ -77,7 +77,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().write(OBJECT_MAPPER.writeValueAsString(Map.of("userId", principal.getUserId())));
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(
+            OBJECT_MAPPER.writeValueAsString(Map.of("success", true, "userId", principal.getUserId()))
+        );
     }
 
     @Override
@@ -87,12 +90,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             message = "비밀번호가 일치하지 않습니다.";
         } else if (failed instanceof UsernameNotFoundException) {
             message = "이메일이 일치하지 않습니다.";
-        }  else {
+        } else {
             message = "인증에 실패했습니다.";
         }
 
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setCharacterEncoding("UTF-8");
         response.getWriter().write(
             OBJECT_MAPPER.writeValueAsString(Map.of("success", false, "message", message))
         );
