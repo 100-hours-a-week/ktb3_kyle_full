@@ -10,8 +10,6 @@ import org.springframework.mock.web.MockHttpSession;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -24,9 +22,6 @@ class PostControllerTest extends ControllerTestSupport {
 
     @BeforeEach
     void setUp() throws Exception {
-        given(authenticationProvider.isAuthenticated(any(), any()))
-          .willReturn(true);
-
         session.setAttribute("userId", 1L);
     }
 
@@ -35,20 +30,20 @@ class PostControllerTest extends ControllerTestSupport {
     void createPost() throws Exception {
         // given
         PostCreateRequest request = PostCreateRequest.builder()
-          .title("제목입니다.")
-          .content("내용입니다.")
-          .images(List.of("image1.jpg", "image2.jpg"))
-          .build();
+            .title("제목입니다.")
+            .content("내용입니다.")
+            .images(List.of("image1.jpg", "image2.jpg"))
+            .build();
 
         // when // then
         mockMvc.perform(
-            post("/posts")
-              .session(session)
-              .content(objectMapper.writeValueAsString(request))
-              .contentType(MediaType.APPLICATION_JSON)
-          )
-          .andDo(print())
-          .andExpect(status().isCreated());
+                post("/posts")
+                    .session(session)
+                    .content(objectMapper.writeValueAsString(request))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isCreated());
     }
 
     @Test
@@ -56,24 +51,24 @@ class PostControllerTest extends ControllerTestSupport {
     void titleNotEmpty() throws Exception {
         // given
         PostCreateRequest request = PostCreateRequest.builder()
-          .title("")
-          .content("내용입니다.")
-          .images(List.of("image1.jpg", "image2.jpg"))
-          .build();
+            .title("")
+            .content("내용입니다.")
+            .images(List.of("image1.jpg", "image2.jpg"))
+            .build();
 
         // when // then
         mockMvc.perform(
-            post("/posts")
-              .session(session)
-              .content(objectMapper.writeValueAsString(request))
-              .contentType(MediaType.APPLICATION_JSON)
-          )
-          .andDo(print())
-          .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").value(false))
-          .andExpect(jsonPath("$.data").isEmpty())
-          .andExpect(jsonPath("$.errorMessage").value("제목은 비어있을 수 없습니다."));
+                post("/posts")
+                    .session(session)
+                    .content(objectMapper.writeValueAsString(request))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.data").isEmpty())
+            .andExpect(jsonPath("$.errorMessage").value("제목은 비어있을 수 없습니다."));
     }
 
     @Test
@@ -81,24 +76,24 @@ class PostControllerTest extends ControllerTestSupport {
     void validationTitleLength() throws Exception {
         // given
         PostCreateRequest request = PostCreateRequest.builder()
-          .title("제목제목제목제목제목제목제목제목제목제목제목제목제목.")
-          .content("내용입니다.")
-          .images(List.of("image1.jpg", "image2.jpg"))
-          .build();
+            .title("제목제목제목제목제목제목제목제목제목제목제목제목제목.")
+            .content("내용입니다.")
+            .images(List.of("image1.jpg", "image2.jpg"))
+            .build();
 
         // when // then
         mockMvc.perform(
-            post("/posts")
-              .session(session)
-              .content(objectMapper.writeValueAsString(request))
-              .contentType(MediaType.APPLICATION_JSON)
-          )
-          .andDo(print())
-          .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").value(false))
-          .andExpect(jsonPath("$.data").isEmpty())
-          .andExpect(jsonPath("$.errorMessage").value("제목은 최대 26자 까지 작성 가능합니다."));
+                post("/posts")
+                    .session(session)
+                    .content(objectMapper.writeValueAsString(request))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.data").isEmpty())
+            .andExpect(jsonPath("$.errorMessage").value("제목은 최대 26자 까지 작성 가능합니다."));
     }
 
     @Test
@@ -106,24 +101,24 @@ class PostControllerTest extends ControllerTestSupport {
     void contentNotEmpty() throws Exception {
         // given
         PostCreateRequest request = PostCreateRequest.builder()
-          .title("제목입니다.")
-          .content("")
-          .images(List.of("image1.jpg", "image2.jpg"))
-          .build();
+            .title("제목입니다.")
+            .content("")
+            .images(List.of("image1.jpg", "image2.jpg"))
+            .build();
 
         // when // then
         mockMvc.perform(
-            post("/posts")
-              .session(session)
-              .content(objectMapper.writeValueAsString(request))
-              .contentType(MediaType.APPLICATION_JSON)
-          )
-          .andDo(print())
-          .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").value(false))
-          .andExpect(jsonPath("$.data").isEmpty())
-          .andExpect(jsonPath("$.errorMessage").value("내용은 비어있을 수 없습니다."));
+                post("/posts")
+                    .session(session)
+                    .content(objectMapper.writeValueAsString(request))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.data").isEmpty())
+            .andExpect(jsonPath("$.errorMessage").value("내용은 비어있을 수 없습니다."));
     }
 
     @Test
@@ -131,23 +126,23 @@ class PostControllerTest extends ControllerTestSupport {
     void titleNotEmpty_whenUpdate() throws Exception {
         // given
         PostUpdateRequest request = PostUpdateRequest.builder()
-          .title("")
-          .content("내용입니다.")
-          .build();
+            .title("")
+            .content("내용입니다.")
+            .build();
 
         // when // then
         mockMvc.perform(
-            patch("/posts/1")
-              .session(session)
-              .content(objectMapper.writeValueAsString(request))
-              .contentType(MediaType.APPLICATION_JSON)
-          )
-          .andDo(print())
-          .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").value(false))
-          .andExpect(jsonPath("$.data").isEmpty())
-          .andExpect(jsonPath("$.errorMessage").value("제목은 비어있을 수 없습니다."));
+                patch("/posts/1")
+                    .session(session)
+                    .content(objectMapper.writeValueAsString(request))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.data").isEmpty())
+            .andExpect(jsonPath("$.errorMessage").value("제목은 비어있을 수 없습니다."));
     }
 
     @Test
@@ -155,23 +150,23 @@ class PostControllerTest extends ControllerTestSupport {
     void validationTitleLength_whenUpdate() throws Exception {
         // given
         PostUpdateRequest request = PostUpdateRequest.builder()
-          .title("제목제목제목제목제목제목제목제목제목제목제목제목제목.")
-          .content("내용입니다.")
-          .build();
+            .title("제목제목제목제목제목제목제목제목제목제목제목제목제목.")
+            .content("내용입니다.")
+            .build();
 
         // when // then
         mockMvc.perform(
-            patch("/posts/1")
-              .session(session)
-              .content(objectMapper.writeValueAsString(request))
-              .contentType(MediaType.APPLICATION_JSON)
-          )
-          .andDo(print())
-          .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").value(false))
-          .andExpect(jsonPath("$.data").isEmpty())
-          .andExpect(jsonPath("$.errorMessage").value("제목은 최대 26자 까지 작성 가능합니다."));
+                patch("/posts/1")
+                    .session(session)
+                    .content(objectMapper.writeValueAsString(request))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.data").isEmpty())
+            .andExpect(jsonPath("$.errorMessage").value("제목은 최대 26자 까지 작성 가능합니다."));
     }
 
     @Test
@@ -179,22 +174,22 @@ class PostControllerTest extends ControllerTestSupport {
     void contentNotEmpty_whenUpdate() throws Exception {
         // given
         PostUpdateRequest request = PostUpdateRequest.builder()
-          .title("제목입니다.")
-          .content("")
-          .build();
+            .title("제목입니다.")
+            .content("")
+            .build();
 
         // when // then
         mockMvc.perform(
-            patch("/posts/1")
-              .session(session)
-              .content(objectMapper.writeValueAsString(request))
-              .contentType(MediaType.APPLICATION_JSON)
-          )
-          .andDo(print())
-          .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-          .andExpect(jsonPath("$.success").value(false))
-          .andExpect(jsonPath("$.data").isEmpty())
-          .andExpect(jsonPath("$.errorMessage").value("내용은 비어있을 수 없습니다."));
+                patch("/posts/1")
+                    .session(session)
+                    .content(objectMapper.writeValueAsString(request))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.data").isEmpty())
+            .andExpect(jsonPath("$.errorMessage").value("내용은 비어있을 수 없습니다."));
     }
 }
