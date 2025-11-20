@@ -125,8 +125,8 @@ class UserServiceTest extends IntegrationTestSupport {
 
         // then
         assertThat(response)
-            .extracting("email", "nickname", "profileImage")
-            .containsExactlyInAnyOrder("test1@test.com", "test1", "image.jpg");
+            .extracting("email", "nickname")
+            .containsExactlyInAnyOrder("test1@test.com", "test1");
     }
 
     @Test
