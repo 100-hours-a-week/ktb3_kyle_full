@@ -7,11 +7,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,15 +32,21 @@ class PostControllerTest extends ControllerTestSupport {
         PostCreateRequest request = PostCreateRequest.builder()
             .title("제목입니다.")
             .content("내용입니다.")
-            .images(List.of("image1.jpg", "image2.jpg"))
             .build();
+
+        MockMultipartFile requestPart = new MockMultipartFile(
+            "request",        // @RequestPart name
+            "",
+            "application/json",
+            objectMapper.writeValueAsBytes(request)
+        );
 
         // when // then
         mockMvc.perform(
-                post("/posts")
+                multipart("/posts")
+                    .file(requestPart)
                     .session(session)
-                    .content(objectMapper.writeValueAsString(request))
-                    .contentType(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
             )
             .andDo(print())
             .andExpect(status().isCreated());
@@ -53,15 +59,21 @@ class PostControllerTest extends ControllerTestSupport {
         PostCreateRequest request = PostCreateRequest.builder()
             .title("")
             .content("내용입니다.")
-            .images(List.of("image1.jpg", "image2.jpg"))
             .build();
+
+        MockMultipartFile requestPart = new MockMultipartFile(
+            "request",        // @RequestPart name
+            "",
+            "application/json",
+            objectMapper.writeValueAsBytes(request)
+        );
 
         // when // then
         mockMvc.perform(
-                post("/posts")
+                multipart("/posts")
+                    .file(requestPart)
                     .session(session)
-                    .content(objectMapper.writeValueAsString(request))
-                    .contentType(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
             )
             .andDo(print())
             .andExpect(status().isBadRequest())
@@ -78,15 +90,21 @@ class PostControllerTest extends ControllerTestSupport {
         PostCreateRequest request = PostCreateRequest.builder()
             .title("제목제목제목제목제목제목제목제목제목제목제목제목제목.")
             .content("내용입니다.")
-            .images(List.of("image1.jpg", "image2.jpg"))
             .build();
+
+        MockMultipartFile requestPart = new MockMultipartFile(
+            "request",        // @RequestPart name
+            "",
+            "application/json",
+            objectMapper.writeValueAsBytes(request)
+        );
 
         // when // then
         mockMvc.perform(
-                post("/posts")
+                multipart("/posts")
+                    .file(requestPart)
                     .session(session)
-                    .content(objectMapper.writeValueAsString(request))
-                    .contentType(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
             )
             .andDo(print())
             .andExpect(status().isBadRequest())
@@ -103,15 +121,21 @@ class PostControllerTest extends ControllerTestSupport {
         PostCreateRequest request = PostCreateRequest.builder()
             .title("제목입니다.")
             .content("")
-            .images(List.of("image1.jpg", "image2.jpg"))
             .build();
+
+        MockMultipartFile requestPart = new MockMultipartFile(
+            "request",        // @RequestPart name
+            "",
+            "application/json",
+            objectMapper.writeValueAsBytes(request)
+        );
 
         // when // then
         mockMvc.perform(
-                post("/posts")
+                multipart("/posts")
+                    .file(requestPart)
                     .session(session)
-                    .content(objectMapper.writeValueAsString(request))
-                    .contentType(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
             )
             .andDo(print())
             .andExpect(status().isBadRequest())
