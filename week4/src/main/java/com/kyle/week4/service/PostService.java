@@ -132,6 +132,10 @@ public class PostService {
             throw new CustomException(PERMISSION_DENIED);
         }
 
+        if (post.isDeleted()) {
+            throw new CustomException(ALREADY_DELETED_POST);
+        }
+
         post.delete();
     }
 

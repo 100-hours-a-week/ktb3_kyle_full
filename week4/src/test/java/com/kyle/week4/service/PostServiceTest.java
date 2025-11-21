@@ -32,8 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
-import static com.kyle.week4.exception.ErrorCode.PERMISSION_DENIED;
-import static com.kyle.week4.exception.ErrorCode.POST_NOT_FOUND;
+import static com.kyle.week4.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -421,6 +420,20 @@ class PostServiceTest extends IntegrationTestSupport {
         assertThatThrownBy(() -> postService.deletePost(other.getId(), post.getId()))
             .isInstanceOf(CustomException.class)
             .hasFieldOrPropertyWithValue("errorCode", PERMISSION_DENIED);
+    }
+
+    @Test
+    @DisplayName("이미 삭제된 게시글은 삭제할 수 없다.")
+    void deletePost_whenAlreadyDeleted() {
+        // given
+        User user = userRepository.save(createUser());
+        Post post = postRepository.save(createPost("제목", user));
+        postService.deletePost(user.getId(), post.getId());
+
+        // when // then
+        assertThatThrownBy(() -> postService.deletePost(user.getId(), post.getId()))
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ALREADY_DELETED_POST);
     }
 
     private User createUser() {
