@@ -73,6 +73,7 @@ def coverageExclusions = [
         'com/kyle/week4/controller/docs',
         'com/kyle/week4/controller/request',
         'com/kyle/week4/controller/response',
+        'com/kyle/week4/controller/BaseResponse.class',
         'com/kyle/week4/controller/AuthController.class',
         'com/kyle/week4/repository/**/*Memory*.class',
         'com/kyle/week4/P6spySqlFormatter.class',

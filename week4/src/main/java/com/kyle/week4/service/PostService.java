@@ -42,22 +42,6 @@ public class PostService {
     private final CountCache postLikeCountCache;
     private final ImageUploader imageUploader;
 
-    @Deprecated
-    @Transactional
-    public PostDetailResponse createPost(Long userId, PostCreateRequest request) {
-        User user = findUserBy(userId);
-
-        Post post = request.toEntity(user);
-        Post savedPost = postRepository.save(post);
-        CommentCount commentCount = new CommentCount(savedPost, 0);
-        commentCountRepository.save(commentCount);
-
-        postViewCountCache.initCache(post.getId());
-        postLikeCountCache.initCache(post.getId());
-
-        return PostDetailResponse.of(savedPost, userId, 0, 0, List.of());
-    }
-
     @Transactional
     public PostDetailResponse createPostAndImage(Long userId, PostCreateRequest request, List<MultipartFile> images) {
         User user = findUserBy(userId);
@@ -135,11 +119,7 @@ public class PostService {
         int viewCount = postViewCountCache.count(post.getId());
         int commentCount = getCommentCount(postId);
 
-        List<PostImageResponse> postImageResponses = post.getPostImages().stream()
-            .map(postImage ->
-                PostImageResponse.of(postImage.getId(), postImage.getImagePath())
-            )
-            .toList();
+        List<PostImageResponse> postImageResponses = getPostImageResponses(post.getPostImages());
 
         return PostDetailResponse.of(post, userId, commentCount, viewCount, postImageResponses);
     }
@@ -194,29 +174,11 @@ public class PostService {
         );
     }
 
-    private List<PostImageResponse> getPostImageResponses(Long postId) {
-        List<PostImage> postImages = postImageRepository.findByPostId(postId);
+    private List<PostImageResponse> getPostImageResponses(List<PostImage> postImages) {
         return postImages.stream()
             .map(postImage ->
                 PostImageResponse.of(postImage.getId(), postImage.getImagePath())
             )
             .toList();
     }
-
-
-//    @Transactional
-//    public PostDetailResponse updatePostTest(Long userId, Long postId, PostUpdateRequest request) {
-//        Post post = findPostBy(postId);
-//
-//        if (post.isNotAuthor(userId)) {
-//            throw new CustomException(PERMISSION_DENIED);
-//        }
-//
-//        post.updatePost(request); // "Dirty Checking"
-//        postJpaRepository.updateTitle(postId, "UPDATE"); // "Bulk UPDATE"
-//
-//        int viewCount = postViewCountCache.count(post.getId());
-//
-//        return PostDetailResponse.of(post, userId, viewCount);
-//    }
 }

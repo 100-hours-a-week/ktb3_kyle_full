@@ -21,12 +21,16 @@ import com.kyle.week4.repository.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 
 import static com.kyle.week4.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,18 +77,55 @@ class CommentServiceTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("테이블 분리 후(벌크성 update 쿼리) - 댓글이 작성되면 게시글의 댓글수가 증가한다.")
-    void increaseCommentCount_whenCreateCommentPessimistic1() throws Exception {
+    @DisplayName("댓글을 작성한다.")
+    void createComment() {
         // given
-        User user = createUser();
-        User savedUser = userRepository.save(user);
+        User user = userRepository.save(createUser());
 
         PostCreateRequest postRequest = PostCreateRequest.builder()
             .title("제목1")
             .content("내용1")
-            .images(List.of("image1", "image2"))
             .build();
-        PostDetailResponse postResponse = postService.createPostAndImage(savedUser.getId(), postRequest, null);
+        PostDetailResponse post = postService.createPostAndImage(user.getId(), postRequest, null);
+
+        CommentCreateRequest request = new CommentCreateRequest("댓글");
+
+        // when
+        Long commentId = commentService.createComment(user.getId(), post.getId(), request);
+
+        // then
+        Comment findComment = commentRepository.findById(commentId).orElseThrow();
+        assertThat(findComment.getId()).isNotNull();
+        assertThat(findComment)
+            .extracting("id", "content")
+            .containsExactlyInAnyOrder(commentId, "댓글");
+    }
+
+    @Test
+    @DisplayName("댓글 작성 시 게시글이 존재하지 않으면 예외가 발생한다.")
+    void createComment_whenPostNotFound() {
+        // given
+        User user = userRepository.save(createUser());
+
+        CommentCreateRequest request = new CommentCreateRequest("댓글");
+
+        // when // then
+        assertThatThrownBy(() -> commentService.createComment(user.getId(), 1L, request))
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", POST_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("댓글이 작성된 횟수만큼 게시글의 댓글수가 증가한다.")
+    void increaseCommentCount_whenCreateCommentPessimistic() throws Exception {
+        // given
+        User user = userRepository.save(createUser());
+
+        PostCreateRequest postRequest = PostCreateRequest.builder()
+            .title("제목1")
+            .content("내용1")
+            .build();
+        PostDetailResponse postResponse = postService.createPostAndImage(user.getId(), postRequest, null);
 
         CommentCreateRequest request = new CommentCreateRequest("댓글");
 
@@ -111,14 +152,10 @@ class CommentServiceTest extends IntegrationTestSupport {
     @DisplayName("댓글을 수정한다.")
     void updateCommentTest() {
         // given
-        User user = createUser();
-        userRepository.save(user);
+        User user = userRepository.save(createUser());
+        Post post = postRepository.save(createPost(user, "제목"));
 
-        Post post = createPost(user, "제목");
-        postRepository.save(post);
-
-        Comment comment = createComment(user, post, "댓글");
-        commentRepository.save(comment);
+        Comment comment = commentRepository.save(createComment(user, post, "댓글"));
 
         CommentUpdateRequest request = new CommentUpdateRequest("수정된 댓글");
 
@@ -133,14 +170,10 @@ class CommentServiceTest extends IntegrationTestSupport {
     @DisplayName("댓글 수정 시 댓글이 존재하지 않으면 예외가 발생한다.")
     void updateComment_whenCommentNotFound() {
         // given
-        User user = createUser();
-        userRepository.save(user);
+        User user = userRepository.save(createUser());
+        Post post = postRepository.save(createPost(user, "제목"));
 
-        Post post = createPost(user, "제목");
-        postRepository.save(post);
-
-        Comment comment = createComment(user, post, "댓글");
-        commentRepository.save(comment);
+        Comment comment = commentRepository.save(createComment(user, post, "댓글"));
 
         CommentUpdateRequest request = new CommentUpdateRequest("수정된 댓글");
 
@@ -151,17 +184,13 @@ class CommentServiceTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("댓글 수정 시 게시글이 존재하지 않으면 예외가 발생한다.")
+    @DisplayName("게시글이 존재하지 않으면 댓글을 수정할 수 없다.")
     void updateComment_whenPostNotFound() {
         // given
-        User user = createUser();
-        userRepository.save(user);
+        User user = userRepository.save(createUser());
+        Post post = postRepository.save(createPost(user, "제목"));
 
-        Post post = createPost(user, "제목");
-        postRepository.save(post);
-
-        Comment comment = createComment(user, post, "댓글");
-        commentRepository.save(comment);
+        Comment comment = commentRepository.save(createComment(user, post, "댓글"));
 
         CommentUpdateRequest request = new CommentUpdateRequest("수정된 댓글");
 
@@ -172,31 +201,121 @@ class CommentServiceTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("댓글 수정 시 작성자가 아닌 경우 예외가 발생한다.")
+    @DisplayName("작성자가 아닌 경우 댓글을 수정할 수 없다.")
     void updateComment_whenUserNotAuthor() {
         // given
-        User user = createUser();
-        userRepository.save(user);
+        User author = userRepository.save(createUser("author@test.com", "author"));
+        User other = userRepository.save(createUser("other@test.com", "other"));
 
-        Post post = createPost(user, "제목");
-        postRepository.save(post);
+        Post post = postRepository.save(createPost(author, "제목"));
 
-        Comment comment = createComment(user, post, "댓글");
-        commentRepository.save(comment);
-
+        Comment comment = commentRepository.save(createComment(author, post, "댓글"));
         CommentUpdateRequest request = new CommentUpdateRequest("수정된 댓글");
 
         // when // then
-        assertThatThrownBy(() -> commentService.updateComment(10L, post.getId(), comment.getId(), request))
+        assertThatThrownBy(() -> commentService.updateComment(other.getId(), post.getId(), comment.getId(), request))
             .isInstanceOf(CustomException.class)
             .hasFieldOrPropertyWithValue("errorCode", PERMISSION_DENIED);
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 시 Soft Delete가 적용된다.")
+    void deleteComment() {
+        // given
+        User user = userRepository.save(createUser());
+        Post post = postRepository.save(createPost(user, "제목"));
+        Comment comment = commentRepository.save(createComment(user, post, "내용"));
+
+        // when
+        commentService.deleteComment(user.getId(), post.getId(), comment.getId());
+
+        // then
+        Comment deletedComment = commentRepository.findById(comment.getId()).orElseThrow();
+        assertThat(deletedComment.isDeleted()).isTrue();
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 시 게시글의 댓글수가 감소한다.")
+    void deleteComment_thenDecreaseCommentCount() {
+        // given
+        User user = userRepository.save(createUser());
+
+        PostCreateRequest postRequest = PostCreateRequest.builder()
+            .title("제목1")
+            .content("내용1")
+            .build();
+        PostDetailResponse post = postService.createPostAndImage(user.getId(), postRequest, null);
+
+        CommentCreateRequest request = new CommentCreateRequest("댓글");
+        Long commentId = commentService.createComment(user.getId(), post.getId(), request);
+        CommentCount beforeDelete = commentCountRepository.findById(commentId).orElseThrow();
+
+        // when
+        commentService.deleteComment(user.getId(), post.getId(), commentId);
+
+        // then
+        CommentCount afterDelete = commentCountRepository.findById(post.getId()).orElseThrow();
+        assertThat(beforeDelete.getCount()).isEqualTo(1);
+        assertThat(afterDelete.getCount()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("댓글 작성자가 아닐 경우 댓글을 삭제할 수 없다.")
+    void deleteComment_whenIsNotAuthor() {
+        // given
+        User author = userRepository.save(createUser("author@test.com", "author"));
+        User other = userRepository.save(createUser("other@test.com", "other"));
+
+        Post post = postRepository.save(createPost(author, "제목"));
+        Comment comment = commentRepository.save(createComment(author, post, "내용"));
+
+        // when // then
+        assertThatThrownBy(() -> commentService.deleteComment(other.getId(), post.getId(), comment.getId()))
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", PERMISSION_DENIED);
+    }
+
+    @ParameterizedTest(name = "[{0}] lastCommentId={1}, limit={2} → expected={3}")
+    @MethodSource("infiniteScrollArguments")
+    @DisplayName("댓글 무한 스크롤 동작 검증")
+    void infiniteScrollTest(String displayName, Long lastCommentId, int limit, List<Long> expectedIds) {
+        // given
+        User user = userRepository.save(createUser());
+        Post post = postRepository.save(createPost(user, "제목"));
+
+        for (int i = 1; i <= 5; i++) {
+            commentService.createComment(user.getId(), post.getId(), new CommentCreateRequest("댓글" + i));
+        }
+
+        // when
+        List<CommentResponse> responses = commentService.infiniteScroll(user.getId(), post.getId(), lastCommentId, limit);
+
+        // then
+        assertThat(responses)
+            .extracting(CommentResponse::getId)
+            .containsExactlyElementsOf(expectedIds);
+    }
+
+    private static Stream<Arguments> infiniteScrollArguments() {
+        return Stream.of(
+            Arguments.of("lastCommentId가 null이면 댓글을 작성된 순서로 조회한다.", null, 2, List.of(1L, 2L)),
+            Arguments.of("lastCommentId보다 큰 댓글부터 조회된다.", 2L, 2, List.of(3L, 4L)),
+            Arguments.of("limit이 남은 댓글보다 클 경우 모든 댓글을 조회한다.", 4L, 2, List.of(5L)),
+            Arguments.of("lastCommentId보다 큰 게시글이 없다면 빈 리스트를 반환한다.", 5L, 2, List.of())
+        );
     }
 
     private User createUser() {
         return User.builder()
             .email("test@test.com")
             .nickname("test")
-            .profileImage("image.jpg")
+            .build();
+    }
+
+    private User createUser(String email, String nickname) {
+        return User.builder()
+            .email(email)
+            .nickname(nickname)
             .build();
     }
 

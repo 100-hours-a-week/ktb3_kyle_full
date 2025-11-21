@@ -19,15 +19,7 @@ import java.util.List;
 public class PostController implements PostControllerDocs {
     private final PostService postService;
 
-    @PostMapping("/posts")
-    public BaseResponse<PostDetailResponse> createPost(
-      @SessionAttribute("userId") Long userId,
-      @Valid @RequestBody PostCreateRequest request
-    ) {
-        return BaseResponse.created(postService.createPost(userId, request));
-    }
-
-    @PostMapping(value = "/posts/image",  consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/posts",  consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public BaseResponse<PostDetailResponse> createPostAndImage(
             @SessionAttribute("userId") Long userId,
             @Valid @RequestPart(value = "request") PostCreateRequest request,

@@ -26,26 +26,6 @@ import static com.kyle.week4.exception.ErrorCode.*;
 public interface PostControllerDocs {
 
     @Operation(
-            summary = "게시글 생성",
-            description =
-                    """
-                              ### 게시글을 생성합니다.
-                              - 제목과 내용은 비어있으면 안됩니다.
-                              - 제목은 최대 26자 까지 작성 가능합니다.
-                            """
-    )
-    @ApiResponse(
-            responseCode = "201", description = "게시글 생성 성공",
-            content = @Content(schema = @Schema(implementation = PostDetailResponse.class))
-    )
-    @ApiErrorResponses({USER_NOT_FOUND})
-    BaseResponse<PostDetailResponse> createPost(
-            @Parameter(hidden = true)
-            Long userId,
-            PostCreateRequest request
-    );
-
-    @Operation(
             summary = "게시글 생성 - 이미지 업로드",
             description =
                     """
