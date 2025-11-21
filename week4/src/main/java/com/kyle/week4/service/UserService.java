@@ -88,6 +88,11 @@ public class UserService {
     @Transactional
     public void deleteUser(Long userId) {
         User user = findUserBy(userId);
+
+        if (user.isDeleted()) {
+            throw new CustomException(ALREADY_DELETED_USER);
+        }
+
         user.withdraw();
     }
 

@@ -271,6 +271,19 @@ class UserServiceTest extends IntegrationTestSupport {
         assertThat(findUser.isDeleted()).isTrue();
     }
 
+    @Test
+    @DisplayName("이미 탈되한 사용자는 탈퇴할 수 없다.")
+    void deleteUser_whenAlreadyDeleted() {
+        // given
+        User user = userRepository.save(createUser("test@test.com", "test1"));
+        userService.deleteUser(user.getId());
+
+        // when // then
+        assertThatThrownBy(() -> userService.deleteUser(user.getId()))
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ALREADY_DELETED_USER);
+    }
+
     private User createUser(String email, String nickname) {
         return User.builder()
             .email(email)
