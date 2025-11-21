@@ -64,6 +64,10 @@ class CommentServiceTest extends IntegrationTestSupport {
     @Autowired
     private CommentCountRepository commentCountRepository;
 
+    private static final Long UNKNOWN_USER_ID = Long.MAX_VALUE;
+    private static final Long UNKNOWN_POST_ID = Long.MAX_VALUE;
+    private static final Long UNKNOWN_COMMENT_ID = Long.MAX_VALUE;
+
     @AfterEach
     void tearDown() {
         commentCountRepository.deleteAllInBatch();
@@ -102,7 +106,7 @@ class CommentServiceTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("댓글 작성 시 게시글이 존재하지 않으면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 게시글에 댓글을 작성할 수 없다.")
     void createComment_whenPostNotFound() {
         // given
         User user = userRepository.save(createUser());
@@ -110,9 +114,24 @@ class CommentServiceTest extends IntegrationTestSupport {
         CommentCreateRequest request = new CommentCreateRequest("댓글");
 
         // when // then
-        assertThatThrownBy(() -> commentService.createComment(user.getId(), 1L, request))
+        assertThatThrownBy(() -> commentService.createComment(user.getId(), UNKNOWN_POST_ID, request))
             .isInstanceOf(CustomException.class)
             .hasFieldOrPropertyWithValue("errorCode", POST_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 사용자는 댓글을 작성할 수 없다.")
+    void createComment_whenUserNotFound() {
+        // given
+        User user = userRepository.save(createUser());
+        Post post = postRepository.save(createPost(user, "제목"));
+
+        CommentCreateRequest request = new CommentCreateRequest("댓글");
+
+        // when // then
+        assertThatThrownBy(() -> commentService.createComment(UNKNOWN_USER_ID, post.getId(), request))
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", USER_NOT_FOUND);
     }
 
     @Test
@@ -167,7 +186,7 @@ class CommentServiceTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("댓글 수정 시 댓글이 존재하지 않으면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 댓글을 수정할 수 없다.")
     void updateComment_whenCommentNotFound() {
         // given
         User user = userRepository.save(createUser());
@@ -178,13 +197,13 @@ class CommentServiceTest extends IntegrationTestSupport {
         CommentUpdateRequest request = new CommentUpdateRequest("수정된 댓글");
 
         // when // then
-        assertThatThrownBy(() -> commentService.updateComment(user.getId(), post.getId(), 10L, request))
+        assertThatThrownBy(() -> commentService.updateComment(user.getId(), post.getId(), UNKNOWN_COMMENT_ID, request))
             .isInstanceOf(CustomException.class)
             .hasFieldOrPropertyWithValue("errorCode", COMMENT_NOT_FOUND);
     }
 
     @Test
-    @DisplayName("게시글이 존재하지 않으면 댓글을 수정할 수 없다.")
+    @DisplayName("존재하지 않는 게시글의 댓글을 수정할 수 없다.")
     void updateComment_whenPostNotFound() {
         // given
         User user = userRepository.save(createUser());
@@ -195,7 +214,7 @@ class CommentServiceTest extends IntegrationTestSupport {
         CommentUpdateRequest request = new CommentUpdateRequest("수정된 댓글");
 
         // when // then
-        assertThatThrownBy(() -> commentService.updateComment(user.getId(), 10L, comment.getId(), request))
+        assertThatThrownBy(() -> commentService.updateComment(user.getId(), UNKNOWN_POST_ID, comment.getId(), request))
             .isInstanceOf(CustomException.class)
             .hasFieldOrPropertyWithValue("errorCode", POST_NOT_FOUND);
     }
@@ -273,6 +292,22 @@ class CommentServiceTest extends IntegrationTestSupport {
         assertThatThrownBy(() -> commentService.deleteComment(other.getId(), post.getId(), comment.getId()))
             .isInstanceOf(CustomException.class)
             .hasFieldOrPropertyWithValue("errorCode", PERMISSION_DENIED);
+    }
+
+    @Test
+    @DisplayName("이미 삭제된 댓글은 삭제할 수 없다.")
+    void deleteComment_whenAlreadyDeleted() {
+        // given
+        User user = userRepository.save(createUser());
+        Post post = postRepository.save(createPost(user, "제목"));
+        Comment comment = commentRepository.save(createComment(user, post, "내용"));
+
+        commentService.deleteComment(user.getId(), post.getId(), comment.getId());
+
+        // when // then
+        assertThatThrownBy(() -> commentService.deleteComment(user.getId(), post.getId(), comment.getId()))
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ALREADY_DELETED_COMMENT);
     }
 
     @ParameterizedTest(name = "[{0}] lastCommentId={1}, limit={2} → expected={3}")

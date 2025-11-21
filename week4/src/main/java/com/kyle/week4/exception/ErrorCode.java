@@ -7,6 +7,9 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
+    ALREADY_DELETED_COMMENT(400, HttpStatus.BAD_REQUEST, "이미 삭제된 댓글입니다."),
+    ALREADY_DELETED_POST(400, HttpStatus.BAD_REQUEST, "이미 삭제된 게시글입니다."),
+    ALREADY_DELETED_USER(400, HttpStatus.BAD_REQUEST, "이미 삭제된 사용자입니다."),
     INVALID_EMAIL(401, HttpStatus.UNAUTHORIZED, "이메일이 일치하지 않습니다."),
     INVALID_PASSWORD(401, HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
     FAILED_AUTHENTICATE(401, HttpStatus.UNAUTHORIZED, "인증이 만료되었거나, 인증에 실패했습니다."),

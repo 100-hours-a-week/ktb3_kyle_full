@@ -73,6 +73,10 @@ public class CommentService {
             throw new CustomException(PERMISSION_DENIED);
         }
 
+        if (comment.isDeleted()) {
+            throw new CustomException(ALREADY_DELETED_COMMENT);
+        }
+
         comment.delete();
         commentCountRepository.decrease(postId);
     }
