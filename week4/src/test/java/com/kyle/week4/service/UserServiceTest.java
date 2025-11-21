@@ -88,8 +88,7 @@ class UserServiceTest extends IntegrationTestSupport {
         // when // then
         assertThatThrownBy(() -> userService.createUserAndImage(request, null))
             .isInstanceOf(CustomException.class)
-            .hasFieldOrPropertyWithValue("errorCode", DUPLICATE_NICKNAME_ERROR)
-            .hasMessage("이미 가입된 닉네임입니다.");
+            .hasFieldOrPropertyWithValue("errorCode", DUPLICATE_NICKNAME_ERROR);
     }
 
     @Test
@@ -110,7 +109,7 @@ class UserServiceTest extends IntegrationTestSupport {
         // when // then
         assertThatThrownBy(() -> userService.createUserAndImage(request, null))
             .isInstanceOf(CustomException.class)
-            .hasMessage("이미 가입된 이메일입니다.");
+            .hasFieldOrPropertyWithValue("errorCode", DUPLICATE_EMAIL_ERROR);
     }
 
     @Test

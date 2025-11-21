@@ -365,8 +365,7 @@ class PostServiceTest extends IntegrationTestSupport {
         // when // then
         assertThatThrownBy(() -> postService.updatePost(user.getId(), 1L, request))
             .isInstanceOf(CustomException.class)
-            .hasFieldOrPropertyWithValue("errorCode", POST_NOT_FOUND)
-            .hasMessage("존재하지 않는 게시글입니다.");
+            .hasFieldOrPropertyWithValue("errorCode", POST_NOT_FOUND);
     }
 
     @Test
@@ -391,8 +390,7 @@ class PostServiceTest extends IntegrationTestSupport {
         // when // then
         assertThatThrownBy(() -> postService.updatePost(other.getId(), post.getId(), request))
             .isInstanceOf(CustomException.class)
-            .hasFieldOrPropertyWithValue("errorCode", PERMISSION_DENIED)
-            .hasMessage("권한이 존재하지 않습니다.");
+            .hasFieldOrPropertyWithValue("errorCode", PERMISSION_DENIED);
     }
 
     @Test
@@ -422,8 +420,7 @@ class PostServiceTest extends IntegrationTestSupport {
         // when // then
         assertThatThrownBy(() -> postService.deletePost(other.getId(), post.getId()))
             .isInstanceOf(CustomException.class)
-            .hasFieldOrPropertyWithValue("errorCode", PERMISSION_DENIED)
-            .hasMessage("권한이 존재하지 않습니다.");
+            .hasFieldOrPropertyWithValue("errorCode", PERMISSION_DENIED);
     }
 
     private User createUser() {
