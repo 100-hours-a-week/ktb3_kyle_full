@@ -6,6 +6,29 @@ Java 21/Spring Boot 기반의 커뮤니티 백엔드입니다.
 게시글∙댓글∙좋아요∙사용자 관리 기능을 중심으로, 세션 인증과 CSRF 방어를 갖춘 REST API와 전용 캐시 계층, 
 이미지 업로드(GCS) 및 Redis 기반의 집계 성능 최적화를 제공합니다.
 
+## 기술 스택
+### 언어
+![Java](https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=openjdk&logoColor=white)
+
+### 프레임워크
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Data%20JPA-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
+![Hibernate](https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge&logo=hibernate&logoColor=white)
+
+### 데이터베이스
+![MySQL 8](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
+
+### 빌드
+![Gradle 8](https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white)
+
+### 테스트
+![JUNIT 5](https://img.shields.io/badge/Junit5-25A162?style=for-the-badge&logo=junit5&logoColor=white)
+
+### 인프라
+![Google Cloud Storage](https://img.shields.io/badge/Google%20Cloud%20Storage-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)
+
 ## 주요 기능
 
 - **사용자**: 회원가입/프로필 조회 및 수정/비밀번호 변경/회원탈퇴, 이메일∙닉네임 중복 확인, 프로필 이미지 업로드.
@@ -104,5 +127,26 @@ curl -X POST http://localhost:8080/posts \
 - **세션/CSRF 문제**: 로그인 전에 `/csrf` 를 호출해 `XSRF-TOKEN` 쿠키를 확보한 뒤, 이후 요청 헤더(`X-XSRF-TOKEN`)에 전달해야 합니다.
 - **응답 규격**: 모든 응답 실패는 `CustomException` + `GlobalExceptionHandler` 를 통해 예외에 대한 메시지와 상태 코드를 반환합니다.
 
-## Troubleshooting
+## 기능 시연 영상
+### 회원가입/로그인
 
+https://github.com/user-attachments/assets/6af348c8-88ef-463f-9466-05db61f28d67
+
+### 회원 정보 수정/비밀번호 수정/로그아웃
+
+https://github.com/user-attachments/assets/605ed585-3fdb-4582-b07d-973a4f55deac
+
+
+### 게시글 목록 및 상세 정보 조회
+
+https://github.com/user-attachments/assets/e411d17e-0057-444f-ab67-b162b1d43791
+
+### 게시글 생성/수정
+
+https://github.com/user-attachments/assets/d289b105-83f0-4765-8645-44c1cef75cd8
+
+### 게시글 댓글 생성/수정/삭제
+
+https://github.com/user-attachments/assets/1e0c7140-9e3f-4db0-b16d-a6eb5cc0bb00
+
+## Troubleshooting
