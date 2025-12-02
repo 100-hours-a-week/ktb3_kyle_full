@@ -68,8 +68,8 @@ public class UserService {
         User user = findUserBy(userId);
 
         if (image != null) {
-            imageUploader.delete(user.getProfileImage());
             String imagePath = imageUploader.upload(image);
+            imageUploader.delete(user.getProfileImage());
             user.changeImage(imagePath);
         }
         user.updateUserProfile(request);

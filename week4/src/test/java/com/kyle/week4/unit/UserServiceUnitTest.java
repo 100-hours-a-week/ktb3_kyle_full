@@ -165,7 +165,7 @@ public class UserServiceUnitTest {
         given(userRepository.existsByNickname(request.getNickname()))
             .willReturn(false);
         given(userRepository.findById(1L))
-            .willThrow(new CustomException(USER_NOT_FOUND));
+            .willReturn(Optional.empty());
 
         // when // then
         assertThatThrownBy(() -> userService.updateUserProfileAndImage(1L, request, null))
@@ -217,7 +217,7 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    @DisplayName("프로필 이미지를 변경하면 이전 이미지가 삭제되고, 새로운 이미지를 업로드한다.")
+    @DisplayName("프로필 이미지를 변경하면 새로운 이미지를 업로드하고, 이전 이미지를 삭제한다.")
     void updateUser_whenImageChange() {
         // given
         MultipartFile mockImage = mock(MultipartFile.class);
@@ -240,8 +240,8 @@ public class UserServiceUnitTest {
         assertThat(response.getProfileImage()).isEqualTo("change.jpg");
 
         InOrder inOrder = inOrder(imageUploader);
-        then(imageUploader).should(inOrder).delete(beforeProfileImage);
         then(imageUploader).should(inOrder).upload(mockImage);
+        then(imageUploader).should(inOrder).delete(beforeProfileImage);
     }
 
     @Test
@@ -251,6 +251,7 @@ public class UserServiceUnitTest {
         MultipartFile mockImage = mock(MultipartFile.class);
         UserProfileUpdateRequest request = UserRequestFixture.update("update");
         User user = UserFixture.defaultUser();
+        String beforeProfileImage = user.getProfileImage();
 
         given(userRepository.existsByNickname(request.getNickname()))
             .willReturn(false);
@@ -264,8 +265,10 @@ public class UserServiceUnitTest {
             .isInstanceOf(CustomException.class)
             .hasFieldOrPropertyWithValue("errorCode", GCS_IMAGE_UPLOAD_ERROR);
 
-        then(imageUploader).should().delete(user.getProfileImage());
+        assertThat(user.getProfileImage()).isEqualTo(beforeProfileImage);
+
         then(imageUploader).should().upload(mockImage);
+        then(imageUploader).should(never()).delete(user.getProfileImage());
     }
 
     @Test
