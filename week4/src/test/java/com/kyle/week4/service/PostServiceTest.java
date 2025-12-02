@@ -172,7 +172,6 @@ class PostServiceTest extends IntegrationTestSupport {
             PostCreateRequest request = PostCreateRequest.builder()
                 .title("제목 " + i)
                 .content("내용" + i)
-                .images(List.of("image1", "image2"))
                 .build();
             postService.createPostAndImage(user.getId(), request, null);
         }

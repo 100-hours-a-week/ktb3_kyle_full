@@ -24,14 +24,10 @@ public class PostCreateRequest {
     @Schema(description = "내용", example = "내용입니다.")
     private String content;
 
-    @Schema(description = "업로드 한 이미지 경로", example = "[\"image1.jpg\", \"image2.jpg\"]")
-    private List<String> images;
-
     @Builder
-    public PostCreateRequest(String title, String content, List<String> images) {
+    public PostCreateRequest(String title, String content) {
         this.title = title;
         this.content = content;
-        this.images = images;
     }
 
     public Post toEntity(User user) {
