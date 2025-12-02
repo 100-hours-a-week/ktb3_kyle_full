@@ -143,7 +143,7 @@ public class UserServiceUnitTest {
         UserProfileUpdateRequest request = UserRequestFixture.update("update");
         User user = UserFixture.defaultUser();
 
-        given(userRepository.existsByNickname(anyString()))
+        given(userRepository.existsByNickname(request.getNickname()))
             .willReturn(false);
         given(userRepository.findById(anyLong()))
             .willReturn(Optional.of(user));
@@ -161,7 +161,7 @@ public class UserServiceUnitTest {
         // given
         UserProfileUpdateRequest request = UserRequestFixture.update("update");
 
-        given(userRepository.existsByNickname(anyString()))
+        given(userRepository.existsByNickname(request.getNickname()))
             .willReturn(false);
         given(userRepository.findById(anyLong()))
             .willThrow(new CustomException(USER_NOT_FOUND));
@@ -181,7 +181,7 @@ public class UserServiceUnitTest {
         UserProfileUpdateRequest request = UserRequestFixture.update("update");
         User user = UserFixture.defaultUser();
 
-        given(userRepository.existsByNickname(anyString()))
+        given(userRepository.existsByNickname(request.getNickname()))
             .willReturn(true);
 
         // when // then
@@ -201,7 +201,7 @@ public class UserServiceUnitTest {
         User user = UserFixture.defaultUser();
         String beforeProfileImage = user.getProfileImage();
 
-        given(userRepository.existsByNickname(anyString()))
+        given(userRepository.existsByNickname(request.getNickname()))
             .willReturn(false);
         given(userRepository.findById(anyLong()))
             .willReturn(Optional.of(user));
@@ -224,7 +224,7 @@ public class UserServiceUnitTest {
         User user = UserFixture.defaultUser();
         String beforeProfileImage = user.getProfileImage();
 
-        given(userRepository.existsByNickname(anyString()))
+        given(userRepository.existsByNickname(request.getNickname()))
             .willReturn(false);
         given(userRepository.findById(anyLong()))
             .willReturn(Optional.of(user));
@@ -251,7 +251,7 @@ public class UserServiceUnitTest {
         UserProfileUpdateRequest request = UserRequestFixture.update("update");
         User user = UserFixture.defaultUser();
 
-        given(userRepository.existsByNickname(anyString()))
+        given(userRepository.existsByNickname(request.getNickname()))
             .willReturn(false);
         given(userRepository.findById(anyLong()))
             .willReturn(Optional.of(user));
