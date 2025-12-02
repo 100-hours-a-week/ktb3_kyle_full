@@ -18,6 +18,10 @@ public class UserProfileUpdateRequest {
     @Schema(description = "사용자 프로필 이미지 경로", defaultValue = "update.jpg")
     private String profileImage;
 
+    public UserProfileUpdateRequest(String nickname) {
+        this.nickname = nickname;
+    }
+
     public UserProfileUpdateRequest(String nickname, String profileImage) {
         this.nickname = nickname;
         this.profileImage = profileImage;

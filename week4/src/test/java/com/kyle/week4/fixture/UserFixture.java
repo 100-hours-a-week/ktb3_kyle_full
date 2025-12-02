@@ -7,6 +7,7 @@ public class UserFixture {
         return User.builder()
             .email("test@test.com")
             .nickname("test")
+            .profileImage("profile.jpg")
             .build();
     }
 

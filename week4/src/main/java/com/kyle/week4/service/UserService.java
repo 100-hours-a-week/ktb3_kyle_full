@@ -61,11 +61,11 @@ public class UserService {
     @Transactional
     @CustomCacheEvict(cacheName = "UserProfile", key = "#userId")
     public UserProfileResponse updateUserProfileAndImage(Long userId, UserProfileUpdateRequest request, MultipartFile image) {
-        User user = findUserBy(userId);
-
         if (userRepository.existsByNickname(request.getNickname())) {
             throw new CustomException(DUPLICATE_NICKNAME_ERROR);
         }
+
+        User user = findUserBy(userId);
 
         if (image != null) {
             imageUploader.delete(user.getProfileImage());
