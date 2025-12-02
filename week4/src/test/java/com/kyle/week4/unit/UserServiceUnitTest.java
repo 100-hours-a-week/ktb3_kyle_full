@@ -1,5 +1,6 @@
 package com.kyle.week4.unit;
 
+import com.kyle.week4.controller.request.PasswordUpdateRequest;
 import com.kyle.week4.controller.request.UserCreateRequest;
 import com.kyle.week4.controller.request.UserProfileUpdateRequest;
 import com.kyle.week4.controller.response.UserProfileResponse;
@@ -145,7 +146,7 @@ public class UserServiceUnitTest {
 
         given(userRepository.existsByNickname(request.getNickname()))
             .willReturn(false);
-        given(userRepository.findById(anyLong()))
+        given(userRepository.findById(1L))
             .willReturn(Optional.of(user));
 
         // when
@@ -163,7 +164,7 @@ public class UserServiceUnitTest {
 
         given(userRepository.existsByNickname(request.getNickname()))
             .willReturn(false);
-        given(userRepository.findById(anyLong()))
+        given(userRepository.findById(1L))
             .willThrow(new CustomException(USER_NOT_FOUND));
 
         // when // then
@@ -171,7 +172,7 @@ public class UserServiceUnitTest {
             .isInstanceOf(CustomException.class)
             .hasFieldOrPropertyWithValue("errorCode", USER_NOT_FOUND);
 
-        then(userRepository).should().findById(anyLong());
+        then(userRepository).should().findById(1L);
     }
 
     @Test
@@ -190,7 +191,7 @@ public class UserServiceUnitTest {
             .hasFieldOrPropertyWithValue("errorCode", DUPLICATE_NICKNAME_ERROR);
 
         then(userRepository).should().existsByNickname(request.getNickname());
-        then(userRepository).should(never()).findById(anyLong());
+        then(userRepository).should(never()).findById(1L);
     }
 
     @Test
@@ -203,7 +204,7 @@ public class UserServiceUnitTest {
 
         given(userRepository.existsByNickname(request.getNickname()))
             .willReturn(false);
-        given(userRepository.findById(anyLong()))
+        given(userRepository.findById(1L))
             .willReturn(Optional.of(user));
 
         // when
@@ -226,7 +227,7 @@ public class UserServiceUnitTest {
 
         given(userRepository.existsByNickname(request.getNickname()))
             .willReturn(false);
-        given(userRepository.findById(anyLong()))
+        given(userRepository.findById(1L))
             .willReturn(Optional.of(user));
         given(imageUploader.upload(mockImage))
             .willReturn("change.jpg");
@@ -253,7 +254,7 @@ public class UserServiceUnitTest {
 
         given(userRepository.existsByNickname(request.getNickname()))
             .willReturn(false);
-        given(userRepository.findById(anyLong()))
+        given(userRepository.findById(1L))
             .willReturn(Optional.of(user));
         given(imageUploader.upload(mockImage))
             .willThrow(new CustomException(GCS_IMAGE_UPLOAD_ERROR));
@@ -265,5 +266,52 @@ public class UserServiceUnitTest {
 
         then(imageUploader).should().delete(user.getProfileImage());
         then(imageUploader).should().upload(mockImage);
+    }
+
+    @Test
+    @DisplayName("비밀번호를 변경한다.")
+    void updatePassword() {
+        // given
+        PasswordUpdateRequest request = UserRequestFixture.passwordUpdate("Qwer1234!");
+        User user = UserFixture.defaultUser();
+        String beforePassword = user.getPassword();
+        String encodedPassword = "encodedPassword";
+
+        given(userRepository.findById(1L))
+            .willReturn(Optional.of(user));
+        given(passwordEncoder.matches(request.getPassword(), beforePassword))
+            .willReturn(false);
+        given(passwordEncoder.encode(request.getPassword()))
+            .willReturn(encodedPassword);
+
+        // when
+        userService.updatePassword(1L, request);
+
+        // then
+        assertThat(user.getPassword()).isEqualTo(encodedPassword);
+
+        then(passwordEncoder).should().matches(request.getPassword(), beforePassword);
+        then(passwordEncoder).should().encode(request.getPassword());
+    }
+    
+    @Test
+    @DisplayName("비밀번호 변경 시 이전 비밀번호와 같으면 변경할 수 없다.")
+    void updatePassword_sameBefore() {
+        // given
+        User user = UserFixture.defaultUser();
+        PasswordUpdateRequest request = UserRequestFixture.passwordUpdate(user.getPassword());
+
+        given(userRepository.findById(1L))
+            .willReturn(Optional.of(user));
+        given(passwordEncoder.matches(request.getPassword(), user.getPassword()))
+            .willReturn(true);
+
+        // when // then
+        assertThatThrownBy(() -> userService.updatePassword(1L, request))
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", PASSWORD_SAME_BEFORE_ERROR);
+
+        then(passwordEncoder).should().matches(request.getPassword(), user.getPassword());
+        then(passwordEncoder).should(never()).encode(request.getPassword());
     }
 }

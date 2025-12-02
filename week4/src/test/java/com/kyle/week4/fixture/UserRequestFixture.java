@@ -1,5 +1,6 @@
 package com.kyle.week4.fixture;
 
+import com.kyle.week4.controller.request.PasswordUpdateRequest;
 import com.kyle.week4.controller.request.UserCreateRequest;
 import com.kyle.week4.controller.request.UserProfileUpdateRequest;
 
@@ -19,5 +20,9 @@ public class UserRequestFixture {
 
     public static UserProfileUpdateRequest update(String nickname) {
         return new UserProfileUpdateRequest(nickname);
+    }
+
+    public static PasswordUpdateRequest passwordUpdate(String newPassword) {
+        return new PasswordUpdateRequest(newPassword);
     }
 }
