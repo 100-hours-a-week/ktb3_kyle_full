@@ -1,4 +1,4 @@
-package com.kyle.week4.fixture;
+package com.kyle.week4.fixture.user;
 
 import com.kyle.week4.entity.User;
 
