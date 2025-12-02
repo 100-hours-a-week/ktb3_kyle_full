@@ -11,6 +11,12 @@ public class UserFixture {
             .build();
     }
 
+    public static User deletedUser() {
+        User user = UserFixture.defaultUser();
+        user.withdraw();
+        return user;
+    }
+
     public static User withEmailAndNickname(String email, String nickname) {
         return User.builder()
             .email(email)

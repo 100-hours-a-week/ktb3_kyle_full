@@ -293,7 +293,7 @@ public class UserServiceUnitTest {
         then(passwordEncoder).should().matches(request.getPassword(), beforePassword);
         then(passwordEncoder).should().encode(request.getPassword());
     }
-    
+
     @Test
     @DisplayName("비밀번호 변경 시 이전 비밀번호와 같으면 변경할 수 없다.")
     void updatePassword_sameBefore() {
@@ -313,5 +313,36 @@ public class UserServiceUnitTest {
 
         then(passwordEncoder).should().matches(request.getPassword(), user.getPassword());
         then(passwordEncoder).should(never()).encode(request.getPassword());
+    }
+
+    @Test
+    @DisplayName("사용자 탈퇴 시 soft delete를 적용한다.")
+    void deleteUser() {
+        // given
+        User user = UserFixture.defaultUser();
+
+        given(userRepository.findById(1L))
+            .willReturn(Optional.of(user));
+
+        // when
+        userService.deleteUser(1L);
+
+        // then
+        assertThat(user.isDeleted()).isTrue();
+    }
+
+    @Test
+    @DisplayName("이미 탈퇴한 사용자는 다시 탈퇴할 수 없다.")
+    void deleteUser_isAlreadyDeleted() {
+        // given
+        User user = UserFixture.deletedUser();
+
+        given(userRepository.findById(1L))
+            .willReturn(Optional.of(user));
+
+        // when // then
+        assertThatThrownBy(() -> userService.deleteUser(1L))
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode",ALREADY_DELETED_USER);
     }
 }
