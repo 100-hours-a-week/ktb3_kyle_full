@@ -24,7 +24,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
@@ -357,4 +356,51 @@ public class PostServiceUnitTest {
         then(postViewCountCache).should(never()).increase(anyLong());
     }
 
+    @Test
+    @DisplayName("게시글을 삭제하면 soft delete를 적용한다.")
+    void deletePost() {
+        // given
+        User author = UserFixture.savedUser(1L);
+        Post post = PostFixture.savedWithUser(1L, author);
+
+        given(postRepository.findById(1L)).willReturn(Optional.of(post));
+
+        // when
+        postService.deletePost(1L, 1L);
+
+        // then
+        assertThat(post.isDeleted()).isTrue();
+    }
+
+    @Test
+    @DisplayName("작성자가 아닐 경우 게시글을 삭제할 수 없다.")
+    void deletePost_isNotAuthor() {
+        // given
+        User author = UserFixture.savedUser(1L);
+        User other = UserFixture.savedUser(2L);
+        Post post = PostFixture.savedWithUser(1L, author);
+
+        given(postRepository.findById(1L)).willReturn(Optional.of(post));
+
+        // when // then
+        assertThatThrownBy(() -> postService.deletePost(other.getId(), 1L))
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", PERMISSION_DENIED);
+    }
+
+    @Test
+    @DisplayName("이미 삭제된 게시글을 다시 삭제할 수 없다.")
+    void deletePost_alreadyDeleted() {
+        // given
+        User author = UserFixture.savedUser(1L);
+        Post post = PostFixture.savedWithUser(1L, author);
+        post.delete();
+
+        given(postRepository.findById(1L)).willReturn(Optional.of(post));
+
+        // when // then
+        assertThatThrownBy(() -> postService.deletePost(1L, 1L))
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ALREADY_DELETED_POST);
+    }
 }
