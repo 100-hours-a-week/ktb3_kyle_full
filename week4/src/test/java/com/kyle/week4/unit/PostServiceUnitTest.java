@@ -2,7 +2,7 @@ package com.kyle.week4.unit;
 
 import com.kyle.week4.cache.CountCache;
 import com.kyle.week4.controller.request.PostCreateRequest;
-import com.kyle.week4.controller.response.PostDetailResponse;
+import com.kyle.week4.controller.response.PostResponse;
 import com.kyle.week4.entity.CommentCount;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
@@ -25,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,7 +75,7 @@ public class PostServiceUnitTest {
 
 
         // when
-        PostDetailResponse response = postService.createPostAndImage(1L, request, null);
+        postService.createPostAndImage(1L, request, null);
 
         // then
         then(imageUploader).should(never()).uploadImages(anyList());
@@ -108,7 +109,7 @@ public class PostServiceUnitTest {
         given(commentCountRepository.save(any(CommentCount.class))).willAnswer(inv -> inv.getArgument(0));
 
         // when
-        PostDetailResponse response = postService.createPostAndImage(1L, request, images);
+        postService.createPostAndImage(1L, request, images);
 
         // then
         then(imageUploader).should().uploadImages(images);
@@ -142,7 +143,7 @@ public class PostServiceUnitTest {
         given(commentCountRepository.save(any(CommentCount.class))).willAnswer(inv -> inv.getArgument(0));
 
         // when
-        PostDetailResponse response = postService.createPostAndImage(1L, request, List.of());
+        postService.createPostAndImage(1L, request, List.of());
 
         // then
         then(commentCountRepository).should().save(captor.capture());
@@ -202,5 +203,46 @@ public class PostServiceUnitTest {
         then(postImageRepository).should(never()).saveAll(anyList());
         then(postLikeCountCache).should(never()).initCache(anyLong());
         then(postViewCountCache).should(never()).initCache(anyLong());
+    }
+
+    @Test
+    @DisplayName("게시글 목록 조회 시 lastPostId가 null이면 최신글 조회 쿼리가 수행된다.")
+    void infiniteScroll_whenLastPostIdIsNull() {
+        // given
+
+        // when
+        postService.infiniteScroll(null, 10);
+
+        // then
+        then(postRepository).should().findAllInfiniteScroll(10);
+
+        then(postRepository).should(never()).findAllInfiniteScroll(anyLong(), anyInt());
+    }
+
+    @Test
+    @DisplayName("게시글 목록 조회 시 lastPostId가 null이 아니면 lastPostId를 기준으로 조회 쿼리가 수행된다.")
+    void infiniteScroll_whenLastPostIdIsExists() {
+        // given
+
+        // when
+        postService.infiniteScroll(1L, 10);
+
+        // then
+        then(postRepository).should().findAllInfiniteScroll(1L, 10);
+
+        then(postRepository).should(never()).findAllInfiniteScroll(anyInt());
+    }
+
+    @Test
+    @DisplayName("더 이상 조회할 게시글이 없다면 빈 리스트를 반환한다.")
+    void infiniteScroll_whenNoPosts() {
+        // given
+        given(postRepository.findAllInfiniteScroll(anyLong(), anyInt())).willReturn(Collections.emptyList());
+
+        // when
+        List<PostResponse> responses = postService.infiniteScroll(1L, 10);
+
+        // then
+        assertThat(responses).isEmpty();
     }
 }
