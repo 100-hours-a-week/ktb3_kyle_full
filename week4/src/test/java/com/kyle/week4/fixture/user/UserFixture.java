@@ -17,6 +17,12 @@ public class UserFixture {
         return user;
     }
 
+    public static User savedUser(Long id) {
+        User user = UserFixture.defaultUser();
+        user.assignId(id);
+        return user;
+    }
+
     public static User withEmailAndNickname(String email, String nickname) {
         return User.builder()
             .email(email)
