@@ -2,11 +2,14 @@ package com.kyle.week4.unit;
 
 import com.kyle.week4.cache.CountCache;
 import com.kyle.week4.controller.request.PostCreateRequest;
+import com.kyle.week4.controller.response.PostDetailResponse;
 import com.kyle.week4.controller.response.PostResponse;
 import com.kyle.week4.entity.CommentCount;
 import com.kyle.week4.entity.Post;
 import com.kyle.week4.entity.User;
 import com.kyle.week4.exception.CustomException;
+import com.kyle.week4.fixture.post.CommentCountFixture;
+import com.kyle.week4.fixture.post.PostFixture;
 import com.kyle.week4.fixture.post.PostRequestFixture;
 import com.kyle.week4.fixture.user.UserFixture;
 import com.kyle.week4.repository.comment.CommentRepository;
@@ -16,6 +19,7 @@ import com.kyle.week4.repository.post.PostRepository;
 import com.kyle.week4.repository.user.UserRepository;
 import com.kyle.week4.service.PostService;
 import com.kyle.week4.utils.ImageUploader;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,8 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static com.kyle.week4.exception.ErrorCode.GCS_IMAGE_UPLOAD_ERROR;
-import static com.kyle.week4.exception.ErrorCode.USER_NOT_FOUND;
+import static com.kyle.week4.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.*;
@@ -53,8 +56,14 @@ public class PostServiceUnitTest {
     private CountCache postLikeCountCache;
     @Mock
     private ImageUploader imageUploader;
-    @InjectMocks
+    //@InjectMocks
     private PostService postService;
+
+    @BeforeEach
+    void setUp() {
+        postService = new PostService(postRepository, userRepository, commentRepository,
+            commentCountRepository, postImageRepository, postViewCountCache, postLikeCountCache, imageUploader);
+    }
 
     @Test
     @DisplayName("게시글을 작성한다. 업로드할 이미지가 없으면 PostImage는 생성되지 않는다.")
@@ -150,7 +159,7 @@ public class PostServiceUnitTest {
         CommentCount savedCommentCount = captor.getValue();
 
         assertThat(savedCommentCount.getCount()).isEqualTo(0);
-        assertThat(savedCommentCount.getPostId()).isEqualTo(1L);
+        assertThat(savedCommentCount.getPost().getId()).isEqualTo(1L);
     }
 
     @Test
@@ -245,4 +254,107 @@ public class PostServiceUnitTest {
         // then
         assertThat(responses).isEmpty();
     }
+
+    @Test
+    @DisplayName("존재하는 게시글 ID로 조회하면 게시글 상세 정보를 반환한다.")
+    void getPostDetail_success() {
+        // given
+        User user = UserFixture.savedUser(1L);
+        Post post = PostFixture.savedWithUser(1L, user);
+
+        given(postRepository.findWithUserAndPostImagesById(1L)).willReturn(Optional.of(post));
+        given(postViewCountCache.increase(1L)).willReturn(5);
+        given(commentCountRepository.findById(1L))
+            .willReturn(Optional.of(CommentCountFixture.withPost(post, 0)));
+
+        // when
+        PostDetailResponse response = postService.getPostDetail(1L, 1L);
+
+        // then
+        assertThat(response.getId()).isEqualTo(1L);
+        assertThat(response.getTitle()).isEqualTo(post.getTitle());
+        assertThat(response.getContent()).isEqualTo(post.getContent());
+    }
+
+    @Test
+    @DisplayName("게시글 조회 시 댓글 수를 함께 반환한다.")
+    void getPostDetail_withCommentCount() {
+        // given
+        int expectedCommentCount = 10;
+        User user = UserFixture.savedUser(1L);
+        Post post = PostFixture.savedWithUser(1L, user);
+        CommentCount commentCount = CommentCountFixture.withPost(post, expectedCommentCount);
+
+        given(postRepository.findWithUserAndPostImagesById(1L))
+            .willReturn(Optional.of(post));
+        given(postViewCountCache.increase(1L)).willReturn(5);
+        given(commentCountRepository.findById(1L))
+            .willReturn(Optional.of(commentCount));
+
+        // when
+        PostDetailResponse response = postService.getPostDetail(1L, 1L);
+
+        // then
+        assertThat(response.getCommentCount()).isEqualTo(expectedCommentCount);
+    }
+
+    @Test
+    @DisplayName("게시글 조회 시 업로드 한 이미지가 없는 경우 비어있는 PostImage 리스트가 반환된다.")
+    void getPostDetail_whenEmptyPostImage() {
+        // given
+        User user = UserFixture.savedUser(1L);
+        Post post = PostFixture.savedWithUser(1L, user);
+        CommentCount commentCount = CommentCountFixture.withPost(post, 0);
+
+        given(postRepository.findWithUserAndPostImagesById(1L)).willReturn(Optional.of(post));
+        given(commentCountRepository.findById(1L)).willReturn(Optional.of(commentCount));
+
+        // when
+        PostDetailResponse response = postService.getPostDetail(1L, 1L);
+
+        // then
+        assertThat(response.getImagePaths()).isEmpty();
+
+        then(postRepository).should().findWithUserAndPostImagesById(1L);
+    }
+
+    @Test
+    @DisplayName("게시글 조회 시 업로드 한 이미지 수만큼 PostImage가 포함된 리스트가 반환된다.")
+    void getPostDetail_whenExistsPostImage() {
+        // given
+        User user = UserFixture.savedUser(1L);
+        Post post = PostFixture.savedWithImages(1L, user, 2);
+        CommentCount commentCount = CommentCountFixture.withPost(post, 0);
+
+        given(postRepository.findWithUserAndPostImagesById(1L)).willReturn(Optional.of(post));
+        given(commentCountRepository.findById(1L)).willReturn(Optional.of(commentCount));
+
+        // when
+        PostDetailResponse response = postService.getPostDetail(1L, 1L);
+
+        // then
+        assertThat(response.getImagePaths()).hasSize(2);
+        assertThat(response.getImagePaths())
+            .extracting("postImagePath")
+            .containsExactly("image1", "image2");
+
+        then(postRepository).should().findWithUserAndPostImagesById(1L);
+    }
+
+    @Test
+    @DisplayName("게시글이 존재하지 않으면 게시글을 조회할 수 없다.")
+    void getPostDetail_whenPostNotFound() {
+        // given
+        given(postRepository.findWithUserAndPostImagesById(anyLong())).willReturn(Optional.empty());
+
+        // when // then
+        assertThatThrownBy(() -> postService.getPostDetail(1L, 1L))
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", POST_NOT_FOUND);
+
+        then(postRepository).should().findWithUserAndPostImagesById(anyLong());
+
+        then(postViewCountCache).should(never()).increase(anyLong());
+    }
+
 }
