@@ -27,6 +27,7 @@ public class GCSImageUploader implements ImageUploader {
 
     @Override
     public void delete(String path) {
+        if (path == null) return;
         storage.delete(BlobId.of(bucket, path));
     }
 
@@ -48,18 +49,9 @@ public class GCSImageUploader implements ImageUploader {
     @Override
     public List<String> uploadImages(List<MultipartFile> images) {
         List<String> result = new ArrayList<>();
-        System.out.println("GCS IMAGE UPLOADER");
         for (MultipartFile image : images) {
-            try {
-                String uuid = UUID.randomUUID().toString();
-                BlobInfo blobInfo = BlobInfo.newBuilder(bucket, uuid)
-                    .setContentType(image.getContentType())
-                    .build();
-                storage.create(blobInfo, image.getBytes());
-                result.add(uuid);
-            } catch (IOException e) {
-                throw new CustomException(ErrorCode.GCS_IMAGE_UPLOAD_ERROR);
-            }
+            String uuid = upload(image);
+            result.add(uuid);
         }
         return result;
     }
