@@ -17,6 +17,9 @@ public class PostResponse {
     @Schema(description = "게시글 제목", example = "게시글 제목입니다.")
     private String title;
 
+    @Schema(description = "작성자 ID", example = "1")
+    private Long authorId;
+
     @Schema(description = "작성자 닉네임", example = "kyle")
     private String authorNickname;
 
@@ -36,9 +39,10 @@ public class PostResponse {
     private LocalDateTime createdAt;
 
     @Builder
-    public PostResponse(Long id, String title, String authorNickname, String authorProfileImage, int likeCount, int viewCount, int commentCount, LocalDateTime createdAt) {
+    public PostResponse(Long id, String title, Long authorId, String authorNickname, String authorProfileImage, int likeCount, int viewCount, int commentCount, LocalDateTime createdAt) {
         this.id = id;
         this.title = title;
+        this.authorId = authorId;
         this.authorNickname = authorNickname;
         this.authorProfileImage = authorProfileImage;
         this.likeCount = likeCount;
@@ -49,14 +53,15 @@ public class PostResponse {
 
     public static PostResponse of(Post post, int commentCount, int viewCount, int likeCount) {
         return PostResponse.builder()
-          .id(post.getId())
-          .title(post.getTitle())
-          .likeCount(likeCount)
-          .viewCount(viewCount)
-          .commentCount(commentCount)
-          .authorNickname(post.getUser().getNickname())
-          .authorProfileImage(post.getUser().getProfileImage())
-          .createdAt(post.getCreatedAt())
-          .build();
+            .id(post.getId())
+            .title(post.getTitle())
+            .authorId(post.getUser().getId())
+            .likeCount(likeCount)
+            .viewCount(viewCount)
+            .commentCount(commentCount)
+            .authorNickname(post.getUser().getNickname())
+            .authorProfileImage(post.getUser().getProfileImage())
+            .createdAt(post.getCreatedAt())
+            .build();
     }
 }

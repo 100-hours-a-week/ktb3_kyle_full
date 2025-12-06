@@ -21,6 +21,9 @@ public class PostDetailResponse {
     @Schema(description = "게시글 내용", example = "게시글 내용입니다.")
     private String content;
 
+    @Schema(description = "작성자 ID", example = "1")
+    private Long authorId;
+
     @Schema(description = "작성자 닉네임", example = "kyle")
     private String authorNickname;
 
@@ -43,10 +46,11 @@ public class PostDetailResponse {
     private List<PostImageResponse> imagePaths;
 
     @Builder
-    public PostDetailResponse(Long id, String title, String content, String authorNickname, String authorProfileImage, int viewCount, int commentCount, boolean isAuthor, List<PostImageResponse> imagePaths, LocalDateTime createdAt) {
+    public PostDetailResponse(Long id, String title, String content, Long authorId, String authorNickname, String authorProfileImage, int viewCount, int commentCount, boolean isAuthor, List<PostImageResponse> imagePaths, LocalDateTime createdAt) {
         this.id = id;
         this.title = title;
         this.content = content;
+        this.authorId = authorId;
         this.authorNickname = authorNickname;
         this.authorProfileImage = authorProfileImage;
         this.viewCount = viewCount;
@@ -56,11 +60,12 @@ public class PostDetailResponse {
         this.imagePaths = imagePaths;
     }
 
-    public static PostDetailResponse of(Post post, Long userId, int commentCount, int viewCount, List<PostImageResponse> imagePaths) {
+    public static PostDetailResponse of(Post post, Long userId, int commentCount, int viewCount, List<PostImageResponse> imagePaths, Long authorId) {
         return PostDetailResponse.builder()
             .id(post.getId())
             .title(post.getTitle())
             .content(post.getContent())
+            .authorId(authorId)
             .viewCount(viewCount)
             .commentCount(commentCount)
             .isAuthor(post.getUser().getId().equals(userId))
