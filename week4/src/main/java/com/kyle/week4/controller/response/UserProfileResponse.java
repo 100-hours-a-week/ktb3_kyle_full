@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Schema(description = "사용자 프로필 정보 응답 DTO")
 public class UserProfileResponse {
+    private Long id;
+
     @Schema(description = "이메일", defaultValue = "kyle@test.com")
     private String email;
 
@@ -20,7 +22,8 @@ public class UserProfileResponse {
     private String profileImage;
 
     @Builder
-    public UserProfileResponse(String email, String nickname, String profileImage) {
+    public UserProfileResponse(Long id, String email, String nickname, String profileImage) {
+        this.id = id;
         this.email = email;
         this.nickname = nickname;
         this.profileImage = profileImage;
@@ -28,9 +31,10 @@ public class UserProfileResponse {
 
     public static UserProfileResponse of(User user) {
         return UserProfileResponse.builder()
-          .email(user.getEmail())
-          .nickname(user.getNickname())
-          .profileImage(user.getProfileImage())
-          .build();
+            .id(user.getId())
+            .email(user.getEmail())
+            .nickname(user.getNickname())
+            .profileImage(user.getProfileImage())
+            .build();
     }
 }
