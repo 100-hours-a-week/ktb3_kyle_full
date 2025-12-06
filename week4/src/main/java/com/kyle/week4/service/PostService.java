@@ -63,7 +63,7 @@ public class PostService {
         postViewCountCache.initCache(savedPost.getId());
         postLikeCountCache.initCache(savedPost.getId());
 
-        return PostDetailResponse.of(savedPost, userId, 0, 0, postImageResponses);
+        return PostDetailResponse.of(savedPost, userId, 0, 0, postImageResponses, userId);
     }
 
     public List<PostResponse> infiniteScroll(Long lastPostId, int limit) {
@@ -103,7 +103,7 @@ public class PostService {
             )
             .toList();
 
-        return PostDetailResponse.of(post, userId, commentCount, viewCount, postImageResponses);
+        return PostDetailResponse.of(post, userId, commentCount, viewCount, postImageResponses, post.getUser().getId());
     }
 
     @Transactional
@@ -121,7 +121,7 @@ public class PostService {
 
         List<PostImageResponse> postImageResponses = getPostImageResponses(post.getPostImages());
 
-        return PostDetailResponse.of(post, userId, commentCount, viewCount, postImageResponses);
+        return PostDetailResponse.of(post, userId, commentCount, viewCount, postImageResponses, post.getUser().getId());
     }
 
     @Transactional
