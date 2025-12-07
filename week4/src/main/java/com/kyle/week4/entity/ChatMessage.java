@@ -4,12 +4,14 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Document(collection = "chat_message")
+@CompoundIndex(name = "roomId_id_idx", def = "{'roomId': 1, '_id': -1}")
 public class ChatMessage {
     @Id
     private Long id;
