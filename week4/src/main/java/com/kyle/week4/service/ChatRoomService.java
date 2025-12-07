@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ChatService {
+public class ChatRoomService {
     private final Snowflake snowflake;
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;

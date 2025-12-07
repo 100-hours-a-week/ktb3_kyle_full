@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,5 +27,11 @@ public class ChatMessageService {
             .build();
 
         chatMessageRepository.save(chatMessage);
+    }
+
+    public List<ChatMessage> getMessages(Long roomId, Long lastMessageId, int limit) {
+        List<ChatMessage> messages = chatMessageRepository.findBeforeMessagesByRoomId(roomId, lastMessageId, limit);
+        messages.sort(Comparator.comparing(ChatMessage::getId));
+        return messages;
     }
 }

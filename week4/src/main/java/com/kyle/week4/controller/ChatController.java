@@ -40,12 +40,21 @@ public class ChatController {
     }
 
     @GetMapping("/chat-rooms")
-    public BaseResponse<?>  getChatRooms(@AuthenticationPrincipal CustomUserDetails user) {
+    public BaseResponse<?> getChatRooms(@AuthenticationPrincipal CustomUserDetails user) {
         return BaseResponse.ok(chatRoomService.getChatRoomList(user.getUserId()));
     }
 
     @GetMapping("/chat-rooms/{roomId}/nicknames")
     public BaseResponse<?> getNicknameMap(@PathVariable("roomId") Long roomId) {
         return BaseResponse.ok(chatRoomService.getNicknameMap(roomId));
+    }
+
+    @GetMapping("/chat-rooms/{roomId}/messages")
+    public BaseResponse<?> getMessages(
+        @PathVariable("roomId") Long roomId,
+        @RequestParam(name = "lastMessageId", required = false) Long lastMessageId,
+        @RequestParam(name = "limit", required = false) int limit
+    ) {
+        return BaseResponse.ok(chatMessageService.getMessages(roomId, lastMessageId, limit));
     }
 }
