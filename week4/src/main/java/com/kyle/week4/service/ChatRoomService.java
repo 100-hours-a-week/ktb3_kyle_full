@@ -50,7 +50,12 @@ public class ChatRoomService {
 
     public List<ChatRoomInfo> getChatRoomList(Long userId) {
         List<ChatRoomSummary> chatRoomList = chatRoomUserRepository.findChatRoomsWithOpponent(userId);
-        //chatRoomList.sort(Comparator.comparing(ChatRoomSummary::getLastChatMessageId).reversed());
+        chatRoomList.sort(
+            Comparator.comparing(
+                ChatRoomSummary::getLastChatMessageId,
+                Comparator.nullsLast(Comparator.reverseOrder())
+            )
+        );
 
         Map<Long, String> lastMessageMap = getLastMessageMap(chatRoomList);
 
