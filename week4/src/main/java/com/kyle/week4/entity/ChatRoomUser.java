@@ -23,6 +23,8 @@ public class ChatRoomUser {
     @JoinColumn(name = "user_id")
     private User user;
 
+    // 채팅방 참가 시점
+
     @Builder
     public ChatRoomUser(ChatRoom chatRoom, User user) {
         this.id = new ChatRoomUserId(chatRoom.getId(), user.getId());

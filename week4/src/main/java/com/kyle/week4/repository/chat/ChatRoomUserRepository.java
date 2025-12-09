@@ -11,13 +11,21 @@ import java.util.List;
 public interface ChatRoomUserRepository extends JpaRepository<ChatRoomUser, Long> {
 
     @Query(value = "select new com.kyle.week4.controller.response.ChatRoomSummary(" +
-        "cr.id, opponent.nickname, opponent.profileImage" +
+        "cr.id, cr.lastChatMessageId, opponent.nickname, opponent.profileImage " +
         ")" +
         "from ChatRoom cr " +
         "join ChatRoomUser me on me.chatRoom = cr and me.user.id = :userId " +
         "join ChatRoomUser other on other.chatRoom = cr and other.user.id <> :userId " +
         "join User opponent on other.user = opponent")
     List<ChatRoomSummary> findChatRoomsWithOpponent(@Param("userId") Long userId);
+
+    @Query(value = "select new com.kyle.week4.controller.response.ChatRoomSummary(" +
+        "me.chatRoom.id, me.chatRoom.lastChatMessageId, other.user.nickname, other.user.profileImage" +
+        ")" +
+        "from ChatRoomUser me " +
+        "join ChatRoomUser other on other.user.id <> :userId and other.chatRoom.id = me.chatRoom.id " +
+        "where me.user.id = :userId ")
+    List<ChatRoomSummary> findChatRoomsWithOpponent2(@Param("userId") Long userId);
 
     @Query("select cru from ChatRoomUser cru " +
         "join fetch cru.user " +

@@ -19,16 +19,13 @@ import java.time.LocalDateTime;
 @RestController
 @RequiredArgsConstructor
 public class ChatController {
-    private final MessageProducer messageProducer;
     private final ChatRoomService chatRoomService;
     private final ChatMessageService chatMessageService;
 
     @MessageMapping("/message/{roomId}")
     public void sendMessage(@DestinationVariable Long roomId, ChatMessageRequest message) {
         log.info("roomId: {}, senderId {} , message: {}", roomId, message.getSenderId(), message.getContent());
-        // 메세지 저장
         chatMessageService.createMessage(roomId, message, LocalDateTime.now());
-        messageProducer.convertAndSend("/sub/room/" + roomId, message);
     }
 
     @PostMapping("/chat-rooms")
